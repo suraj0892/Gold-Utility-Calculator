@@ -76,11 +76,13 @@ function App() {
   
   // State for amount calculator
   const [amountWeight, setAmountWeight] = useState<number | string>('');
-  const [amountPurity, setAmountPurity] = useState<number | string>('');
+  const [amountPurity, setAmountPurity] = useState<number | string | 'custom'>('');
+  const [customAmountPurity, setCustomAmountPurity] = useState<number | string>('');
   const [goldRate, setGoldRate] = useState<number | string>('');
+  const [rateType, setRateType] = useState<'22k' | '24k'>('22k');
   const [miscAmount, setMiscAmount] = useState<number | string>('');
   const [miscPercentage, setMiscPercentage] = useState<number | string>('');
-  const [miscType, setMiscType] = useState<'fixed' | 'percentage'>('fixed');
+  const [miscType, setMiscType] = useState<'amount' | 'percentage'>('amount');
   
   // State for amount calculator results
   const [baseValue, setBaseValue] = useState<number | null>(null);
@@ -136,17 +138,23 @@ function App() {
   // Calculate amount results when inputs change
   useEffect(() => {
     if (calculatorType === 'amount') {
-      if (amountWeight && amountPurity && goldRate) {
-        calculateAmountResults(Number(amountWeight), Number(amountPurity), Number(goldRate));
+      const actualPurity = amountPurity === 'custom' ? 
+        (customAmountPurity ? Number(customAmountPurity) : 0) : 
+        Number(amountPurity);
+        
+      if (amountWeight && actualPurity && goldRate) {
+        calculateAmountResults(Number(amountWeight), actualPurity, Number(goldRate));
       } else {
         // Reset results if any input is empty
         setBaseValue(null);
         setMiscValue(null);
         setNetAmount(null);
         setPureGoldWeight(null);
+        setPureGoldWorth(null);
+        setTotalMiscAmount(null);
       }
     }
-  }, [calculatorType, amountWeight, amountPurity, goldRate, miscAmount, miscPercentage]);
+  }, [calculatorType, amountWeight, amountPurity, customAmountPurity, goldRate, rateType, miscAmount, miscPercentage, miscType]);
 
   // Function to calculate results based on formula
   const calculateResults = (
@@ -203,18 +211,27 @@ function App() {
     const pureGold = weightVal * (purityVal / 100);
     setPureGoldWeight(pureGold);
     
-    // Calculate base value (pure gold weight * rate)
-    const baseVal = pureGold * rateVal;
+    // Adjust rate based on rate type and actual purity
+    let adjustedRate = rateVal;
+    if (rateType === '22k' && purityVal !== 91.6) {
+      // Convert 22k rate to pure gold rate, then to actual purity rate
+      adjustedRate = (rateVal / 91.6) * 100 * (purityVal / 100);
+    } else if (rateType === '24k' && purityVal !== 100) {
+      // 24k rate is for pure gold, adjust for actual purity
+      adjustedRate = rateVal * (purityVal / 100);
+    }
+    
+    // Calculate base value (pure gold weight * adjusted rate)
+    const baseVal = pureGold * adjustedRate;
     setBaseValue(baseVal);
     setPureGoldWorth(baseVal);
     
     // Calculate miscellaneous value
     let miscVal = 0;
-    if (miscAmount && Number(miscAmount) !== 0) {
+    if (miscType === 'amount' && miscAmount && Number(miscAmount) !== 0) {
       miscVal = Number(miscAmount);
-    }
-    if (miscPercentage && Number(miscPercentage) !== 0) {
-      miscVal += baseVal * (Number(miscPercentage) / 100);
+    } else if (miscType === 'percentage' && miscPercentage && Number(miscPercentage) !== 0) {
+      miscVal = baseVal * (Number(miscPercentage) / 100);
     }
     setMiscValue(miscVal);
     setTotalMiscAmount(miscVal);
@@ -250,10 +267,12 @@ function App() {
     } else {
       setAmountWeight('');
       setAmountPurity('');
+      setCustomAmountPurity('');
       setGoldRate('');
+      setRateType('22k');
       setMiscAmount('');
       setMiscPercentage('');
-      setMiscType('fixed');
+      setMiscType('amount');
       setBaseValue(null);
       setMiscValue(null);
       setNetAmount(null);
@@ -452,175 +471,176 @@ function App() {
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
         
         <Card elevation={3}>
-          <CardContent>
+          <CardContent sx={{ p: 3 }}>
             {calculatorType === 'purity' ? (
               // Purity Calculator Content
-              <Box sx={{ p: 2 }}>
+              <Box sx={{ p: 1 }}>
               <Stack 
-                direction={{ xs: 'column', md: 'row' }} 
+                direction={{ xs: 'column', lg: 'row' }} 
                 spacing={4} 
                 sx={{ width: '100%' }}
               >
                 {/* Input Section */}
-                <Box sx={{ flex: 1 }}>
+                <Box sx={{ flex: 1, minWidth: { xs: '100%', lg: '400px' } }}>
                   <Typography variant="h5" gutterBottom sx={{ 
-                    color: '#9c7c38', // Always gold color
-                    transition: 'color 0.3s ease' 
+                    color: '#9c7c38',
+                    transition: 'color 0.3s ease',
+                    mb: 3
                   }}>
                     {t('inputValues')}
                   </Typography>
                   <Box 
                     sx={{ 
                       mt: 2, 
-                      p: 2, 
-                      backgroundColor: 'rgba(248, 246, 236, 0.6)', // Always gold background
+                      p: 3, 
+                      backgroundColor: 'rgba(248, 246, 236, 0.6)',
                       borderRadius: 2,
-                      border: '1px solid rgba(212, 175, 55, 0.3)', // Always gold border
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
                       transition: 'all 0.3s ease'
                     }}
                   >
-                    <TextField
-                      fullWidth
-                      label={t('currentWeight')}
-                      type="number"
-                      value={weight}
-                      onChange={(e) => setWeight(e.target.value)}
-                      margin="dense"
-                      size="small"
-                      InputProps={{
-                        inputProps: { min: 0, step: 0.001 }
-                      }}
-                    />
-                    <TextField
-                      fullWidth
-                      label={t('currentPurity')}
-                      type="number"
-                      value={currentPurity}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
-                          // Allow only 2 decimal places
-                          const parts = value.split('.');
-                          if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
-                            setCurrentPurity(value);
-                          }
-                        }
-                      }}
-                      margin="dense"
-                      size="small"
-                      InputProps={{
-                        inputProps: { min: 0, max: 100, step: 0.01 }
-                      }}
-                    />
-                    <FormControl fullWidth margin="dense" size="small">
-                      <InputLabel id="target-purity-select-label">{t('selectTargetPurity')}</InputLabel>
-                      <Select
-                        labelId="target-purity-select-label"
-                        id="target-purity-select"
-                        value={targetPurity.toString()}
-                        label={t('selectTargetPurity')}
-                        onChange={handlePuritySelect}
-                      >
-                        {commonPurities.map((option) => (
-                          <MenuItem key={option.value} value={option.value.toString()}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                        <MenuItem value="custom">{t('customPurity')}</MenuItem>
-                      </Select>
-                    </FormControl>
-                    
-                    {targetPurity === 'custom' && (
+                    <Stack spacing={2.5}>
                       <TextField
                         fullWidth
-                        label={t('customValue')}
+                        label={t('currentWeight')}
                         type="number"
-                        value={customTargetPurity}
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                        size="small"
+                        InputProps={{
+                          inputProps: { min: 0, step: 0.001 }
+                        }}
+                      />
+                      <TextField
+                        fullWidth
+                        label={t('currentPurity')}
+                        type="number"
+                        value={currentPurity}
                         onChange={(e) => {
                           const value = e.target.value;
                           if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
                             // Allow only 2 decimal places
                             const parts = value.split('.');
                             if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
-                              setCustomTargetPurity(value);
+                              setCurrentPurity(value);
                             }
                           }
                         }}
-                        margin="dense"
                         size="small"
                         InputProps={{
                           inputProps: { min: 0, max: 100, step: 0.01 }
                         }}
                       />
-                    )}
+                      <FormControl fullWidth size="small">
+                        <InputLabel id="target-purity-select-label">{t('selectTargetPurity')}</InputLabel>
+                        <Select
+                          labelId="target-purity-select-label"
+                          id="target-purity-select"
+                          value={targetPurity.toString()}
+                          label={t('selectTargetPurity')}
+                          onChange={handlePuritySelect}
+                        >
+                          {commonPurities.map((option) => (
+                            <MenuItem key={option.value} value={option.value.toString()}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                          <MenuItem value="custom">{t('customPurity')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                      
+                      {targetPurity === 'custom' && (
+                        <TextField
+                          fullWidth
+                          label={t('customValue')}
+                          type="number"
+                          value={customTargetPurity}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                              // Allow only 2 decimal places
+                              const parts = value.split('.');
+                              if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                                setCustomTargetPurity(value);
+                              }
+                            }
+                          }}
+                          size="small"
+                          InputProps={{
+                            inputProps: { min: 0, max: 100, step: 0.01 }
+                          }}
+                        />
+                      )}
+                    </Stack>
                     
                     {resultType === 'gold' && (
                       <Box sx={{ 
-                        mt: 3, 
-                        pt: 1, 
-                        pb: 1, 
-                        backgroundColor: 'rgba(212, 175, 55, 0.1)', // Always gold background
-                        borderRadius: 1, 
-                        px: 2, 
-                        borderLeft: '3px solid #D4AF37', // Always gold border
+                        mt: 4, 
+                        pt: 3, 
+                        pb: 3, 
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        borderRadius: 2, 
+                        px: 3, 
+                        borderLeft: '3px solid #D4AF37',
                         transition: 'all 0.3s ease'
                       }}>
-                        <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'medium' }}>
+                        <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'medium', color: '#9c7c38' }}>
                           {t('selectGoldPurity')}:
                         </Typography>
-                        <FormControl size="small" fullWidth>
-                          <InputLabel id="gold-purity-select-label">{t('goldPurityToAdd')}</InputLabel>
-                          <Select
-                            labelId="gold-purity-select-label"
-                            id="gold-purity-select"
-                            value={goldPurityToAdd === 'custom' ? 'custom' : goldPurityToAdd.toString()}
-                            label={t('goldPurityToAdd')}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (value === 'custom') {
-                                setGoldPurityToAdd('custom');
-                              } else {
-                                setGoldPurityToAdd(value);
-                              }
-                            }}
-                          >
-                            {commonPurities.map((option) => (
-                              <MenuItem key={option.value} value={option.value.toString()}>
-                                {option.label}
-                              </MenuItem>
-                            ))}
-                            <MenuItem value="custom">{t('customPurity')}</MenuItem>
-                          </Select>
-                        </FormControl>
-                        
-                        {goldPurityToAdd === 'custom' && (
-                          <TextField
-                            fullWidth
-                            label={t('customValue')}
-                            type="number"
-                            size="small"
-                            sx={{ mt: 2 }}
-                            value={customGoldPurity}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
-                                // Allow only 2 decimal places
-                                const parts = value.split('.');
-                                if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
-                                  setCustomGoldPurity(value);
+                        <Stack spacing={2}>
+                          <FormControl size="small" fullWidth>
+                            <InputLabel id="gold-purity-select-label">{t('goldPurityToAdd')}</InputLabel>
+                            <Select
+                              labelId="gold-purity-select-label"
+                              id="gold-purity-select"
+                              value={goldPurityToAdd === 'custom' ? 'custom' : goldPurityToAdd.toString()}
+                              label={t('goldPurityToAdd')}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === 'custom') {
+                                  setGoldPurityToAdd('custom');
+                                } else {
+                                  setGoldPurityToAdd(value);
                                 }
-                              }
-                            }}
-                            InputProps={{
-                              inputProps: { min: 0.1, max: 100, step: 0.01 }
-                            }}
-                          />
-                        )}
+                              }}
+                            >
+                              {commonPurities.map((option) => (
+                                <MenuItem key={option.value} value={option.value.toString()}>
+                                  {option.label}
+                                </MenuItem>
+                              ))}
+                              <MenuItem value="custom">{t('customPurity')}</MenuItem>
+                            </Select>
+                          </FormControl>
+                          
+                          {goldPurityToAdd === 'custom' && (
+                            <TextField
+                              fullWidth
+                              label={t('customValue')}
+                              type="number"
+                              size="small"
+                              value={customGoldPurity}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                                  // Allow only 2 decimal places
+                                  const parts = value.split('.');
+                                  if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                                    setCustomGoldPurity(value);
+                                  }
+                                }
+                              }}
+                              InputProps={{
+                                inputProps: { min: 0.1, max: 100, step: 0.01 }
+                              }}
+                            />
+                          )}
+                        </Stack>
                       </Box>
                     )}
                     
                     {/* Reset Button */}
-                    <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
                       <Button
                         variant="outlined"
                         size="small"
@@ -633,9 +653,9 @@ function App() {
                             backgroundColor: 'rgba(212, 175, 55, 0.04)',
                           },
                           fontWeight: 'medium',
-                          px: 2,
-                          py: 0.5,
-                          fontSize: '0.75rem',
+                          px: 3,
+                          py: 1,
+                          fontSize: '0.875rem',
                         }}
                       >
                         {t('reset')}
@@ -645,21 +665,23 @@ function App() {
                 </Box>
 
                 {/* Results Section */}
-                <Box sx={{ flex: 1 }}>
+                <Box sx={{ flex: 1, minWidth: { xs: '100%', lg: '400px' } }}>
                   <Typography variant="h5" gutterBottom sx={{ 
-                    color: '#8E5924', // Always gold color
-                    transition: 'color 0.3s ease'
+                    color: '#8E5924',
+                    transition: 'color 0.3s ease',
+                    mb: 3
                   }}>
                     {t('results')}
                   </Typography>
                   <Box sx={{ 
                     mt: 2, 
-                    p: 3, 
-                    bgcolor: 'rgba(248, 246, 240, 0.8)', // Always gold background
+                    p: 4, 
+                    bgcolor: 'rgba(248, 246, 240, 0.8)',
                     borderRadius: 2, 
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-                    border: '1px solid rgba(200, 117, 51, 0.3)', // Always gold border
-                    transition: 'all 0.3s ease'
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    border: '1px solid rgba(200, 117, 51, 0.3)',
+                    transition: 'all 0.3s ease',
+                    minHeight: '300px'
                   }}>
                     {(weight && currentPurity && targetPurity && 
                       !(targetPurity === 'custom' && (!customTargetPurity || customTargetPurity === ''))
@@ -769,113 +791,193 @@ function App() {
             </Box>
             ) : (
               // Amount Calculator Content
-              <Box sx={{ p: 2 }}>
+              <Box sx={{ p: 1 }}>
                 <Stack 
-                  direction={{ xs: 'column', md: 'row' }} 
+                  direction={{ xs: 'column', lg: 'row' }} 
                   spacing={4} 
                   sx={{ width: '100%' }}
                 >
                   {/* Input Section */}
-                  <Box sx={{ flex: 1 }}>
+                  <Box sx={{ flex: 1, minWidth: { xs: '100%', lg: '400px' } }}>
                     <Typography variant="h5" gutterBottom sx={{ 
                       color: '#9c7c38',
-                      transition: 'color 0.3s ease' 
+                      transition: 'color 0.3s ease',
+                      mb: 3
                     }}>
                       {t('inputValues')}
                     </Typography>
                     <Box 
                       sx={{ 
                         mt: 2, 
-                        p: 2, 
+                        p: 3, 
                         backgroundColor: 'rgba(248, 246, 236, 0.6)',
                         borderRadius: 2,
                         border: '1px solid rgba(212, 175, 55, 0.3)',
                         transition: 'all 0.3s ease'
                       }}
                     >
-                      <TextField
-                        fullWidth
-                        label={t('goldWeight')}
-                        type="number"
-                        value={amountWeight}
-                        onChange={(e) => setAmountWeight(e.target.value)}
-                        margin="dense"
-                        size="small"
-                        InputProps={{
-                          inputProps: { min: 0, step: 0.001 }
-                        }}
-                      />
-                      <TextField
-                        fullWidth
-                        label={t('goldPurity')}
-                        type="number"
-                        value={amountPurity}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
-                            // Allow only 2 decimal places
-                            const parts = value.split('.');
-                            if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
-                              setAmountPurity(value);
-                            }
-                          }
-                        }}
-                        margin="dense"
-                        size="small"
-                        InputProps={{
-                          inputProps: { min: 0, max: 100, step: 0.01 }
-                        }}
-                      />
-                      <TextField
-                        fullWidth
-                        label={t('goldRate')}
-                        type="number"
-                        value={goldRate}
-                        onChange={(e) => setGoldRate(e.target.value)}
-                        margin="dense"
-                        size="small"
-                        InputProps={{
-                          inputProps: { min: 0, step: 0.01 }
-                        }}
-                      />
-                      <TextField
-                        fullWidth
-                        label={t('miscAmount')}
-                        type="number"
-                        value={miscAmount}
-                        onChange={(e) => setMiscAmount(e.target.value)}
-                        margin="dense"
-                        size="small"
-                        InputProps={{
-                          inputProps: { min: 0, step: 0.01 }
-                        }}
-                        helperText={t('miscAmountHelper')}
-                      />
-                      <TextField
-                        fullWidth
-                        label={t('miscPercentage')}
-                        type="number"
-                        value={miscPercentage}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
-                            // Allow only 2 decimal places
-                            const parts = value.split('.');
-                            if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
-                              setMiscPercentage(value);
-                            }
-                          }
-                        }}
-                        margin="dense"
-                        size="small"
-                        InputProps={{
-                          inputProps: { min: 0, max: 100, step: 0.01 }
-                        }}
-                        helperText={t('miscPercentageHelper')}
-                      />
+                      <Stack spacing={2.5}>
+                        {/* Weight Input */}
+                        <TextField
+                          fullWidth
+                          label={t('goldWeight')}
+                          type="number"
+                          value={amountWeight}
+                          onChange={(e) => setAmountWeight(e.target.value)}
+                          size="small"
+                          InputProps={{
+                            inputProps: { min: 0, step: 0.001 }
+                          }}
+                        />
+                        
+                        {/* Purity Selection */}
+                        <FormControl fullWidth size="small">
+                          <InputLabel id="amount-purity-select-label">{t('selectAmountPurity')}</InputLabel>
+                          <Select
+                            labelId="amount-purity-select-label"
+                            id="amount-purity-select"
+                            value={amountPurity === 'custom' ? 'custom' : amountPurity.toString()}
+                            label={t('selectAmountPurity')}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === 'custom') {
+                                setAmountPurity('custom');
+                              } else {
+                                setAmountPurity(value);
+                              }
+                            }}
+                          >
+                            {commonPurities.map((option) => (
+                              <MenuItem key={option.value} value={option.value.toString()}>
+                                {option.label}
+                              </MenuItem>
+                            ))}
+                            <MenuItem value="custom">{t('customPurity')}</MenuItem>
+                          </Select>
+                        </FormControl>
+                        
+                        {amountPurity === 'custom' && (
+                          <TextField
+                            fullWidth
+                            label={t('customValue')}
+                            type="number"
+                            value={customAmountPurity}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                                // Allow only 2 decimal places
+                                const parts = value.split('.');
+                                if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                                  setCustomAmountPurity(value);
+                                }
+                              }
+                            }}
+                            size="small"
+                            InputProps={{
+                              inputProps: { min: 0, max: 100, step: 0.01 }
+                            }}
+                          />
+                        )}
+                        
+                        {/* Rate Type Selection */}
+                        <FormControl fullWidth size="small">
+                          <InputLabel id="rate-type-select-label">{t('selectRateType')}</InputLabel>
+                          <Select
+                            labelId="rate-type-select-label"
+                            id="rate-type-select"
+                            value={rateType}
+                            label={t('selectRateType')}
+                            onChange={(e) => setRateType(e.target.value as '22k' | '24k')}
+                          >
+                            <MenuItem value="22k">{t('rate22k')}</MenuItem>
+                            <MenuItem value="24k">{t('rate24k')}</MenuItem>
+                          </Select>
+                        </FormControl>
+                        
+                        {/* Rate Input */}
+                        <TextField
+                          fullWidth
+                          label={t('goldRate')}
+                          type="number"
+                          value={goldRate}
+                          onChange={(e) => setGoldRate(e.target.value)}
+                          size="small"
+                          InputProps={{
+                            inputProps: { min: 0, step: 0.01 }
+                          }}
+                          helperText={t('rateHelper', { type: rateType.toUpperCase() })}
+                        />
+                      </Stack>
+                      
+                      {/* Miscellaneous Section */}
+                      <Box sx={{ 
+                        mt: 4, 
+                        pt: 3, 
+                        pb: 3, 
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        borderRadius: 2, 
+                        px: 3, 
+                        borderLeft: '3px solid #D4AF37'
+                      }}>
+                        <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'medium', color: '#9c7c38' }}>
+                          Additional Charges:
+                        </Typography>
+                        <Stack spacing={2}>
+                          <FormControl fullWidth size="small">
+                            <InputLabel id="misc-type-select-label">{t('selectMiscType')}</InputLabel>
+                            <Select
+                              labelId="misc-type-select-label"
+                              id="misc-type-select"
+                              value={miscType}
+                              label={t('selectMiscType')}
+                              onChange={(e) => setMiscType(e.target.value as 'amount' | 'percentage')}
+                            >
+                              <MenuItem value="amount">{t('fixedAmount')}</MenuItem>
+                              <MenuItem value="percentage">{t('percentage')}</MenuItem>
+                            </Select>
+                          </FormControl>
+                          
+                          {miscType === 'amount' ? (
+                            <TextField
+                              fullWidth
+                              label={t('miscAmount')}
+                              type="number"
+                              value={miscAmount}
+                              onChange={(e) => setMiscAmount(e.target.value)}
+                              size="small"
+                              InputProps={{
+                                inputProps: { min: 0, step: 0.01 }
+                              }}
+                              helperText={t('miscAmountHelper')}
+                            />
+                          ) : (
+                            <TextField
+                              fullWidth
+                              label={t('miscPercentage')}
+                              type="number"
+                              value={miscPercentage}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                                  // Allow only 2 decimal places
+                                  const parts = value.split('.');
+                                  if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                                    setMiscPercentage(value);
+                                  }
+                                }
+                              }}
+                              size="small"
+                              InputProps={{
+                                inputProps: { min: 0, max: 100, step: 0.01 }
+                              }}
+                              helperText={t('miscPercentageHelper')}
+                            />
+                          )}
+                        </Stack>
+                      </Box>
                       
                       {/* Reset Button */}
-                      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
                           variant="outlined"
                           size="small"
@@ -888,9 +990,9 @@ function App() {
                               backgroundColor: 'rgba(212, 175, 55, 0.04)',
                             },
                             fontWeight: 'medium',
-                            px: 2,
-                            py: 0.5,
-                            fontSize: '0.75rem',
+                            px: 3,
+                            py: 1,
+                            fontSize: '0.875rem',
                           }}
                         >
                           {t('reset')}
@@ -900,24 +1002,28 @@ function App() {
                   </Box>
 
                   {/* Results Section */}
-                  <Box sx={{ flex: 1 }}>
+                  <Box sx={{ flex: 1, minWidth: { xs: '100%', lg: '400px' } }}>
                     <Typography variant="h5" gutterBottom sx={{ 
                       color: '#8E5924',
-                      transition: 'color 0.3s ease'
+                      transition: 'color 0.3s ease',
+                      mb: 3
                     }}>
                       {t('results')}
                     </Typography>
                     <Box sx={{ 
                       mt: 2, 
-                      p: 3, 
+                      p: 4, 
                       bgcolor: 'rgba(248, 246, 240, 0.8)',
                       borderRadius: 2, 
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                       border: '1px solid rgba(200, 117, 51, 0.3)',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      minHeight: '300px'
                     }}>
-                      {(amountWeight && amountPurity && goldRate) ? (
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {(amountWeight && 
+                        (amountPurity !== 'custom' ? amountPurity : customAmountPurity) && 
+                        goldRate) ? (
+                        <Stack spacing={3}>
                           <Typography 
                             variant="h6"
                             dangerouslySetInnerHTML={{ __html: t('pureGoldWorth', { amount: pureGoldWorth?.toFixed(2) }) }}
@@ -927,21 +1033,21 @@ function App() {
                             dangerouslySetInnerHTML={{ __html: t('miscellaneousAmount', { amount: totalMiscAmount?.toFixed(2) }) }}
                           />
                           <Box sx={{ 
-                            p: 2, 
+                            p: 3, 
                             bgcolor: 'rgba(212, 175, 55, 0.15)',
-                            borderRadius: 1, 
+                            borderRadius: 2, 
                             borderLeft: '4px solid #D4AF37',
                             mt: 2
                           }}>
                             <Typography 
-                              variant="h6" 
+                              variant="h5" 
                               sx={{ color: 'primary.main', fontWeight: 'bold' }}
                               dangerouslySetInnerHTML={{ __html: t('netAmount', { amount: netAmount?.toFixed(2) }) }}
                             />
                           </Box>
-                        </Box>
+                        </Stack>
                       ) : (
-                        <Typography variant="body1" color="textSecondary">
+                        <Typography variant="body1" color="textSecondary" sx={{ textAlign: 'center', mt: 8 }}>
                           {t('enterAllValues')}
                         </Typography>
                       )}
