@@ -16,13 +16,14 @@ import {
   FormLabel
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { formatIndianNumber, numberToWords, numberToWordsTamil } from '../utils/numberUtils';
 
 interface AmountCalculatorProps {
   onReset?: () => void;
 }
 
 const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // State for inputs
   const [goldWeight, setGoldWeight] = useState<number | string>('');
@@ -359,10 +360,37 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                   sx={{ color: 'primary.main', mb: 2 }}
                   dangerouslySetInnerHTML={{ 
                     __html: t('totalAmountResult', { 
-                      amount: totalAmount?.toFixed(2) || '0.00'
+                      amount: totalAmount ? formatIndianNumber(totalAmount) : '0.00'
                     })
                   }}
                 />
+                
+                {/* Amount in Words */}
+                {totalAmount && totalAmount > 0 && (
+                  <Box sx={{ 
+                    mt: 2, 
+                    p: 2, 
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)', 
+                    borderRadius: 1,
+                    border: '1px solid rgba(76, 175, 80, 0.3)'
+                  }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontStyle: 'italic', 
+                        color: '#2E7D32',
+                        fontWeight: 'medium',
+                        lineHeight: 1.4
+                      }}
+                    >
+                      <strong>{t('amountInWords')}:</strong><br />
+                      {i18n.language === 'ta' ? 
+                        numberToWordsTamil(totalAmount) : 
+                        numberToWords(totalAmount)
+                      }
+                    </Typography>
+                  </Box>
+                )}
               </Box>
               
               {/* Breakdown Section */}
@@ -375,7 +403,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                     variant="body1"
                     dangerouslySetInnerHTML={{ 
                       __html: t('goldValue', { 
-                        value: goldValue?.toFixed(2) || '0.00'
+                        value: goldValue ? formatIndianNumber(goldValue) : '0.00'
                       })
                     }}
                   />
@@ -383,7 +411,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                     variant="body1"
                     dangerouslySetInnerHTML={{ 
                       __html: t('miscChargesValue', { 
-                        value: miscValue?.toFixed(2) || '0.00'
+                        value: miscValue ? formatIndianNumber(miscValue) : '0.00'
                       })
                     }}
                   />
@@ -407,7 +435,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                     <span dangerouslySetInnerHTML={{ 
                       __html: t('rateUsed', { 
                         type: '24k',
-                        rate: Number(goldRate24k).toFixed(2) || '0.00'
+                        rate: goldRate24k ? formatIndianNumber(Number(goldRate24k)) : '0.00'
                       })
                     }} />
                   </Typography>

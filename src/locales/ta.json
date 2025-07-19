@@ -72,5 +72,6 @@
   "goldPurityUsed": "தங்க தூய்மை: <span style='font-weight: bold; color: #1565C0;'>{{purity}}%</span>",
   "rateUsed": "பயன்படுத்திய விலை ({{type}}): ₹<span style='font-weight: bold; color: #1565C0;'>{{rate}}</span>",
   "calculationNote": "குறிப்பு: தொகை தூய தங்க உள்ளடக்கம் (எடை × தூய்மை%) அடிப்படையில் 24K விலையைப் பயன்படுத்தி கணக்கிடப்படுகிறது.",
-  "pureGoldWeightUsed": "தூய தங்க எடை: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்"
+  "pureGoldWeightUsed": "தூய தங்க எடை: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
+  "amountInWords": "வார்த்தைகளில் தொகை"
 }
