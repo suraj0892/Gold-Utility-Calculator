@@ -1,5 +1,7 @@
 {
-  "title": "Gold Purity Calculator",
+  "title": "Gold Utility Calculator",
+  "purityCalculator": "Purity Calculator",
+  "amountCalculator": "Amount Calculator",
   "inputValues": "Input Values",
   "results": "Results",
   "currentWeight": "Current Gold Weight (grams)",
@@ -30,5 +32,22 @@
   "pureGoldContent": "Pure gold content: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
   "copperContent": "Copper content: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
   "enterAllValues": "Enter all values to see results",
-  "reset": "Reset"
+  "reset": "Reset",
+  "goldWeight": "Gold Weight (grams)",
+  "goldPurity": "Gold Purity (%)",
+  "goldRate": "Gold Rate (per gram)",
+  "miscAmount": "Miscellaneous Amount",
+  "miscPercentage": "Miscellaneous Percentage (%)",
+  "miscAmountHelper": "Additional fixed amount (charges, etc.)",
+  "miscPercentageHelper": "Additional percentage of gold worth",
+  "miscType": "Miscellaneous Type",
+  "fixedAmount": "Fixed Amount",
+  "percentage": "Percentage (%)",
+  "baseValue": "Base Gold Value: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "miscValue": "Miscellaneous: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "pureGoldWorth": "Pure Gold Worth: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "miscellaneousAmount": "Miscellaneous Amount: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "netAmount": "Net Amount: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "pureGoldWeight": "Pure Gold Weight: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
+  "calculatorType": "Calculator Type"
 }

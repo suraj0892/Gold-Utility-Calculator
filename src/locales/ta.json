@@ -1,5 +1,7 @@
 {
-  "title": "தங்க தூய்மை கணக்கீட்டாளர்",
+  "title": "தங்க பயன்பாட்டு கணக்கீட்டாளர்",
+  "purityCalculator": "தூய்மை கணக்கீட்டாளர்",
+  "amountCalculator": "தொகை கணக்கீட்டாளர்",
   "inputValues": "உள்ளீட்டு மதிப்புகள்",
   "results": "முடிவுகள்",
   "currentWeight": "தற்போதைய தங்க எடை (கிராம்)",
@@ -30,5 +32,22 @@
   "pureGoldContent": "தூய தங்க உள்ளடக்கம்: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
   "copperContent": "செம்பு உள்ளடக்கம்: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
   "enterAllValues": "முடிவுகளைக் காண அனைத்து மதிப்புகளையும் உள்ளிடவும்",
-  "reset": "மீட்டமை"
+  "reset": "மீட்டமை",
+  "goldWeight": "தங்க எடை (கிராம்)",
+  "goldPurity": "தங்க தூய்மை (%)",
+  "goldRate": "தங்க விலை (ஒரு கிராமுக்கு)",
+  "miscAmount": "இதர தொகை",
+  "miscPercentage": "இதர சதவிகிதம் (%)",
+  "miscAmountHelper": "கூடுதல் நிர்ணயித்த தொகை (கட்டணம், முதலியன)",
+  "miscPercentageHelper": "தங்க மதிப்பின் கூடுதல் சதவிகிதம்",
+  "miscType": "இதர வகை",
+  "fixedAmount": "நிர்ணயித்த தொகை",
+  "percentage": "சதவிகிதம் (%)",
+  "baseValue": "அடிப்படை தங்க மதிப்பு: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "miscValue": "இதர தொகை: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "pureGoldWorth": "தூய தங்க மதிப்பு: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "miscellaneousAmount": "இதர தொகை: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "netAmount": "நிகர தொகை: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "pureGoldWeight": "தூய தங்க எடை: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
+  "calculatorType": "கணக்கீட்டாளர் வகை"
 }

@@ -12,20 +12,33 @@ import {
   AppBar,
   Toolbar,
   Stack,
-  MenuItem,
-  Select,
+  Button,
+  IconButton,
   FormControl,
   InputLabel,
+  Select,
+  MenuItem,
   SelectChangeEvent,
-  Button,
-  IconButton
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider
 } from '@mui/material';
-import { Translate, Clear } from '@mui/icons-material';
+import { Translate, Clear, Menu, Calculate, MonetizationOn } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import './App.css';
 
 function App() {
   const { t, i18n } = useTranslation();
+  
+  // State for calculator type selection
+  const [calculatorType, setCalculatorType] = useState<'purity' | 'amount'>('purity');
+  
+  // State for sidebar
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   
   // Create dynamic theme based on language
   const theme = createTheme({
@@ -61,6 +74,22 @@ function App() {
   const [goldPurityToAdd, setGoldPurityToAdd] = useState<number | string | 'custom'>(100);
   const [customGoldPurity, setCustomGoldPurity] = useState<number | string>('');
   
+  // State for amount calculator
+  const [amountWeight, setAmountWeight] = useState<number | string>('');
+  const [amountPurity, setAmountPurity] = useState<number | string>('');
+  const [goldRate, setGoldRate] = useState<number | string>('');
+  const [miscAmount, setMiscAmount] = useState<number | string>('');
+  const [miscPercentage, setMiscPercentage] = useState<number | string>('');
+  const [miscType, setMiscType] = useState<'fixed' | 'percentage'>('fixed');
+  
+  // State for amount calculator results
+  const [baseValue, setBaseValue] = useState<number | null>(null);
+  const [miscValue, setMiscValue] = useState<number | null>(null);
+  const [netAmount, setNetAmount] = useState<number | null>(null);
+  const [pureGoldWeight, setPureGoldWeight] = useState<number | null>(null);
+  const [pureGoldWorth, setPureGoldWorth] = useState<number | null>(null);
+  const [totalMiscAmount, setTotalMiscAmount] = useState<number | null>(null);
+  
   // Common gold purity values
   const commonPurities = [
     { value: 91.6, label: t('22k') },
@@ -79,28 +108,45 @@ function App() {
 
   // Calculate results when any input changes
   useEffect(() => {
-    const actualTargetPurity = targetPurity === 'custom' ? customTargetPurity : targetPurity;
-    const actualGoldPurityToAdd = goldPurityToAdd === 'custom' ? 
-      (customGoldPurity ? Number(customGoldPurity) : 100) : 
-      Number(goldPurityToAdd);
-    
-    // Don't show results if custom target purity is selected but empty
-    if (targetPurity === 'custom' && (!customTargetPurity || customTargetPurity === '')) {
-      setResultType('');
-      setWeightToAdd(null);
-      setTotalWeight(null);
-      return;
+    if (calculatorType === 'purity') {
+      const actualTargetPurity = targetPurity === 'custom' ? customTargetPurity : targetPurity;
+      const actualGoldPurityToAdd = goldPurityToAdd === 'custom' ? 
+        (customGoldPurity ? Number(customGoldPurity) : 100) : 
+        Number(goldPurityToAdd);
+      
+      // Don't show results if custom target purity is selected but empty
+      if (targetPurity === 'custom' && (!customTargetPurity || customTargetPurity === '')) {
+        setResultType('');
+        setWeightToAdd(null);
+        setTotalWeight(null);
+        return;
+      }
+      
+      if (weight && currentPurity && actualTargetPurity && actualTargetPurity !== '') {
+        calculateResults(Number(weight), Number(currentPurity), Number(actualTargetPurity));
+      } else {
+        // Reset results if any input is empty
+        setResultType('');
+        setWeightToAdd(null);
+        setTotalWeight(null);
+      }
     }
-    
-    if (weight && currentPurity && actualTargetPurity && actualTargetPurity !== '') {
-      calculateResults(Number(weight), Number(currentPurity), Number(actualTargetPurity));
-    } else {
-      // Reset results if any input is empty
-      setResultType('');
-      setWeightToAdd(null);
-      setTotalWeight(null);
+  }, [calculatorType, weight, currentPurity, targetPurity, customTargetPurity, goldPurityToAdd, customGoldPurity]);
+
+  // Calculate amount results when inputs change
+  useEffect(() => {
+    if (calculatorType === 'amount') {
+      if (amountWeight && amountPurity && goldRate) {
+        calculateAmountResults(Number(amountWeight), Number(amountPurity), Number(goldRate));
+      } else {
+        // Reset results if any input is empty
+        setBaseValue(null);
+        setMiscValue(null);
+        setNetAmount(null);
+        setPureGoldWeight(null);
+      }
     }
-  }, [weight, currentPurity, targetPurity, customTargetPurity, goldPurityToAdd, customGoldPurity]);
+  }, [calculatorType, amountWeight, amountPurity, goldRate, miscAmount, miscPercentage]);
 
   // Function to calculate results based on formula
   const calculateResults = (
@@ -147,6 +193,37 @@ function App() {
     }
   };
   
+  // Function to calculate amount results
+  const calculateAmountResults = (
+    weightVal: number,
+    purityVal: number,
+    rateVal: number
+  ) => {
+    // Calculate pure gold weight
+    const pureGold = weightVal * (purityVal / 100);
+    setPureGoldWeight(pureGold);
+    
+    // Calculate base value (pure gold weight * rate)
+    const baseVal = pureGold * rateVal;
+    setBaseValue(baseVal);
+    setPureGoldWorth(baseVal);
+    
+    // Calculate miscellaneous value
+    let miscVal = 0;
+    if (miscAmount && Number(miscAmount) !== 0) {
+      miscVal = Number(miscAmount);
+    }
+    if (miscPercentage && Number(miscPercentage) !== 0) {
+      miscVal += baseVal * (Number(miscPercentage) / 100);
+    }
+    setMiscValue(miscVal);
+    setTotalMiscAmount(miscVal);
+    
+    // Calculate net amount
+    const netVal = baseVal + miscVal;
+    setNetAmount(netVal);
+  };
+  
   // Handle common purity selection
   const handlePuritySelect = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
@@ -160,15 +237,30 @@ function App() {
 
   // Reset all fields
   const handleReset = () => {
-    setWeight('');
-    setCurrentPurity('');
-    setTargetPurity('');
-    setCustomTargetPurity('');
-    setGoldPurityToAdd(100);
-    setCustomGoldPurity('');
-    setResultType('');
-    setWeightToAdd(null);
-    setTotalWeight(null);
+    if (calculatorType === 'purity') {
+      setWeight('');
+      setCurrentPurity('');
+      setTargetPurity('');
+      setCustomTargetPurity('');
+      setGoldPurityToAdd(100);
+      setCustomGoldPurity('');
+      setResultType('');
+      setWeightToAdd(null);
+      setTotalWeight(null);
+    } else {
+      setAmountWeight('');
+      setAmountPurity('');
+      setGoldRate('');
+      setMiscAmount('');
+      setMiscPercentage('');
+      setMiscType('fixed');
+      setBaseValue(null);
+      setMiscValue(null);
+      setNetAmount(null);
+      setPureGoldWeight(null);
+      setPureGoldWorth(null);
+      setTotalMiscAmount(null);
+    }
   };
 
   return (
@@ -177,6 +269,15 @@ function App() {
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={() => setSidebarOpen(true)}
+              sx={{ mr: 2 }}
+            >
+              <Menu />
+            </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               {t('title')}
             </Typography>
@@ -300,10 +401,61 @@ function App() {
           </Toolbar>
         </AppBar>
       </Box>
+      
+      {/* Sidebar */}
+      <Drawer
+        anchor="left"
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      >
+        <Box
+          sx={{ width: 250 }}
+          role="presentation"
+          onClick={() => setSidebarOpen(false)}
+          onKeyDown={() => setSidebarOpen(false)}
+        >
+          <List>
+            <ListItem>
+              <Typography variant="h6" sx={{ color: '#D4AF37', fontWeight: 'bold' }}>
+                {t('title')}
+              </Typography>
+            </ListItem>
+            <Divider />
+            <ListItemButton
+              selected={calculatorType === 'purity'}
+              onClick={() => {
+                setCalculatorType('purity');
+                handleReset();
+              }}
+            >
+              <ListItemIcon>
+                <Calculate sx={{ color: calculatorType === 'purity' ? '#D4AF37' : 'inherit' }} />
+              </ListItemIcon>
+              <ListItemText primary={t('purityCalculator')} />
+            </ListItemButton>
+            <ListItemButton
+              selected={calculatorType === 'amount'}
+              onClick={() => {
+                setCalculatorType('amount');
+                handleReset();
+              }}
+            >
+              <ListItemIcon>
+                <MonetizationOn sx={{ color: calculatorType === 'amount' ? '#D4AF37' : 'inherit' }} />
+              </ListItemIcon>
+              <ListItemText primary={t('amountCalculator')} />
+            </ListItemButton>
+          </List>
+        </Box>
+      </Drawer>
+      
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+        
         <Card elevation={3}>
           <CardContent>
-            <Box sx={{ p: 2 }}>
+            {calculatorType === 'purity' ? (
+              // Purity Calculator Content
+              <Box sx={{ p: 2 }}>
               <Stack 
                 direction={{ xs: 'column', md: 'row' }} 
                 spacing={4} 
@@ -344,7 +496,16 @@ function App() {
                       label={t('currentPurity')}
                       type="number"
                       value={currentPurity}
-                      onChange={(e) => setCurrentPurity(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                          // Allow only 2 decimal places
+                          const parts = value.split('.');
+                          if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                            setCurrentPurity(value);
+                          }
+                        }
+                      }}
                       margin="dense"
                       size="small"
                       InputProps={{
@@ -375,7 +536,16 @@ function App() {
                         label={t('customValue')}
                         type="number"
                         value={customTargetPurity}
-                        onChange={(e) => setCustomTargetPurity(e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                            // Allow only 2 decimal places
+                            const parts = value.split('.');
+                            if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                              setCustomTargetPurity(value);
+                            }
+                          }
+                        }}
                         margin="dense"
                         size="small"
                         InputProps={{
@@ -433,7 +603,13 @@ function App() {
                             value={customGoldPurity}
                             onChange={(e) => {
                               const value = e.target.value;
-                              setCustomGoldPurity(value);
+                              if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                                // Allow only 2 decimal places
+                                const parts = value.split('.');
+                                if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                                  setCustomGoldPurity(value);
+                                }
+                              }
                             }}
                             InputProps={{
                               inputProps: { min: 0.1, max: 100, step: 0.01 }
@@ -591,6 +767,189 @@ function App() {
                 </Box>
               </Stack>
             </Box>
+            ) : (
+              // Amount Calculator Content
+              <Box sx={{ p: 2 }}>
+                <Stack 
+                  direction={{ xs: 'column', md: 'row' }} 
+                  spacing={4} 
+                  sx={{ width: '100%' }}
+                >
+                  {/* Input Section */}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h5" gutterBottom sx={{ 
+                      color: '#9c7c38',
+                      transition: 'color 0.3s ease' 
+                    }}>
+                      {t('inputValues')}
+                    </Typography>
+                    <Box 
+                      sx={{ 
+                        mt: 2, 
+                        p: 2, 
+                        backgroundColor: 'rgba(248, 246, 236, 0.6)',
+                        borderRadius: 2,
+                        border: '1px solid rgba(212, 175, 55, 0.3)',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <TextField
+                        fullWidth
+                        label={t('goldWeight')}
+                        type="number"
+                        value={amountWeight}
+                        onChange={(e) => setAmountWeight(e.target.value)}
+                        margin="dense"
+                        size="small"
+                        InputProps={{
+                          inputProps: { min: 0, step: 0.001 }
+                        }}
+                      />
+                      <TextField
+                        fullWidth
+                        label={t('goldPurity')}
+                        type="number"
+                        value={amountPurity}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                            // Allow only 2 decimal places
+                            const parts = value.split('.');
+                            if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                              setAmountPurity(value);
+                            }
+                          }
+                        }}
+                        margin="dense"
+                        size="small"
+                        InputProps={{
+                          inputProps: { min: 0, max: 100, step: 0.01 }
+                        }}
+                      />
+                      <TextField
+                        fullWidth
+                        label={t('goldRate')}
+                        type="number"
+                        value={goldRate}
+                        onChange={(e) => setGoldRate(e.target.value)}
+                        margin="dense"
+                        size="small"
+                        InputProps={{
+                          inputProps: { min: 0, step: 0.01 }
+                        }}
+                      />
+                      <TextField
+                        fullWidth
+                        label={t('miscAmount')}
+                        type="number"
+                        value={miscAmount}
+                        onChange={(e) => setMiscAmount(e.target.value)}
+                        margin="dense"
+                        size="small"
+                        InputProps={{
+                          inputProps: { min: 0, step: 0.01 }
+                        }}
+                        helperText={t('miscAmountHelper')}
+                      />
+                      <TextField
+                        fullWidth
+                        label={t('miscPercentage')}
+                        type="number"
+                        value={miscPercentage}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                            // Allow only 2 decimal places
+                            const parts = value.split('.');
+                            if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
+                              setMiscPercentage(value);
+                            }
+                          }
+                        }}
+                        margin="dense"
+                        size="small"
+                        InputProps={{
+                          inputProps: { min: 0, max: 100, step: 0.01 }
+                        }}
+                        helperText={t('miscPercentageHelper')}
+                      />
+                      
+                      {/* Reset Button */}
+                      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={handleReset}
+                          sx={{
+                            color: '#D4AF37',
+                            borderColor: '#D4AF37',
+                            '&:hover': {
+                              borderColor: '#B8941F',
+                              backgroundColor: 'rgba(212, 175, 55, 0.04)',
+                            },
+                            fontWeight: 'medium',
+                            px: 2,
+                            py: 0.5,
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          {t('reset')}
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  {/* Results Section */}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h5" gutterBottom sx={{ 
+                      color: '#8E5924',
+                      transition: 'color 0.3s ease'
+                    }}>
+                      {t('results')}
+                    </Typography>
+                    <Box sx={{ 
+                      mt: 2, 
+                      p: 3, 
+                      bgcolor: 'rgba(248, 246, 240, 0.8)',
+                      borderRadius: 2, 
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                      border: '1px solid rgba(200, 117, 51, 0.3)',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      {(amountWeight && amountPurity && goldRate) ? (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <Typography 
+                            variant="h6"
+                            dangerouslySetInnerHTML={{ __html: t('pureGoldWorth', { amount: pureGoldWorth?.toFixed(2) }) }}
+                          />
+                          <Typography 
+                            variant="body1"
+                            dangerouslySetInnerHTML={{ __html: t('miscellaneousAmount', { amount: totalMiscAmount?.toFixed(2) }) }}
+                          />
+                          <Box sx={{ 
+                            p: 2, 
+                            bgcolor: 'rgba(212, 175, 55, 0.15)',
+                            borderRadius: 1, 
+                            borderLeft: '4px solid #D4AF37',
+                            mt: 2
+                          }}>
+                            <Typography 
+                              variant="h6" 
+                              sx={{ color: 'primary.main', fontWeight: 'bold' }}
+                              dangerouslySetInnerHTML={{ __html: t('netAmount', { amount: netAmount?.toFixed(2) }) }}
+                            />
+                          </Box>
+                        </Box>
+                      ) : (
+                        <Typography variant="body1" color="textSecondary">
+                          {t('enterAllValues')}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                </Stack>
+              </Box>
+            )}
           </CardContent>
         </Card>
       </Container>
