@@ -28,9 +28,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
   const [goldWeight, setGoldWeight] = useState<number | string>('');
   const [goldPurity, setGoldPurity] = useState<number | string | 'custom'>('');
   const [customGoldPurity, setCustomGoldPurity] = useState<number | string>('');
-  const [goldRate22k, setGoldRate22k] = useState<number | string>('');
   const [goldRate24k, setGoldRate24k] = useState<number | string>('');
-  const [rateType, setRateType] = useState<'22k' | '24k'>('22k');
   const [miscChargeType, setMiscChargeType] = useState<'amount' | 'percentage'>('amount');
   const [miscAmount, setMiscAmount] = useState<number | string>('');
   const [miscPercentage, setMiscPercentage] = useState<number | string>('');
@@ -69,25 +67,11 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     miscAmountVal: number,
     miscPercentageVal: number
   ) => {
-    let baseRate: number;
+    // Always convert to pure gold weight (100% purity)
+    const pureGoldWeight = goldWeightVal * (goldPurityVal / 100);
     
-    if (rateType === '22k') {
-      baseRate = rate22kVal;
-    } else {
-      baseRate = rate24kVal;
-    }
-
-    // Calculate the effective rate based on purity
-    // If using 22k rate: effectiveRate = baseRate * (purity / 91.6)
-    // If using 24k rate: effectiveRate = baseRate * (purity / 100)
-    let effectiveRate: number;
-    if (rateType === '22k') {
-      effectiveRate = baseRate * (goldPurityVal / 91.6);
-    } else {
-      effectiveRate = baseRate * (goldPurityVal / 100);
-    }
-
-    const goldValueCalc = goldWeightVal * effectiveRate;
+    // Always use 24K rate for calculation since we're using pure gold weight
+    const goldValueCalc = pureGoldWeight * rate24kVal;
 
     let miscValueCalc: number;
     if (miscChargeType === 'amount') {
@@ -107,7 +91,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
   useEffect(() => {
     if (goldWeight && goldPurity && 
         !(goldPurity === 'custom' && (!customGoldPurity || customGoldPurity === '')) &&
-        ((rateType === '22k' && goldRate22k) || (rateType === '24k' && goldRate24k))) {
+        goldRate24k) { // Only require 24K rate since we always use it
       
       const actualGoldPurity = goldPurity === 'custom' ? 
         Number(customGoldPurity) : Number(goldPurity);
@@ -120,7 +104,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
       calculateAmountResults(
         Number(goldWeight),
         actualGoldPurity,
-        goldRate22k ? Number(goldRate22k) : 0,
+        0, // No longer needed
         goldRate24k ? Number(goldRate24k) : 0,
         miscAmountVal,
         miscPercentageVal
@@ -131,15 +115,13 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
       setMiscValue(null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goldWeight, goldPurity, customGoldPurity, goldRate22k, goldRate24k, rateType, miscChargeType, miscAmount, miscPercentage]);
+  }, [goldWeight, goldPurity, customGoldPurity, goldRate24k, miscChargeType, miscAmount, miscPercentage]);
 
   const handleReset = () => {
     setGoldWeight('');
     setGoldPurity('');
     setCustomGoldPurity('');
-    setGoldRate22k('');
     setGoldRate24k('');
-    setRateType('22k');
     setMiscChargeType('amount');
     setMiscAmount('');
     setMiscPercentage('');
@@ -230,19 +212,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
               />
             )}
 
-            {/* Gold Rates */}
-            <TextField
-              fullWidth
-              label={t('enter22kGoldRate')}
-              type="number"
-              value={goldRate22k}
-              onChange={(e) => setGoldRate22k(e.target.value)}
-              size="small"
-              InputProps={{
-                inputProps: { min: 0, step: 0.01 }
-              }}
-            />
-
+            {/* 24K Gold Rate - Only rate needed for calculation */}
             <TextField
               fullWidth
               label={t('enter24kGoldRate')}
@@ -255,36 +225,17 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
               }}
             />
 
-            {/* Rate Type Selection */}
-            <FormControl component="fieldset" size="small">
-              <FormLabel component="legend" sx={{ fontSize: '0.875rem', color: '#666' }}>
-                {t('selectRateType')}
-              </FormLabel>
-              <RadioGroup
-                row
-                value={rateType}
-                onChange={(e) => setRateType(e.target.value as '22k' | '24k')}
-              >
-                <FormControlLabel 
-                  value="22k" 
-                  control={<Radio size="small" />} 
-                  label={
-                    <span dangerouslySetInnerHTML={{ 
-                      __html: t('use22kRate', { type: '22k' }) 
-                    }} />
-                  }
-                />
-                <FormControlLabel 
-                  value="24k" 
-                  control={<Radio size="small" />} 
-                  label={
-                    <span dangerouslySetInnerHTML={{ 
-                      __html: t('use24kRate', { type: '24k' }) 
-                    }} />
-                  }
-                />
-              </RadioGroup>
-            </FormControl>
+            {/* Info about calculation method */}
+            <Box sx={{ 
+              p: 2, 
+              backgroundColor: 'rgba(212, 175, 55, 0.1)',
+              borderRadius: 1, 
+              border: '1px solid rgba(212, 175, 55, 0.3)'
+            }}>
+              <Typography variant="body2" sx={{ color: '#8E5924', fontStyle: 'italic' }}>
+                {t('calculationNote')}
+              </Typography>
+            </Box>
 
             {/* Miscellaneous Charges */}
             <FormControl component="fieldset" size="small">
@@ -393,7 +344,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
         }}>
           {(goldWeight && goldPurity && 
             !(goldPurity === 'custom' && (!customGoldPurity || customGoldPurity === '')) &&
-            ((rateType === '22k' && goldRate22k) || (rateType === '24k' && goldRate24k))
+            goldRate24k
           ) ? (
             <>
               <Box sx={{ 
@@ -455,10 +406,18 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                   <Typography variant="body1" color="textSecondary">
                     <span dangerouslySetInnerHTML={{ 
                       __html: t('rateUsed', { 
-                        type: rateType,
-                        rate: (rateType === '22k' ? 
-                          Number(goldRate22k).toFixed(2) : 
-                          Number(goldRate24k).toFixed(2)) || '0.00'
+                        type: '24k',
+                        rate: Number(goldRate24k).toFixed(2) || '0.00'
+                      })
+                    }} />
+                  </Typography>
+                  <Typography variant="body1" color="textSecondary">
+                    <span dangerouslySetInnerHTML={{ 
+                      __html: t('pureGoldWeightUsed', { 
+                        weight: (goldWeight && goldPurity !== 'custom' ? 
+                          (Number(goldWeight) * Number(goldPurity) / 100).toFixed(3) : 
+                          goldWeight && customGoldPurity ? 
+                          (Number(goldWeight) * Number(customGoldPurity) / 100).toFixed(3) : '0.000')
                       })
                     }} />
                   </Typography>

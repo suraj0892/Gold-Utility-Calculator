@@ -70,5 +70,7 @@
   "goldValue": "Gold Value: ₹<span style='font-weight: bold; color: #1565C0;'>{{value}}</span>",
   "miscChargesValue": "Misc Charges: ₹<span style='font-weight: bold; color: #1565C0;'>{{value}}</span>",
   "goldPurityUsed": "Gold Purity: <span style='font-weight: bold; color: #1565C0;'>{{purity}}%</span>",
-  "rateUsed": "Rate Used ({{type}}): ₹<span style='font-weight: bold; color: #1565C0;'>{{rate}}</span>"
+  "rateUsed": "Rate Used ({{type}}): ₹<span style='font-weight: bold; color: #1565C0;'>{{rate}}</span>",
+  "calculationNote": "Note: Amount is calculated based on pure gold content (weight × purity%) using 24K rate.",
+  "pureGoldWeightUsed": "Pure Gold Weight: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams"
 }
