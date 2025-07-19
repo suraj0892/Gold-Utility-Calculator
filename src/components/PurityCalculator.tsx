@@ -157,18 +157,17 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
             <TextField
               fullWidth
               label={t('currentWeight')}
-              type="number"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               size="small"
-              InputProps={{
-                inputProps: { min: 0, step: 0.001 }
+              inputProps={{
+                inputMode: 'decimal',
+                pattern: '[0-9]*\\.?[0-9]*'
               }}
             />
             <TextField
               fullWidth
               label={t('currentPurity')}
-              type="number"
               value={currentPurity}
               onChange={(e) => {
                 const value = e.target.value;
@@ -181,8 +180,9 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                 }
               }}
               size="small"
-              InputProps={{
-                inputProps: { min: 0, max: 100, step: 0.01 }
+              inputProps={{
+                inputMode: 'decimal',
+                pattern: '[0-9]*\\.?[0-9]*'
               }}
             />
             <FormControl fullWidth size="small">
@@ -207,7 +207,6 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
               <TextField
                 fullWidth
                 label={t('customValue')}
-                type="number"
                 value={customTargetPurity}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -220,8 +219,9 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                   }
                 }}
                 size="small"
-                InputProps={{
-                  inputProps: { min: 0, max: 100, step: 0.01 }
+                inputProps={{
+                  inputMode: 'decimal',
+                  pattern: '[0-9]*\\.?[0-9]*'
                 }}
               />
             )}
@@ -271,7 +271,6 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                   <TextField
                     fullWidth
                     label={t('customValue')}
-                    type="number"
                     size="small"
                     value={customGoldPurity}
                     onChange={(e) => {
@@ -284,8 +283,9 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                         }
                       }
                     }}
-                    InputProps={{
-                      inputProps: { min: 0.1, max: 100, step: 0.01 }
+                    inputProps={{
+                      inputMode: 'decimal',
+                      pattern: '[0-9]*\\.?[0-9]*'
                     }}
                   />
                 )}

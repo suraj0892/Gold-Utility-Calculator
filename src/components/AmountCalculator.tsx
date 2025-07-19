@@ -252,12 +252,12 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
             <TextField
               fullWidth
               label={t('goldWeight')}
-              type="number"
               value={goldWeight}
               onChange={(e) => setGoldWeight(e.target.value)}
               size="small"
-              InputProps={{
-                inputProps: { min: 0, step: 0.001 }
+              inputProps={{
+                inputMode: 'decimal',
+                pattern: '[0-9]*\\.?[0-9]*'
               }}
             />
 
@@ -284,7 +284,6 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
               <TextField
                 fullWidth
                 label={t('customValue')}
-                type="number"
                 value={customGoldPurity}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -297,8 +296,9 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                   }
                 }}
                 size="small"
-                InputProps={{
-                  inputProps: { min: 0, max: 100, step: 0.01 }
+                inputProps={{
+                  inputMode: 'decimal',
+                  pattern: '[0-9]*\\.?[0-9]*'
                 }}
               />
             )}
@@ -396,7 +396,6 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
               <TextField
                 fullWidth
                 label={t('miscPercentage')}
-                type="number"
                 value={miscPercentage}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -409,8 +408,9 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                   }
                 }}
                 size="small"
-                InputProps={{
-                  inputProps: { min: 0, max: 1000, step: 0.01 }
+                inputProps={{
+                  inputMode: 'decimal',
+                  pattern: '[0-9]*\\.?[0-9]*'
                 }}
               />
             )}
