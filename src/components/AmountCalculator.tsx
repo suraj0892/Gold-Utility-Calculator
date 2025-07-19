@@ -29,9 +29,13 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
   const [goldWeight, setGoldWeight] = useState<number | string>('');
   const [goldPurity, setGoldPurity] = useState<number | string | 'custom'>('');
   const [customGoldPurity, setCustomGoldPurity] = useState<number | string>('');
+  const [goldRate22k, setGoldRate22k] = useState<number | string>('');
+  const [goldRate22kDisplay, setGoldRate22kDisplay] = useState<string>(''); // For formatted display
   const [goldRate24k, setGoldRate24k] = useState<number | string>('');
+  const [goldRate24kDisplay, setGoldRate24kDisplay] = useState<string>(''); // For formatted display
   const [miscChargeType, setMiscChargeType] = useState<'amount' | 'percentage'>('amount');
   const [miscAmount, setMiscAmount] = useState<number | string>('');
+  const [miscAmountDisplay, setMiscAmountDisplay] = useState<string>(''); // For formatted display
   const [miscPercentage, setMiscPercentage] = useState<number | string>('');
 
   // State for results
@@ -88,6 +92,90 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     setTotalAmount(totalAmountCalc);
   };
 
+  // Helper function to handle misc amount input with formatting
+  const handleMiscAmountChange = (value: string) => {
+    // Remove existing commas and non-numeric characters (except decimal point)
+    const cleanValue = value.replace(/[^\d.]/g, '');
+    
+    // Validate decimal places (max 2)
+    const parts = cleanValue.split('.');
+    if (parts.length > 2) return; // More than one decimal point
+    if (parts.length === 2 && parts[1].length > 2) return; // More than 2 decimal places
+    
+    // Update the actual numeric value
+    setMiscAmount(cleanValue);
+    
+    // Format for display if it's a valid number
+    if (cleanValue && !isNaN(Number(cleanValue))) {
+      const formattedValue = formatIndianNumber(Number(cleanValue));
+      setMiscAmountDisplay(formattedValue);
+    } else {
+      setMiscAmountDisplay(cleanValue);
+    }
+  };
+
+  // Helper function to handle 24K gold rate input with formatting and cross-calculation
+  const handleGoldRate24kChange = (value: string) => {
+    // Remove existing commas and non-numeric characters (except decimal point)
+    const cleanValue = value.replace(/[^\d.]/g, '');
+    
+    // Validate decimal places (max 2)
+    const parts = cleanValue.split('.');
+    if (parts.length > 2) return; // More than one decimal point
+    if (parts.length === 2 && parts[1].length > 2) return; // More than 2 decimal places
+    
+    // Update the actual numeric value
+    setGoldRate24k(cleanValue);
+    
+    // Format for display if it's a valid number
+    if (cleanValue && !isNaN(Number(cleanValue))) {
+      const formattedValue = formatIndianNumber(Number(cleanValue));
+      setGoldRate24kDisplay(formattedValue);
+      
+      // Calculate and update 22K rate (22K purity is 91.6%)
+      const rate22k = Number(cleanValue) * (91.6 / 100);
+      const formattedRate22k = formatIndianNumber(rate22k);
+      setGoldRate22k(rate22k.toFixed(2));
+      setGoldRate22kDisplay(formattedRate22k);
+    } else {
+      setGoldRate24kDisplay(cleanValue);
+      // Clear 22K rate if 24K is invalid
+      setGoldRate22k('');
+      setGoldRate22kDisplay('');
+    }
+  };
+
+  // Helper function to handle 22K gold rate input with formatting and cross-calculation
+  const handleGoldRate22kChange = (value: string) => {
+    // Remove existing commas and non-numeric characters (except decimal point)
+    const cleanValue = value.replace(/[^\d.]/g, '');
+    
+    // Validate decimal places (max 2)
+    const parts = cleanValue.split('.');
+    if (parts.length > 2) return; // More than one decimal point
+    if (parts.length === 2 && parts[1].length > 2) return; // More than 2 decimal places
+    
+    // Update the actual numeric value
+    setGoldRate22k(cleanValue);
+    
+    // Format for display if it's a valid number
+    if (cleanValue && !isNaN(Number(cleanValue))) {
+      const formattedValue = formatIndianNumber(Number(cleanValue));
+      setGoldRate22kDisplay(formattedValue);
+      
+      // Calculate and update 24K rate (22K purity is 91.6%)
+      const rate24k = Number(cleanValue) / (91.6 / 100);
+      const formattedRate24k = formatIndianNumber(rate24k);
+      setGoldRate24k(rate24k.toFixed(2));
+      setGoldRate24kDisplay(formattedRate24k);
+    } else {
+      setGoldRate22kDisplay(cleanValue);
+      // Clear 24K rate if 22K is invalid
+      setGoldRate24k('');
+      setGoldRate24kDisplay('');
+    }
+  };
+
   // Effect to calculate when inputs change
   useEffect(() => {
     if (goldWeight && goldPurity && 
@@ -123,8 +211,10 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     setGoldPurity('');
     setCustomGoldPurity('');
     setGoldRate24k('');
+    setGoldRate24kDisplay('');
     setMiscChargeType('amount');
     setMiscAmount('');
+    setMiscAmountDisplay('');
     setMiscPercentage('');
     setTotalAmount(null);
     setGoldValue(null);
@@ -213,17 +303,40 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
               />
             )}
 
-            {/* 24K Gold Rate - Only rate needed for calculation */}
+            {/* 24K Gold Rate - Primary rate for calculation */}
             <TextField
               fullWidth
               label={t('enter24kGoldRate')}
-              type="number"
-              value={goldRate24k}
-              onChange={(e) => setGoldRate24k(e.target.value)}
+              type="text"
+              value={goldRate24kDisplay}
+              onChange={(e) => handleGoldRate24kChange(e.target.value)}
               size="small"
+              placeholder="0.00"
               InputProps={{
-                inputProps: { min: 0, step: 0.01 }
+                inputProps: { 
+                  inputMode: 'decimal',
+                  pattern: '[0-9,]*\\.?[0-9]*'
+                }
               }}
+              sx={{ mb: 2 }}
+            />
+
+            {/* 22K Gold Rate - Auto-calculated from 24K rate */}
+            <TextField
+              fullWidth
+              label={t('enter22kGoldRate')}
+              type="text"
+              value={goldRate22kDisplay}
+              onChange={(e) => handleGoldRate22kChange(e.target.value)}
+              size="small"
+              placeholder="0.00"
+              InputProps={{
+                inputProps: { 
+                  inputMode: 'decimal',
+                  pattern: '[0-9,]*\\.?[0-9]*'
+                }
+              }}
+              sx={{ mb: 2 }}
             />
 
             {/* Info about calculation method */}
@@ -265,12 +378,16 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
               <TextField
                 fullWidth
                 label={t('miscAmount')}
-                type="number"
-                value={miscAmount}
-                onChange={(e) => setMiscAmount(e.target.value)}
+                type="text"
+                value={miscAmountDisplay}
+                onChange={(e) => handleMiscAmountChange(e.target.value)}
                 size="small"
+                placeholder="0.00"
                 InputProps={{
-                  inputProps: { min: 0, step: 0.01 }
+                  inputProps: { 
+                    inputMode: 'decimal',
+                    pattern: '[0-9,]*\\.?[0-9]*'
+                  }
                 }}
               />
             )}
@@ -283,7 +400,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                 value={miscPercentage}
                 onChange={(e) => {
                   const value = e.target.value;
-                  if (value === '' || (Number(value) >= 0 && Number(value) <= 100)) {
+                  if (value === '' || (Number(value) >= 0 && Number(value) <= 1000)) {
                     // Allow only 2 decimal places
                     const parts = value.split('.');
                     if (parts.length === 1 || (parts.length === 2 && parts[1].length <= 2)) {
@@ -293,7 +410,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                 }}
                 size="small"
                 InputProps={{
-                  inputProps: { min: 0, max: 100, step: 0.01 }
+                  inputProps: { min: 0, max: 1000, step: 0.01 }
                 }}
               />
             )}
