@@ -16,32 +16,44 @@ import {
   Select,
   FormControl,
   InputLabel,
-  SelectChangeEvent
+  SelectChangeEvent,
+  IconButton,
+  Switch,
+  Chip,
+  Button,
+  ButtonGroup
 } from '@mui/material';
+import { Language, Translate } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import './App.css';
 
-// Create a custom theme
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#D4AF37', // Gold color
-    },
-    secondary: {
-      main: '#C87533', // Copper color
-    },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h3: {
-      fontWeight: 600,
-    },
-  },
-});
-
 function App() {
+  const { t, i18n } = useTranslation();
+  
+  // Create dynamic theme based on language
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: i18n.language === 'ta' ? '#E8B4B8' : '#D4AF37', // Rose gold for Tamil, Gold for English
+      },
+      secondary: {
+        main: '#C87533', // Copper color
+      },
+      background: {
+        default: '#f5f5f5',
+      },
+    },
+    typography: {
+      fontFamily: '"Roboto", "Noto Sans Tamil", "Helvetica", "Arial", sans-serif',
+      h3: {
+        fontWeight: 600,
+      },
+      h6: {
+        fontFamily: '"Roboto", "Noto Sans Tamil", "Helvetica", "Arial", sans-serif',
+      },
+    },
+  });
+  
   // State for input values
   const [weight, setWeight] = useState<number | string>('');
   const [currentPurity, setCurrentPurity] = useState<number | string>('');
@@ -55,13 +67,13 @@ function App() {
   
   // Common gold purity values
   const commonPurities = [
-    { value: 91.6, label: '22K (91.6%)' },
-    { value: 75, label: '18K (75%)' },
-    { value: 58.3, label: '14K (58.3%)' },
-    { value: 41.7, label: '10K (41.7%)' },
-    { value: 37.5, label: '9K (37.5%)' },
-    { value: 33.3, label: '8K (33.3%)' },
-    { value: 100, label: 'Pure Gold (100%)' },
+    { value: 91.6, label: t('22k') },
+    { value: 75, label: t('18k') },
+    { value: 58.3, label: t('14k') },
+    { value: 41.7, label: t('10k') },
+    { value: 37.5, label: t('9k') },
+    { value: 33.3, label: t('8k') },
+    { value: 100, label: t('pureGold') },
   ];
   
   // State for calculated results
@@ -160,8 +172,125 @@ function App() {
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Gold Purity Calculator
+              {t('title')}
             </Typography>
+            
+            {/* Fancy Language Toggle Section */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box
+                sx={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '25px',
+                  padding: '4px',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                {/* Sliding Background */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '4px',
+                    left: i18n.language === 'en' ? '4px' : 'calc(50% - 2px)',
+                    width: 'calc(50% - 2px)',
+                    height: 'calc(100% - 8px)',
+                    bgcolor: i18n.language === 'en' ? '#FFD700' : '#E8B4B8',
+                    borderRadius: '20px',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    zIndex: 1,
+                  }}
+                />
+                
+                {/* English Button */}
+                <Button
+                  onClick={() => i18n.changeLanguage('en')}
+                  sx={{
+                    position: 'relative',
+                    zIndex: 2,
+                    minWidth: '60px',
+                    height: '36px',
+                    color: i18n.language === 'en' ? '#000' : 'rgba(255, 255, 255, 0.8)',
+                    fontWeight: i18n.language === 'en' ? 'bold' : 'normal',
+                    fontSize: '0.875rem',
+                    textTransform: 'none',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      color: i18n.language === 'en' ? '#000' : '#fff',
+                    },
+                  }}
+                >
+                  EN
+                </Button>
+                
+                {/* Tamil Button */}
+                <Button
+                  onClick={() => i18n.changeLanguage('ta')}
+                  sx={{
+                    position: 'relative',
+                    zIndex: 2,
+                    minWidth: '60px',
+                    height: '36px',
+                    color: i18n.language === 'ta' ? '#000' : 'rgba(255, 255, 255, 0.8)',
+                    fontWeight: i18n.language === 'ta' ? 'bold' : 'normal',
+                    fontSize: '0.875rem',
+                    textTransform: 'none',
+                    fontFamily: '"Roboto", "Noto Sans Tamil", sans-serif',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      color: i18n.language === 'ta' ? '#000' : '#fff',
+                    },
+                  }}
+                >
+                  தமிழ்
+                </Button>
+              </Box>
+              
+              {/* Animated Language Icon */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                    bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                }}
+              >
+                <Translate 
+                  sx={{ 
+                    color: i18n.language === 'ta' ? '#E8B4B8' : '#FFD700',
+                    transition: 'all 0.3s ease',
+                    animation: i18n.language === 'ta' ? 'pulse 2s infinite' : 'none',
+                    '@keyframes pulse': {
+                      '0%': {
+                        transform: 'scale(1)',
+                      },
+                      '50%': {
+                        transform: 'scale(1.1)',
+                      },
+                      '100%': {
+                        transform: 'scale(1)',
+                      },
+                    },
+                  }} 
+                />
+              </Box>
+            </Box>
           </Toolbar>
         </AppBar>
       </Box>
@@ -176,21 +305,25 @@ function App() {
               >
                 {/* Input Section */}
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="h5" gutterBottom sx={{ color: '#9c7c38' }}>
-                    Input Values
+                  <Typography variant="h5" gutterBottom sx={{ 
+                    color: i18n.language === 'ta' ? '#D4A5A8' : '#9c7c38',
+                    transition: 'color 0.3s ease' 
+                  }}>
+                    {t('inputValues')}
                   </Typography>
                   <Box 
                     sx={{ 
                       mt: 2, 
                       p: 2, 
-                      backgroundColor: 'rgba(248, 246, 236, 0.6)', 
+                      backgroundColor: i18n.language === 'ta' ? 'rgba(232, 180, 184, 0.1)' : 'rgba(248, 246, 236, 0.6)', 
                       borderRadius: 2,
-                      border: '1px solid rgba(212, 175, 55, 0.3)'
+                      border: i18n.language === 'ta' ? '1px solid rgba(232, 180, 184, 0.3)' : '1px solid rgba(212, 175, 55, 0.3)',
+                      transition: 'all 0.3s ease'
                     }}
                   >
                     <TextField
                       fullWidth
-                      label="Current Gold Weight (grams)"
+                      label={t('currentWeight')}
                       type="number"
                       value={weight}
                       onChange={(e) => setWeight(e.target.value)}
@@ -202,7 +335,7 @@ function App() {
                     />
                     <TextField
                       fullWidth
-                      label="Current Gold Purity (%)"
+                      label={t('currentPurity')}
                       type="number"
                       value={currentPurity}
                       onChange={(e) => setCurrentPurity(e.target.value)}
@@ -213,12 +346,12 @@ function App() {
                       }}
                     />
                     <FormControl fullWidth margin="dense" size="small">
-                      <InputLabel id="target-purity-select-label">Target Gold Purity</InputLabel>
+                      <InputLabel id="target-purity-select-label">{t('selectTargetPurity')}</InputLabel>
                       <Select
                         labelId="target-purity-select-label"
                         id="target-purity-select"
                         value={targetPurity.toString()}
-                        label="Target Gold Purity"
+                        label={t('selectTargetPurity')}
                         onChange={handlePuritySelect}
                       >
                         {commonPurities.map((option) => (
@@ -226,14 +359,14 @@ function App() {
                             {option.label}
                           </MenuItem>
                         ))}
-                        <MenuItem value="custom">Custom Value</MenuItem>
+                        <MenuItem value="custom">{t('customPurity')}</MenuItem>
                       </Select>
                     </FormControl>
                     
                     {targetPurity === 'custom' && (
                       <TextField
                         fullWidth
-                        label="Custom Target Purity (%)"
+                        label={t('customValue')}
                         type="number"
                         value={customTargetPurity}
                         onChange={(e) => setCustomTargetPurity(e.target.value)}
@@ -246,17 +379,26 @@ function App() {
                     )}
                     
                     {resultType === 'gold' && (
-                      <Box sx={{ mt: 3, pt: 1, pb: 1, backgroundColor: 'rgba(212, 175, 55, 0.1)', borderRadius: 1, px: 2, borderLeft: '3px solid #D4AF37' }}>
+                      <Box sx={{ 
+                        mt: 3, 
+                        pt: 1, 
+                        pb: 1, 
+                        backgroundColor: i18n.language === 'ta' ? 'rgba(232, 180, 184, 0.15)' : 'rgba(212, 175, 55, 0.1)', 
+                        borderRadius: 1, 
+                        px: 2, 
+                        borderLeft: i18n.language === 'ta' ? '3px solid #E8B4B8' : '3px solid #D4AF37',
+                        transition: 'all 0.3s ease'
+                      }}>
                         <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'medium' }}>
-                          Select gold type to add:
+                          {t('selectGoldPurity')}:
                         </Typography>
                         <FormControl size="small" fullWidth>
-                          <InputLabel id="gold-purity-select-label">Gold Purity to Add</InputLabel>
+                          <InputLabel id="gold-purity-select-label">{t('goldPurityToAdd')}</InputLabel>
                           <Select
                             labelId="gold-purity-select-label"
                             id="gold-purity-select"
                             value={goldPurityToAdd === 'custom' ? 'custom' : goldPurityToAdd.toString()}
-                            label="Gold Purity to Add"
+                            label={t('goldPurityToAdd')}
                             onChange={(e) => {
                               const value = e.target.value;
                               if (value === 'custom') {
@@ -271,14 +413,14 @@ function App() {
                                 {option.label}
                               </MenuItem>
                             ))}
-                            <MenuItem value="custom">Custom Value</MenuItem>
+                            <MenuItem value="custom">{t('customPurity')}</MenuItem>
                           </Select>
                         </FormControl>
                         
                         {goldPurityToAdd === 'custom' && (
                           <TextField
                             fullWidth
-                            label="Custom Gold Purity (%)"
+                            label={t('customValue')}
                             type="number"
                             size="small"
                             sx={{ mt: 2 }}
@@ -299,84 +441,98 @@ function App() {
 
                 {/* Results Section */}
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="h5" gutterBottom sx={{ color: '#8E5924' }}>
-                    Results
+                  <Typography variant="h5" gutterBottom sx={{ 
+                    color: i18n.language === 'ta' ? '#C4979B' : '#8E5924',
+                    transition: 'color 0.3s ease'
+                  }}>
+                    {t('results')}
                   </Typography>
                   <Box sx={{ 
                     mt: 2, 
                     p: 3, 
-                    bgcolor: 'rgba(248, 246, 240, 0.8)', 
+                    bgcolor: i18n.language === 'ta' ? 'rgba(232, 180, 184, 0.08)' : 'rgba(248, 246, 240, 0.8)', 
                     borderRadius: 2, 
                     boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-                    border: '1px solid rgba(200, 117, 51, 0.3)'
+                    border: i18n.language === 'ta' ? '1px solid rgba(232, 180, 184, 0.2)' : '1px solid rgba(200, 117, 51, 0.3)',
+                    transition: 'all 0.3s ease'
                   }}>
-                    {(weight && currentPurity && targetPurity) ? (
+                    {(weight && currentPurity && targetPurity && 
+                      !(targetPurity === 'custom' && (!customTargetPurity || customTargetPurity === ''))
+                    ) ? (
                       <>
                         {resultType === 'equal' && (
                           <Box sx={{ p: 2, bgcolor: 'rgba(0, 150, 136, 0.1)', borderRadius: 1 }}>
                             <Typography variant="h6" sx={{ color: 'success.main' }}>
-                              No adjustment needed
-                            </Typography>
-                            <Typography variant="body1" color="textSecondary" sx={{ mt: 1 }}>
-                              The current and target purities are the same.
+                              {t('noAdjustmentNeeded')}
                             </Typography>
                           </Box>
                         )}
                         {resultType === 'copper' && (
                           <Box sx={{ p: 2, bgcolor: 'rgba(200, 117, 51, 0.15)', borderRadius: 1, borderLeft: '4px solid #C87533' }}>
                             <Typography variant="h6" sx={{ color: 'secondary.main' }}>
-                              Add {weightToAdd?.toFixed(3)} grams of copper
+                              {t('addCopper', { weight: weightToAdd?.toFixed(3) })}
                             </Typography>
                             <Typography variant="body1" color="textSecondary" sx={{ mt: 1 }}>
-                              To decrease purity from {Number(currentPurity).toFixed(2)}% to {
-                                targetPurity === 'custom' ? 
-                                Number(customTargetPurity).toFixed(2) : 
-                                Number(targetPurity).toFixed(2)
-                              }%
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
-                              Copper weight: <strong>{weightToAdd?.toFixed(3)} grams</strong>
+                              {t('toDecreasePurity', { 
+                                current: Number(currentPurity).toFixed(2),
+                                target: targetPurity === 'custom' ? 
+                                  Number(customTargetPurity).toFixed(2) : 
+                                  Number(targetPurity).toFixed(2)
+                              })}
                             </Typography>
                           </Box>
                         )}
                         {resultType === 'gold' && (
                           <>
-                            <Box sx={{ p: 2, bgcolor: 'rgba(212, 175, 55, 0.15)', borderRadius: 1, borderLeft: '4px solid #D4AF37' }}>
+                            <Box sx={{ 
+                              p: 2, 
+                              bgcolor: i18n.language === 'ta' ? 'rgba(232, 180, 184, 0.15)' : 'rgba(212, 175, 55, 0.15)', 
+                              borderRadius: 1, 
+                              borderLeft: i18n.language === 'ta' ? '4px solid #E8B4B8' : '4px solid #D4AF37',
+                              transition: 'all 0.3s ease'
+                            }}>
                               <Typography variant="h6" sx={{ color: 'primary.main' }}>
-                                Add {weightToAdd?.toFixed(3)} grams of gold ({goldPurityToAdd === 'custom' ? 
-                                  Number(customGoldPurity || 100).toFixed(2) : Number(goldPurityToAdd).toFixed(2)}% purity)
+                                {t('addGold', { 
+                                  weight: weightToAdd?.toFixed(3),
+                                  purity: goldPurityToAdd === 'custom' ? 
+                                    Number(customGoldPurity || 100).toFixed(2) : 
+                                    Number(goldPurityToAdd).toFixed(2)
+                                })}
                               </Typography>
                               <Typography variant="body1" color="textSecondary" sx={{ mt: 1 }}>
-                                To increase purity from {Number(currentPurity).toFixed(2)}% to {
-                                  targetPurity === 'custom' ? 
-                                  Number(customTargetPurity).toFixed(2) : 
-                                  Number(targetPurity).toFixed(2)
-                                }%
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
-                                Gold weight: <strong>{weightToAdd?.toFixed(3)} grams</strong>
+                                {t('toIncreasePurity', { 
+                                  current: Number(currentPurity).toFixed(2),
+                                  target: targetPurity === 'custom' ? 
+                                    Number(customTargetPurity).toFixed(2) : 
+                                    Number(targetPurity).toFixed(2)
+                                })}
                               </Typography>
                             </Box>
                           </>
                         )}
+                        {/* Final Results section */}
                         <Box sx={{ mt: 3, pt: 2, pb: 1, borderTop: '1px solid #eaeaea' }}>
                           <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 1.5 }}>
-                            Final Results:
+                            {t('finalResults')}
                           </Typography>
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, ml: 1 }}>
                             <Typography variant="body1">
-                              New total metal weight: <strong>{totalWeight?.toFixed(3)} grams</strong>
+                              {t('totalWeight', { weight: totalWeight?.toFixed(3) })}
                             </Typography>
                             <Typography variant="body1" color="textSecondary">
-                              Pure gold content: <strong>
-                                {(totalWeight && (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity))) ? 
-                                  (totalWeight * (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity)) / 100).toFixed(3) : '0.000'} grams
+                              <strong>
+                                {t('pureGoldContent', { 
+                                  weight: (totalWeight && (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity))) ? 
+                                    (totalWeight * (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity)) / 100).toFixed(3) : '0.000'
+                                })}
                               </strong>
                             </Typography>
                             <Typography variant="body1" color="textSecondary">
-                              Copper content: <strong>
-                                {(totalWeight && (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity))) ? 
-                                  (totalWeight * (1 - (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity)) / 100)).toFixed(3) : '0.000'} grams
+                              <strong>
+                                {t('copperContent', { 
+                                  weight: (totalWeight && (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity))) ? 
+                                    (totalWeight * (1 - (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity)) / 100)).toFixed(3) : '0.000'
+                                })}
                               </strong>
                             </Typography>
                           </Box>
@@ -384,7 +540,7 @@ function App() {
                       </>
                     ) : (
                       <Typography variant="body1" color="textSecondary">
-                        Enter all values to see results
+                        {t('enterAllValues')}
                       </Typography>
                     )}
                   </Box>
