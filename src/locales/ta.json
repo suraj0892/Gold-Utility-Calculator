@@ -11,9 +11,9 @@
   "customPurity": "விருப்ப தூய்மை",
   "customValue": "விருப்ப மதிப்பு (%)",
   "noAdjustmentNeeded": "சரிசெய்தல் தேவையில்லை! உங்கள் தங்கம் ஏற்கனவே இலக்கு தூய்மையில் உள்ளது.",
-  "addCopper": "{{weight}} கிராம் செம்பு சேர்க்கவும்",
-  "addGold": "{{weight}} கிராம் {{purity}}% தங்கம் சேர்க்கவும்",
-  "totalWeight": "புதிய மொத்த உலோக எடை: {{weight}} கிராம்",
+  "addCopper": "<span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம் செம்பு சேர்க்கவும்",
+  "addGold": "<span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம் {{purity}}% தங்கம் சேர்க்கவும்",
+  "totalWeight": "புதிய மொத்த உலோக எடை: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
   "22k": "22K (91.6%)",
   "18k": "18K (75%)",
   "14k": "14K (58.3%)",
@@ -27,7 +27,7 @@
   "toDecreasePurity": "தூய்மையை {{current}}% இலிருந்து {{target}}% ஆக குறைக்க",
   "toIncreasePurity": "தூய்மையை {{current}}% இலிருந்து {{target}}% ஆக அதிகரிக்க",
   "finalResults": "இறுதி முடிவுகள்:",
-  "pureGoldContent": "தூய தங்க உள்ளடக்கம்: {{weight}} கிராம்",
-  "copperContent": "செம்பு உள்ளடக்கம்: {{weight}} கிராம்",
+  "pureGoldContent": "தூய தங்க உள்ளடக்கம்: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
+  "copperContent": "செம்பு உள்ளடக்கம்: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
   "enterAllValues": "முடிவுகளைக் காண அனைத்து மதிப்புகளையும் உள்ளிடவும்"
 }

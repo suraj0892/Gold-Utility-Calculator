@@ -11,9 +11,9 @@
   "customPurity": "Custom Purity",
   "customValue": "Custom Value (%)",
   "noAdjustmentNeeded": "No adjustment needed! Your gold is already at the target purity.",
-  "addCopper": "Add {{weight}} grams of copper",
-  "addGold": "Add {{weight}} grams of {{purity}}% gold",
-  "totalWeight": "New total metal weight: {{weight}} grams",
+  "addCopper": "Add <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams of copper",
+  "addGold": "Add <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams of {{purity}}% gold",
+  "totalWeight": "New total metal weight: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
   "22k": "22K (91.6%)",
   "18k": "18K (75%)",
   "14k": "14K (58.3%)",
@@ -27,7 +27,7 @@
   "toDecreasePurity": "To decrease purity from {{current}}% to {{target}}%",
   "toIncreasePurity": "To increase purity from {{current}}% to {{target}}%",
   "finalResults": "Final Results:",
-  "pureGoldContent": "Pure gold content: {{weight}} grams",
-  "copperContent": "Copper content: {{weight}} grams",
+  "pureGoldContent": "Pure gold content: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
+  "copperContent": "Copper content: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
   "enterAllValues": "Enter all values to see results"
 }

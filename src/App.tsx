@@ -17,13 +17,9 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
-  IconButton,
-  Switch,
-  Chip,
-  Button,
-  ButtonGroup
+  Button
 } from '@mui/material';
-import { Language, Translate } from '@mui/icons-material';
+import { Translate } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import './App.css';
 
@@ -34,7 +30,7 @@ function App() {
   const theme = createTheme({
     palette: {
       primary: {
-        main: i18n.language === 'ta' ? '#E8B4B8' : '#D4AF37', // Rose gold for Tamil, Gold for English
+        main: '#D4AF37', // Always gold color for both languages
       },
       secondary: {
         main: '#C87533', // Copper color
@@ -63,7 +59,6 @@ function App() {
   // State for gold purity to add
   const [goldPurityToAdd, setGoldPurityToAdd] = useState<number | string | 'custom'>(100);
   const [customGoldPurity, setCustomGoldPurity] = useState<number | string>('');
-  const [showGoldPuritySelect, setShowGoldPuritySelect] = useState<boolean>(false);
   
   // Common gold purity values
   const commonPurities = [
@@ -126,15 +121,12 @@ function App() {
       setResultType('equal');
       setWeightToAdd(0);
       setTotalWeight(weightVal);
-      setShowGoldPuritySelect(false);
     } else if (targetPurityVal < currentPurityVal) {
       setResultType('copper');
       setWeightToAdd(Math.abs(weightAddition));
       setTotalWeight(weightVal + Math.abs(weightAddition)); // Total metal weight
-      setShowGoldPuritySelect(false);
     } else {
       setResultType('gold');
-      setShowGoldPuritySelect(true);
       // Recalculate based on gold purity to add
       const goldPurityVal = goldPurityToAdd === 'custom' ? 
         (customGoldPurity ? Number(customGoldPurity) : 100) : 
@@ -198,7 +190,7 @@ function App() {
                     left: i18n.language === 'en' ? '4px' : 'calc(50% - 2px)',
                     width: 'calc(50% - 2px)',
                     height: 'calc(100% - 8px)',
-                    bgcolor: i18n.language === 'en' ? '#FFD700' : '#E8B4B8',
+                    bgcolor: '#FFD700', // Always gold color
                     borderRadius: '20px',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -214,14 +206,14 @@ function App() {
                     zIndex: 2,
                     minWidth: '60px',
                     height: '36px',
-                    color: i18n.language === 'en' ? '#000' : 'rgba(255, 255, 255, 0.8)',
+                    color: i18n.language === 'en' ? '#000' : '#000', // Black for both
                     fontWeight: i18n.language === 'en' ? 'bold' : 'normal',
                     fontSize: '0.875rem',
                     textTransform: 'none',
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       backgroundColor: 'transparent',
-                      color: i18n.language === 'en' ? '#000' : '#fff',
+                      color: '#000',
                     },
                   }}
                 >
@@ -236,7 +228,7 @@ function App() {
                     zIndex: 2,
                     minWidth: '60px',
                     height: '36px',
-                    color: i18n.language === 'ta' ? '#000' : 'rgba(255, 255, 255, 0.8)',
+                    color: i18n.language === 'ta' ? '#000' : '#000', // Black for both
                     fontWeight: i18n.language === 'ta' ? 'bold' : 'normal',
                     fontSize: '0.875rem',
                     textTransform: 'none',
@@ -244,7 +236,7 @@ function App() {
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       backgroundColor: 'transparent',
-                      color: i18n.language === 'ta' ? '#000' : '#fff',
+                      color: '#000',
                     },
                   }}
                 >
@@ -273,7 +265,7 @@ function App() {
               >
                 <Translate 
                   sx={{ 
-                    color: i18n.language === 'ta' ? '#E8B4B8' : '#FFD700',
+                    color: '#FFD700', // Always gold color
                     transition: 'all 0.3s ease',
                     animation: i18n.language === 'ta' ? 'pulse 2s infinite' : 'none',
                     '@keyframes pulse': {
@@ -306,7 +298,7 @@ function App() {
                 {/* Input Section */}
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h5" gutterBottom sx={{ 
-                    color: i18n.language === 'ta' ? '#D4A5A8' : '#9c7c38',
+                    color: '#9c7c38', // Always gold color
                     transition: 'color 0.3s ease' 
                   }}>
                     {t('inputValues')}
@@ -315,9 +307,9 @@ function App() {
                     sx={{ 
                       mt: 2, 
                       p: 2, 
-                      backgroundColor: i18n.language === 'ta' ? 'rgba(232, 180, 184, 0.1)' : 'rgba(248, 246, 236, 0.6)', 
+                      backgroundColor: 'rgba(248, 246, 236, 0.6)', // Always gold background
                       borderRadius: 2,
-                      border: i18n.language === 'ta' ? '1px solid rgba(232, 180, 184, 0.3)' : '1px solid rgba(212, 175, 55, 0.3)',
+                      border: '1px solid rgba(212, 175, 55, 0.3)', // Always gold border
                       transition: 'all 0.3s ease'
                     }}
                   >
@@ -383,10 +375,10 @@ function App() {
                         mt: 3, 
                         pt: 1, 
                         pb: 1, 
-                        backgroundColor: i18n.language === 'ta' ? 'rgba(232, 180, 184, 0.15)' : 'rgba(212, 175, 55, 0.1)', 
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)', // Always gold background
                         borderRadius: 1, 
                         px: 2, 
-                        borderLeft: i18n.language === 'ta' ? '3px solid #E8B4B8' : '3px solid #D4AF37',
+                        borderLeft: '3px solid #D4AF37', // Always gold border
                         transition: 'all 0.3s ease'
                       }}>
                         <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'medium' }}>
@@ -442,7 +434,7 @@ function App() {
                 {/* Results Section */}
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h5" gutterBottom sx={{ 
-                    color: i18n.language === 'ta' ? '#C4979B' : '#8E5924',
+                    color: '#8E5924', // Always gold color
                     transition: 'color 0.3s ease'
                   }}>
                     {t('results')}
@@ -450,10 +442,10 @@ function App() {
                   <Box sx={{ 
                     mt: 2, 
                     p: 3, 
-                    bgcolor: i18n.language === 'ta' ? 'rgba(232, 180, 184, 0.08)' : 'rgba(248, 246, 240, 0.8)', 
+                    bgcolor: 'rgba(248, 246, 240, 0.8)', // Always gold background
                     borderRadius: 2, 
                     boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-                    border: i18n.language === 'ta' ? '1px solid rgba(232, 180, 184, 0.2)' : '1px solid rgba(200, 117, 51, 0.3)',
+                    border: '1px solid rgba(200, 117, 51, 0.3)', // Always gold border
                     transition: 'all 0.3s ease'
                   }}>
                     {(weight && currentPurity && targetPurity && 
@@ -469,10 +461,16 @@ function App() {
                         )}
                         {resultType === 'copper' && (
                           <Box sx={{ p: 2, bgcolor: 'rgba(200, 117, 51, 0.15)', borderRadius: 1, borderLeft: '4px solid #C87533' }}>
-                            <Typography variant="h6" sx={{ color: 'secondary.main' }}>
-                              {t('addCopper', { weight: weightToAdd?.toFixed(3) })}
-                            </Typography>
-                            <Typography variant="body1" color="textSecondary" sx={{ mt: 1 }}>
+                            <Typography 
+                              variant="h6" 
+                              sx={{ color: 'secondary.main' }}
+                              dangerouslySetInnerHTML={{ __html: t('addCopper', { weight: weightToAdd?.toFixed(3) }) }}
+                            />
+                            <Typography 
+                              variant="body1" 
+                              color="textSecondary" 
+                              sx={{ mt: 1 }}
+                            >
                               {t('toDecreasePurity', { 
                                 current: Number(currentPurity).toFixed(2),
                                 target: targetPurity === 'custom' ? 
@@ -486,20 +484,28 @@ function App() {
                           <>
                             <Box sx={{ 
                               p: 2, 
-                              bgcolor: i18n.language === 'ta' ? 'rgba(232, 180, 184, 0.15)' : 'rgba(212, 175, 55, 0.15)', 
+                              bgcolor: 'rgba(212, 175, 55, 0.15)', // Always gold background
                               borderRadius: 1, 
-                              borderLeft: i18n.language === 'ta' ? '4px solid #E8B4B8' : '4px solid #D4AF37',
+                              borderLeft: '4px solid #D4AF37', // Always gold border
                               transition: 'all 0.3s ease'
                             }}>
-                              <Typography variant="h6" sx={{ color: 'primary.main' }}>
-                                {t('addGold', { 
-                                  weight: weightToAdd?.toFixed(3),
-                                  purity: goldPurityToAdd === 'custom' ? 
-                                    Number(customGoldPurity || 100).toFixed(2) : 
-                                    Number(goldPurityToAdd).toFixed(2)
-                                })}
-                              </Typography>
-                              <Typography variant="body1" color="textSecondary" sx={{ mt: 1 }}>
+                              <Typography 
+                                variant="h6" 
+                                sx={{ color: 'primary.main' }}
+                                dangerouslySetInnerHTML={{ 
+                                  __html: t('addGold', { 
+                                    weight: weightToAdd?.toFixed(3),
+                                    purity: goldPurityToAdd === 'custom' ? 
+                                      Number(customGoldPurity || 100).toFixed(2) : 
+                                      Number(goldPurityToAdd).toFixed(2)
+                                  })
+                                }}
+                              />
+                              <Typography 
+                                variant="body1" 
+                                color="textSecondary" 
+                                sx={{ mt: 1 }}
+                              >
                                 {t('toIncreasePurity', { 
                                   current: Number(currentPurity).toFixed(2),
                                   target: targetPurity === 'custom' ? 
@@ -516,24 +522,25 @@ function App() {
                             {t('finalResults')}
                           </Typography>
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, ml: 1 }}>
-                            <Typography variant="body1">
-                              {t('totalWeight', { weight: totalWeight?.toFixed(3) })}
-                            </Typography>
+                            <Typography 
+                              variant="body1"
+                              dangerouslySetInnerHTML={{ __html: t('totalWeight', { weight: totalWeight?.toFixed(3) }) }}
+                            />
                             <Typography variant="body1" color="textSecondary">
-                              <strong>
-                                {t('pureGoldContent', { 
+                              <span dangerouslySetInnerHTML={{ 
+                                __html: t('pureGoldContent', { 
                                   weight: (totalWeight && (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity))) ? 
                                     (totalWeight * (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity)) / 100).toFixed(3) : '0.000'
-                                })}
-                              </strong>
+                                })
+                              }} />
                             </Typography>
                             <Typography variant="body1" color="textSecondary">
-                              <strong>
-                                {t('copperContent', { 
+                              <span dangerouslySetInnerHTML={{ 
+                                __html: t('copperContent', { 
                                   weight: (totalWeight && (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity))) ? 
                                     (totalWeight * (1 - (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity)) / 100)).toFixed(3) : '0.000'
-                                })}
-                              </strong>
+                                })
+                              }} />
                             </Typography>
                           </Box>
                         </Box>
