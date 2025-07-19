@@ -27,8 +27,8 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
   const [customTargetPurity, setCustomTargetPurity] = useState<number | string>('');
   
   // State for gold purity to add
-  const [goldPurityToAdd, setGoldPurityToAdd] = useState<number | string | 'custom'>(100);
-  const [customGoldPurity, setCustomGoldPurity] = useState<number | string>('');
+  const [goldPurityToAdd, setGoldPurityToAdd] = useState<number | string | 'custom'>('custom');
+  const [customGoldPurity, setCustomGoldPurity] = useState<number | string>(100);
   
   // State for results
   const [resultType, setResultType] = useState<'equal' | 'copper' | 'gold' | ''>('');
@@ -61,31 +61,42 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
     currentPurityVal: number,
     targetPurityVal: number
   ) => {
+    // Calculate pure gold content
     const currentPureGold = weightVal * (currentPurityVal / 100);
     
-    if (Math.abs(currentPurityVal - targetPurityVal) < 0.01) {
+    // Calculate target total weight needed
+    const targetTotalWeight = currentPureGold / (targetPurityVal / 100);
+    
+    // Calculate weight to add
+    const weightAddition = targetTotalWeight - weightVal;
+    
+    // Set results based on calculation
+    if (targetPurityVal === currentPurityVal) {
       setResultType('equal');
       setWeightToAdd(0);
       setTotalWeight(weightVal);
     } else if (targetPurityVal < currentPurityVal) {
-      // Need to add copper
-      const targetTotalWeight = currentPureGold / (targetPurityVal / 100);
-      const copperToAdd = targetTotalWeight - weightVal;
       setResultType('copper');
-      setWeightToAdd(copperToAdd);
-      setTotalWeight(targetTotalWeight);
+      setWeightToAdd(Math.abs(weightAddition));
+      setTotalWeight(weightVal + Math.abs(weightAddition)); // Total metal weight
     } else {
-      // Need to add gold
-      const actualGoldPurityToAdd = goldPurityToAdd === 'custom' ? 
+      setResultType('gold');
+      // Recalculate based on gold purity to add
+      const goldPurityVal = goldPurityToAdd === 'custom' ? 
         (customGoldPurity ? Number(customGoldPurity) : 100) : 
         Number(goldPurityToAdd);
       
-      const goldToAdd = (currentPureGold * (targetPurityVal - currentPurityVal)) / 
-        (actualGoldPurityToAdd - targetPurityVal);
-      const newTotalWeight = weightVal + goldToAdd;
-      setResultType('gold');
-      setWeightToAdd(goldToAdd);
-      setTotalWeight(newTotalWeight);
+      // When increasing purity (adding gold), use this corrected formula
+      // We need to calculate how much gold of specified purity to add
+      const pureGoldInItem = weightVal * (currentPurityVal / 100); // Pure gold content in original item
+      const requiredPureGold = pureGoldInItem / (targetPurityVal / 100); // Total weight needed at target purity
+      const weightToAddNeeded = requiredPureGold - weightVal; // Additional weight needed
+      
+      // If we're adding gold of purity less than 100%, we need to add more
+      const goldToAdd = weightToAddNeeded * (100 / goldPurityVal);
+      
+      setWeightToAdd(Math.abs(goldToAdd)); // Ensure value is always positive
+      setTotalWeight(weightVal + Math.abs(goldToAdd)); // Total metal weight
     }
   };
 
@@ -109,8 +120,8 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
     setCurrentPurity('');
     setTargetPurity('');
     setCustomTargetPurity('');
-    setGoldPurityToAdd(100);
-    setCustomGoldPurity('');
+    setGoldPurityToAdd('custom');
+    setCustomGoldPurity(100);
     setResultType('');
     setWeightToAdd(null);
     setTotalWeight(null);
@@ -334,6 +345,32 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                 <Box sx={{ p: 2, bgcolor: 'rgba(0, 150, 136, 0.1)', borderRadius: 1 }}>
                   <Typography variant="h6" sx={{ color: 'success.main' }}>
                     {t('noAdjustmentNeeded')}
+                  </Typography>
+                </Box>
+              )}
+              {resultType === '' && weightToAdd === null && (
+                <Box sx={{ p: 2, bgcolor: 'rgba(255, 152, 0, 0.1)', borderRadius: 1, borderLeft: '4px solid #FF9800' }}>
+                  <Typography variant="h6" sx={{ color: '#E65100', mb: 1 }}>
+                    {t('impossibleCalculation')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#BF360C' }}>
+                    {(() => {
+                      const actualTargetPurity = targetPurity === 'custom' ? 
+                        Number(customTargetPurity) : Number(targetPurity);
+                      const actualGoldPurityToAdd = goldPurityToAdd === 'custom' ? 
+                        (customGoldPurity ? Number(customGoldPurity) : 100) : 
+                        Number(goldPurityToAdd);
+                      
+                      if (actualTargetPurity === 100 && actualGoldPurityToAdd < 100) {
+                        return t('cannotReach100Percent', { purity: actualGoldPurityToAdd.toFixed(2) });
+                      } else if (actualGoldPurityToAdd <= actualTargetPurity) {
+                        return t('cannotIncreaseWithLowerPurity', { 
+                          goldPurity: actualGoldPurityToAdd.toFixed(2),
+                          targetPurity: actualTargetPurity.toFixed(2)
+                        });
+                      }
+                      return t('calculationNotPossible');
+                    })()}
                   </Typography>
                 </Box>
               )}
