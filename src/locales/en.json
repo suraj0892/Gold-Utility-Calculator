@@ -55,5 +55,20 @@
   "miscellaneousAmount": "Miscellaneous Amount: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
   "netAmount": "Net Amount: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
   "pureGoldWeight": "Pure Gold Weight: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
-  "calculatorType": "Calculator Type"
+  "calculatorType": "Calculator Type",
+  "goldUtilityCalculator": "Gold Utility Calculator",
+  "menu": "Menu",
+  "welcomeMessage": "Welcome to Gold Utility Calculator",
+  "selectCalculatorMessage": "Please select a calculator from the menu to get started",
+  "enter22kGoldRate": "Enter 22K Gold Rate (per gram)",
+  "enter24kGoldRate": "Enter 24K Gold Rate (per gram)",
+  "use22kRate": "Use <span style='font-weight: bold; color: #D4AF37;'>{{type}}</span> rate",
+  "use24kRate": "Use <span style='font-weight: bold; color: #D4AF37;'>{{type}}</span> rate",
+  "miscCharges": "Miscellaneous Charges",
+  "totalAmountResult": "Total Amount: ₹<span style='font-weight: bold; color: #1565C0;'>{{amount}}</span>",
+  "breakdown": "Breakdown",
+  "goldValue": "Gold Value: ₹<span style='font-weight: bold; color: #1565C0;'>{{value}}</span>",
+  "miscChargesValue": "Misc Charges: ₹<span style='font-weight: bold; color: #1565C0;'>{{value}}</span>",
+  "goldPurityUsed": "Gold Purity: <span style='font-weight: bold; color: #1565C0;'>{{purity}}%</span>",
+  "rateUsed": "Rate Used ({{type}}): ₹<span style='font-weight: bold; color: #1565C0;'>{{rate}}</span>"
 }
