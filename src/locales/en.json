@@ -29,5 +29,6 @@
   "finalResults": "Final Results:",
   "pureGoldContent": "Pure gold content: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
   "copperContent": "Copper content: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
-  "enterAllValues": "Enter all values to see results"
+  "enterAllValues": "Enter all values to see results",
+  "reset": "Reset"
 }

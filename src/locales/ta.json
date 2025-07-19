@@ -29,5 +29,6 @@
   "finalResults": "இறுதி முடிவுகள்:",
   "pureGoldContent": "தூய தங்க உள்ளடக்கம்: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
   "copperContent": "செம்பு உள்ளடக்கம்: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
-  "enterAllValues": "முடிவுகளைக் காண அனைத்து மதிப்புகளையும் உள்ளிடவும்"
+  "enterAllValues": "முடிவுகளைக் காண அனைத்து மதிப்புகளையும் உள்ளிடவும்",
+  "reset": "மீட்டமை"
 }

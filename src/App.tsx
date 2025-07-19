@@ -17,9 +17,10 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
-import { Translate } from '@mui/icons-material';
+import { Translate, Clear } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import './App.css';
 
@@ -155,6 +156,19 @@ function App() {
       // Just mark as custom, don't clear the value
       setTargetPurity('custom');
     }
+  };
+
+  // Reset all fields
+  const handleReset = () => {
+    setWeight('');
+    setCurrentPurity('');
+    setTargetPurity('');
+    setCustomTargetPurity('');
+    setGoldPurityToAdd(100);
+    setCustomGoldPurity('');
+    setResultType('');
+    setWeightToAdd(null);
+    setTotalWeight(null);
   };
 
   return (
@@ -428,6 +442,29 @@ function App() {
                         )}
                       </Box>
                     )}
+                    
+                    {/* Reset Button */}
+                    <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={handleReset}
+                        sx={{
+                          color: '#D4AF37',
+                          borderColor: '#D4AF37',
+                          '&:hover': {
+                            borderColor: '#B8941F',
+                            backgroundColor: 'rgba(212, 175, 55, 0.04)',
+                          },
+                          fontWeight: 'medium',
+                          px: 2,
+                          py: 0.5,
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        {t('reset')}
+                      </Button>
+                    </Box>
                   </Box>
                 </Box>
 
