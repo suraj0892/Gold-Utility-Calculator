@@ -152,10 +152,18 @@ function App() {
                 sx={{ 
                   flexGrow: 1,
                   fontWeight: 'bold',
-                  letterSpacing: '0.5px'
+                  letterSpacing: '0.5px',
+                  fontSize: {
+                    xs: '1rem',    // Smaller on mobile
+                    sm: '1.1rem',  // Medium on small tablets
+                    md: '1.25rem'  // Full size on desktop
+                  },
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                {t('goldUtilityCalculator')}
+                {isMobile ? t('goldCalculator') : t('goldUtilityCalculator')}
               </Typography>
               
               <LanguageToggle />

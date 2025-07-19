@@ -6,7 +6,9 @@ import {
   SelectChangeEvent,
   Box,
   Typography,
-  Chip
+  Chip,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   Language as LanguageIcon,
@@ -16,18 +18,20 @@ import { useTranslation } from 'react-i18next';
 
 const LanguageToggle: React.FC = () => {
   const { i18n } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleLanguageChange = (event: SelectChangeEvent) => {
     i18n.changeLanguage(event.target.value);
   };
 
   const languages = {
-    en: { label: 'English', flag: '🇺🇸' },
-    ta: { label: 'தமிழ்', flag: '🇮🇳' }
+    en: { label: 'English', flag: '🇺🇸', short: 'EN' },
+    ta: { label: 'தமிழ்', flag: '🇮🇳', short: 'தமிழ்' }
   };
 
   return (
-    <Box sx={{ minWidth: 140 }}>
+    <Box sx={{ minWidth: isMobile ? 80 : 140 }}>
       <FormControl size="small" fullWidth>
         <Select
           value={i18n.language}
@@ -38,19 +42,22 @@ const LanguageToggle: React.FC = () => {
             <Box sx={{ 
               display: 'flex', 
               alignItems: 'center', 
-              gap: 1,
+              gap: isMobile ? 0.5 : 1,
               py: 0.5
             }}>
               <LanguageIcon sx={{ 
-                fontSize: '1rem', 
+                fontSize: isMobile ? '0.9rem' : '1rem', 
                 color: '#D4AF37' 
               }} />
               <Typography sx={{ 
-                fontSize: '0.85rem', 
+                fontSize: isMobile ? '0.75rem' : '0.85rem', 
                 fontWeight: 'medium',
                 color: 'white'
               }}>
-                {languages[selected as keyof typeof languages]?.flag} {languages[selected as keyof typeof languages]?.label}
+                {isMobile 
+                  ? languages[selected as keyof typeof languages]?.short
+                  : `${languages[selected as keyof typeof languages]?.flag} ${languages[selected as keyof typeof languages]?.label}`
+                }
               </Typography>
             </Box>
           )}
@@ -76,12 +83,12 @@ const LanguageToggle: React.FC = () => {
             '& .MuiSelect-select': {
               color: 'white',
               fontWeight: 'medium',
-              fontSize: '0.85rem',
-              padding: '8px 12px',
+              fontSize: isMobile ? '0.75rem' : '0.85rem',
+              padding: isMobile ? '6px 8px' : '8px 12px',
             },
             '& .MuiSvgIcon-root': {
               color: '#D4AF37',
-              fontSize: '1.2rem',
+              fontSize: isMobile ? '1rem' : '1.2rem',
             },
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           }}

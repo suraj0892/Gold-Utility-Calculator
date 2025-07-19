@@ -57,6 +57,7 @@
   "pureGoldWeight": "Pure Gold Weight: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> grams",
   "calculatorType": "Calculator Type",
   "goldUtilityCalculator": "Gold Utility Calculator",
+  "goldCalculator": "Gold Calculator",
   "menu": "Menu",
   "welcomeMessage": "Welcome to Gold Utility Calculator",
   "selectCalculatorMessage": "Please select a calculator from the menu to get started",

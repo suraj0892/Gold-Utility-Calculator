@@ -57,6 +57,7 @@
   "pureGoldWeight": "தூய தங்க எடை: <span style='font-weight: bold; color: #1565C0;'>{{weight}}</span> கிராம்",
   "calculatorType": "கணக்கீட்டாளர் வகை",
   "goldUtilityCalculator": "தங்க உபயோக கணக்கீட்டாளர்",
+  "goldCalculator": "தங்க கணக்கீடு",
   "menu": "பட்டியல்",
   "welcomeMessage": "தங்க உபயோக கணக்கீட்டாளருக்கு வரவேற்பு",
   "selectCalculatorMessage": "தொடங்க, தயவுசெய்து பட்டியலில் இருந்து ஒரு கணக்கீட்டாளரை தேர்ந்தெடுக்கவும்",
