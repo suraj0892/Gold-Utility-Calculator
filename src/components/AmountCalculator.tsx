@@ -345,12 +345,12 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
 
             {/* Gold Purity */}
             <FormControl fullWidth size="small">
-              <InputLabel id="gold-purity-select-label">{t('selectGoldPurity')}</InputLabel>
+              <InputLabel id="gold-purity-select-label">{t('currentPurity')}</InputLabel>
               <Select
                 labelId="gold-purity-select-label"
                 id="gold-purity-select"
                 value={goldPurity.toString()}
-                label={t('selectGoldPurity')}
+                label={t('currentPurity')}
                 onChange={handlePuritySelect}
               >
                 {commonPurities.map((option) => (

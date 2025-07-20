@@ -25,7 +25,7 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
 
   // State for input values
   const [weight, setWeight] = useState<number | string>('');
-  const [currentPurity, setCurrentPurity] = useState<number | string>('');
+  const [currentPurity, setCurrentPurity] = useState<number | string>(99.5);
   const [targetPurity, setTargetPurity] = useState<number | string | 'custom'>('');
   const [customTargetPurity, setCustomTargetPurity] = useState<number | string>('');
   
