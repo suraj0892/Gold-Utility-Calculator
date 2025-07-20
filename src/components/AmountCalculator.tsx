@@ -46,6 +46,12 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
   const [goldValue, setGoldValue] = useState<number | null>(null);
   const [miscValue, setMiscValue] = useState<number | null>(null);
 
+  // Helper function for round half up
+  const roundHalfUp = (num: number, decimals: number = 2): number => {
+    const factor = Math.pow(10, decimals);
+    return Math.round((num + Number.EPSILON) * factor) / factor;
+  };
+
   // Load values from localStorage on component mount
   useEffect(() => {
     const savedData = localStorage.getItem('amountCalculator');
@@ -225,10 +231,11 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
       const formattedValue = formatIndianNumber(Number(cleanValue));
       setGoldRate24kDisplay(formattedValue);
       
-      // Calculate and update 22K rate (22K purity is 91.6%)
-      const rate22k = Number(cleanValue) * (91.6 / 100);
-      const formattedRate22k = formatIndianNumber(rate22k);
-      setGoldRate22k(rate22k.toFixed(2));
+      // Calculate and update 22K rate (22K purity is 22/24 = 91.67%)
+      const rate22k = Number(cleanValue) * (22 / 24);
+      const roundedRate22k = roundHalfUp(rate22k, 0); // Round to whole number
+      const formattedRate22k = formatIndianNumber(roundedRate22k);
+      setGoldRate22k(roundedRate22k.toString());
       setGoldRate22kDisplay(formattedRate22k);
     } else {
       setGoldRate24kDisplay(cleanValue);
@@ -256,10 +263,11 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
       const formattedValue = formatIndianNumber(Number(cleanValue));
       setGoldRate22kDisplay(formattedValue);
       
-      // Calculate and update 24K rate (22K purity is 91.6%)
-      const rate24k = Number(cleanValue) / (91.6 / 100);
-      const formattedRate24k = formatIndianNumber(rate24k);
-      setGoldRate24k(rate24k.toFixed(2));
+      // Calculate and update 24K rate (22K purity is 22/24 = 91.67%)
+      const rate24k = Number(cleanValue) / (22 / 24);
+      const roundedRate24k = roundHalfUp(rate24k, 0); // Round to whole number
+      const formattedRate24k = formatIndianNumber(roundedRate24k);
+      setGoldRate24k(roundedRate24k.toString());
       setGoldRate24kDisplay(formattedRate24k);
     } else {
       setGoldRate22kDisplay(cleanValue);
