@@ -12,6 +12,10 @@ import {
   Radio,
   FormLabel
 } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { formatIndianNumber, numberToWords, numberToWordsTamil } from '../utils/numberUtils';
 
@@ -25,8 +29,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   // State for inputs
   const [amount, setAmount] = useState<number | string>('');
   const [amountDisplay, setAmountDisplay] = useState<string>(''); // For formatted display
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs()); // Current date as default
   const [interestRate, setInterestRate] = useState<number | string>('');
   const [interestPeriod, setInterestPeriod] = useState<'monthly' | 'yearly'>('yearly');
 
@@ -36,12 +40,12 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
   const [timePeriod, setTimePeriod] = useState<{ years: number; months: number; days: number } | null>(null);
 
-  // Set current date as default end date
-  useEffect(() => {
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
-    setEndDate(formattedDate);
-  }, []);
+  // Set current date as default end date (removed since we're setting it in state declaration)
+  // useEffect(() => {
+  //   const today = new Date();
+  //   const formattedDate = today.toISOString().split('T')[0];
+  //   setEndDate(formattedDate);
+  // }, []);
 
   // Handle amount input with Indian formatting
   const handleAmountChange = (value: string) => {
@@ -66,9 +70,11 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   };
 
   // Calculate time difference
-  const calculateTimeDifference = (start: string, end: string) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+  const calculateTimeDifference = (start: Dayjs | null, end: Dayjs | null) => {
+    if (!start || !end) return null;
+    
+    const startDate = start.toDate();
+    const endDate = end.toDate();
     
     if (endDate < startDate) {
       return null;
@@ -142,9 +148,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   const handleReset = () => {
     setAmount('');
     setAmountDisplay('');
-    setStartDate('');
-    const today = new Date().toISOString().split('T')[0];
-    setEndDate(today);
+    setStartDate(null);
+    setEndDate(dayjs());
     setInterestRate('');
     setInterestPeriod('yearly');
     setPrincipalAmount(null);
@@ -154,7 +159,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     onReset?.();
   };
 
-  const isValidDateRange = startDate && endDate && new Date(endDate) >= new Date(startDate);
+  const isValidDateRange = startDate && endDate && endDate.isAfter(startDate, 'day') || endDate?.isSame(startDate, 'day');
 
   return (
     <Stack 
@@ -202,70 +207,86 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
             />
 
             {/* Date Selection Section */}
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: { xs: 2, sm: 2 }
-            }}>
-              {/* Start Date */}
-              <TextField
-                fullWidth
-                label={t('startDate')}
-                type="date"
-                value={startDate}
-                onChange={(e) => {
-                  const newStartDate = e.target.value;
-                  setStartDate(newStartDate);
-                  // If end date is before new start date, update end date
-                  if (endDate && new Date(endDate) < new Date(newStartDate)) {
-                    setEndDate(newStartDate);
-                  }
-                }}
-                size="small"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                inputProps={{
-                  max: endDate || undefined
-                }}
-                sx={{
-                  '& .MuiInputBase-input': {
-                    fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
-                  }
-                }}
-              />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 2, sm: 2 }
+              }}>
+                {/* Start Date */}
+                <DatePicker
+                  label={t('startDate')}
+                  value={startDate}
+                  onChange={(newValue) => {
+                    setStartDate(newValue);
+                    // If end date is before new start date, update end date
+                    if (endDate && newValue && endDate.isBefore(newValue, 'day')) {
+                      setEndDate(newValue);
+                    }
+                  }}
+                  format="DD MMM YYYY"
+                  maxDate={endDate || undefined}
+                  disableFuture
+                  slotProps={{
+                    textField: {
+                      size: 'small',
+                      fullWidth: true,
+                      inputProps: {
+                        readOnly: true,
+                        style: { cursor: 'pointer' }
+                      },
+                      sx: {
+                        '& .MuiInputBase-input': {
+                          fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                          cursor: 'pointer',
+                        },
+                        '& .MuiInputBase-root': {
+                          cursor: 'pointer',
+                        }
+                      }
+                    }
+                  }}
+                />
 
-              {/* End Date */}
-              <TextField
-                fullWidth
-                label={t('endDate')}
-                type="date"
-                value={endDate}
-                onChange={(e) => {
-                  const newEndDate = e.target.value;
-                  setEndDate(newEndDate);
-                  // If start date is after new end date, update start date
-                  if (startDate && new Date(startDate) > new Date(newEndDate)) {
-                    setStartDate(newEndDate);
-                  }
-                }}
-                size="small"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                inputProps={{
-                  min: startDate || undefined
-                }}
-                sx={{
-                  '& .MuiInputBase-input': {
-                    fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
-                  }
-                }}
-              />
-            </Box>
+                {/* End Date */}
+                <DatePicker
+                  label={t('endDate')}
+                  value={endDate}
+                  onChange={(newValue) => {
+                    setEndDate(newValue);
+                    // If start date is after new end date, update start date
+                    if (startDate && newValue && startDate.isAfter(newValue, 'day')) {
+                      setStartDate(newValue);
+                    }
+                  }}
+                  format="DD MMM YYYY"
+                  minDate={startDate || undefined}
+                  disableFuture
+                  slotProps={{
+                    textField: {
+                      size: 'small',
+                      fullWidth: true,
+                      inputProps: {
+                        readOnly: true,
+                        style: { cursor: 'pointer' }
+                      },
+                      sx: {
+                        '& .MuiInputBase-input': {
+                          fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                          cursor: 'pointer',
+                        },
+                        '& .MuiInputBase-root': {
+                          cursor: 'pointer',
+                        }
+                      }
+                    }
+                  }}
+                />
+              </Box>
+            </LocalizationProvider>
 
             {/* Date validation alert */}
-            {startDate && endDate && new Date(endDate) < new Date(startDate) && (
+            {startDate && endDate && endDate.isBefore(startDate, 'day') && (
               <Alert severity="error" sx={{ fontSize: '0.875rem' }}>
                 {t('endDateMustBeGreater')}
               </Alert>

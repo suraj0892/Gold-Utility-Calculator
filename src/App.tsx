@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ThemeProvider,
   createTheme,
@@ -27,13 +27,37 @@ import AmountCalculator from './components/AmountCalculator';
 import InterestCalculator from './components/InterestCalculator';
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
+  // Get initial selected menu from localStorage or default to 'purity'
+  const getInitialSelectedMenu = () => {
+    const savedMenu = localStorage.getItem('goldCalculator_selectedMenu');
+    return savedMenu || 'purity';
+  };
+  
   // Drawer state
   const [isDrawerOpen, setIsDrawerOpen] = useState(!isMobile);
-  const [selectedMenu, setSelectedMenu] = useState('purity');
+  const [selectedMenu, setSelectedMenu] = useState(getInitialSelectedMenu());
+
+  // Save selected menu to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('goldCalculator_selectedMenu', selectedMenu);
+  }, [selectedMenu]);
+
+  // Initialize language from localStorage or default to English
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('i18nextLng');
+    if (savedLanguage && ['en', 'ta'].includes(savedLanguage)) {
+      if (i18n.language !== savedLanguage) {
+        i18n.changeLanguage(savedLanguage);
+      }
+    } else if (!savedLanguage) {
+      // Only set English as default if no language preference exists
+      i18n.changeLanguage('en');
+    }
+  }, [i18n]);
 
   const handleDrawerToggle = () => {
     setIsDrawerOpen(!isDrawerOpen);

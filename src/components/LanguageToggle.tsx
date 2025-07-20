@@ -22,7 +22,10 @@ const LanguageToggle: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleLanguageChange = (event: SelectChangeEvent) => {
-    i18n.changeLanguage(event.target.value);
+    const newLanguage = event.target.value;
+    i18n.changeLanguage(newLanguage);
+    // Explicitly save to localStorage to ensure persistence
+    localStorage.setItem('i18nextLng', newLanguage);
   };
 
   const languages = {

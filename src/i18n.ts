@@ -18,15 +18,28 @@ i18n
         translation: ta,
       },
     },
+    // Don't set a default language here, let the language detector handle it
     fallbackLng: 'en',
     debug: false,
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator', 'htmlTag'],
+      order: ['localStorage', 'sessionStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
+      // Look for stored language preference
+      lookupLocalStorage: 'i18nextLng',
     },
+    // Only allow supported languages
+    supportedLngs: ['en', 'ta'],
+    nonExplicitSupportedLngs: false,
+  })
+  .then(() => {
+    // Only set English as default if no language preference exists at all
+    const storedLanguage = localStorage.getItem('i18nextLng');
+    if (!storedLanguage) {
+      i18n.changeLanguage('en');
+    }
   });
 
 export default i18n;
