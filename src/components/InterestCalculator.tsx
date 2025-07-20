@@ -95,6 +95,95 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   const [monthlyBreakdown, setMonthlyBreakdown] = useState<MonthlyBreakdown[]>([]);
   const [showBreakdown, setShowBreakdown] = useState<boolean>(false);
 
+  // Load values from localStorage on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('interestCalculator');
+    console.log('Loading from localStorage (Interest):', savedData); // Debug log
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        console.log('Parsed data (Interest):', parsed); // Debug log
+        
+        // Only set values if they exist and are not empty
+        if (parsed.amount !== undefined && parsed.amount !== '') {
+          setAmount(parsed.amount);
+        }
+        if (parsed.amountDisplay !== undefined && parsed.amountDisplay !== '') {
+          setAmountDisplay(parsed.amountDisplay);
+        }
+        if (parsed.startDate !== undefined && parsed.startDate !== null) {
+          setStartDate(dayjs(parsed.startDate));
+        }
+        if (parsed.endDate !== undefined && parsed.endDate !== null) {
+          setEndDate(dayjs(parsed.endDate));
+        }
+        if (parsed.interestRate !== undefined && parsed.interestRate !== '') {
+          setInterestRate(parsed.interestRate);
+        }
+        if (parsed.interestPeriod !== undefined && parsed.interestPeriod !== '') {
+          setInterestPeriod(parsed.interestPeriod);
+        }
+        if (parsed.interestType !== undefined && parsed.interestType !== '') {
+          setInterestType(parsed.interestType);
+        }
+        if (parsed.useRounding !== undefined) {
+          setUseRounding(parsed.useRounding);
+        }
+        
+        // Load results if they exist
+        if (parsed.principalAmount !== undefined && parsed.principalAmount !== null) {
+          setPrincipalAmount(parsed.principalAmount);
+        }
+        if (parsed.interestAmount !== undefined && parsed.interestAmount !== null) {
+          setInterestAmount(parsed.interestAmount);
+        }
+        if (parsed.totalAmount !== undefined && parsed.totalAmount !== null) {
+          setTotalAmount(parsed.totalAmount);
+        }
+        if (parsed.timePeriod !== undefined && parsed.timePeriod !== null) {
+          setTimePeriod(parsed.timePeriod);
+        }
+        if (parsed.monthlyBreakdown !== undefined && Array.isArray(parsed.monthlyBreakdown)) {
+          setMonthlyBreakdown(parsed.monthlyBreakdown);
+        }
+        if (parsed.showBreakdown !== undefined) {
+          setShowBreakdown(parsed.showBreakdown);
+        }
+      } catch (error) {
+        console.error('Error loading saved data (Interest):', error);
+      }
+    }
+  }, []);
+
+  // Save values to localStorage whenever they change
+  const saveToLocalStorage = () => {
+    const dataToSave = {
+      amount,
+      amountDisplay,
+      startDate: startDate ? startDate.toISOString() : null,
+      endDate: endDate ? endDate.toISOString() : null,
+      interestRate,
+      interestPeriod,
+      interestType,
+      useRounding,
+      // Include results
+      principalAmount,
+      interestAmount,
+      totalAmount,
+      timePeriod,
+      monthlyBreakdown,
+      showBreakdown
+    };
+    console.log('Saving to localStorage (Interest):', dataToSave); // Debug log
+    localStorage.setItem('interestCalculator', JSON.stringify(dataToSave));
+  };
+
+  // Save to localStorage whenever any input or result changes
+  useEffect(() => {
+    saveToLocalStorage();
+  }, [amount, amountDisplay, startDate, endDate, interestRate, interestPeriod, interestType, useRounding,
+      principalAmount, interestAmount, totalAmount, timePeriod, monthlyBreakdown, showBreakdown]);
+
   // Set current date as default end date (removed since we're setting it in state declaration)
   // useEffect(() => {
   //   const today = new Date();
@@ -341,6 +430,10 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     setTimePeriod(null);
     setMonthlyBreakdown([]);
     setShowBreakdown(false);
+    
+    // Clear localStorage
+    localStorage.removeItem('interestCalculator');
+    
     onReset?.();
   };
 

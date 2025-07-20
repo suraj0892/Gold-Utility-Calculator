@@ -46,6 +46,96 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
   const [goldValue, setGoldValue] = useState<number | null>(null);
   const [miscValue, setMiscValue] = useState<number | null>(null);
 
+  // Load values from localStorage on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('amountCalculator');
+    console.log('Loading from localStorage:', savedData); // Debug log
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        console.log('Parsed data:', parsed); // Debug log
+        
+        // Only set values if they exist and are not empty
+        if (parsed.goldWeight !== undefined && parsed.goldWeight !== '') {
+          setGoldWeight(parsed.goldWeight);
+        }
+        if (parsed.goldPurity !== undefined && parsed.goldPurity !== '') {
+          setGoldPurity(parsed.goldPurity);
+        }
+        if (parsed.customGoldPurity !== undefined && parsed.customGoldPurity !== '') {
+          setCustomGoldPurity(parsed.customGoldPurity);
+        }
+        if (parsed.goldRate22k !== undefined && parsed.goldRate22k !== '') {
+          setGoldRate22k(parsed.goldRate22k);
+        }
+        if (parsed.goldRate22kDisplay !== undefined && parsed.goldRate22kDisplay !== '') {
+          setGoldRate22kDisplay(parsed.goldRate22kDisplay);
+        }
+        if (parsed.goldRate24k !== undefined && parsed.goldRate24k !== '') {
+          setGoldRate24k(parsed.goldRate24k);
+        }
+        if (parsed.goldRate24kDisplay !== undefined && parsed.goldRate24kDisplay !== '') {
+          setGoldRate24kDisplay(parsed.goldRate24kDisplay);
+        }
+        if (parsed.miscChargeType !== undefined && parsed.miscChargeType !== '') {
+          setMiscChargeType(parsed.miscChargeType);
+        }
+        if (parsed.miscAmount !== undefined && parsed.miscAmount !== '') {
+          setMiscAmount(parsed.miscAmount);
+        }
+        if (parsed.miscAmountDisplay !== undefined && parsed.miscAmountDisplay !== '') {
+          setMiscAmountDisplay(parsed.miscAmountDisplay);
+        }
+        if (parsed.miscPercentage !== undefined && parsed.miscPercentage !== '') {
+          setMiscPercentage(parsed.miscPercentage);
+        }
+        
+        // Load results if they exist
+        if (parsed.totalAmount !== undefined && parsed.totalAmount !== null) {
+          setTotalAmount(parsed.totalAmount);
+        }
+        if (parsed.goldValue !== undefined && parsed.goldValue !== null) {
+          setGoldValue(parsed.goldValue);
+        }
+        if (parsed.miscValue !== undefined && parsed.miscValue !== null) {
+          setMiscValue(parsed.miscValue);
+        }
+      } catch (error) {
+        console.error('Error loading saved data:', error);
+      }
+    }
+  }, []);
+
+  // Save values to localStorage whenever they change
+  const saveToLocalStorage = () => {
+    const dataToSave = {
+      goldWeight,
+      goldPurity,
+      customGoldPurity,
+      goldRate22k,
+      goldRate22kDisplay,
+      goldRate24k,
+      goldRate24kDisplay,
+      miscChargeType,
+      miscAmount,
+      miscAmountDisplay,
+      miscPercentage,
+      // Include results
+      totalAmount,
+      goldValue,
+      miscValue
+    };
+    console.log('Saving to localStorage:', dataToSave); // Debug log
+    localStorage.setItem('amountCalculator', JSON.stringify(dataToSave));
+  };
+
+  // Save to localStorage whenever any input or result changes
+  useEffect(() => {
+    saveToLocalStorage();
+  }, [goldWeight, goldPurity, customGoldPurity, goldRate22k, goldRate22kDisplay, 
+      goldRate24k, goldRate24kDisplay, miscChargeType, miscAmount, miscAmountDisplay, miscPercentage,
+      totalAmount, goldValue, miscValue]);
+
   // Common gold purity values
   const commonPurities = [
     { value: 91.6, label: t('22k') },
@@ -252,6 +342,8 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     setCustomGoldPurity('');
     setGoldRate24k('');
     setGoldRate24kDisplay('');
+    setGoldRate22k('');
+    setGoldRate22kDisplay('');
     setMiscChargeType('amount');
     setMiscAmount('');
     setMiscAmountDisplay('');
@@ -259,6 +351,10 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     setTotalAmount(null);
     setGoldValue(null);
     setMiscValue(null);
+    
+    // Clear localStorage
+    localStorage.removeItem('amountCalculator');
+    
     onReset?.();
   };
 

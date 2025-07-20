@@ -38,6 +38,75 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
   const [weightToAdd, setWeightToAdd] = useState<number | null>(null);
   const [totalWeight, setTotalWeight] = useState<number | null>(null);
 
+  // Load values from localStorage on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('purityCalculator');
+    console.log('Loading from localStorage (Purity):', savedData); // Debug log
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        console.log('Parsed data (Purity):', parsed); // Debug log
+        
+        // Only set values if they exist and are not empty
+        if (parsed.weight !== undefined && parsed.weight !== '') {
+          setWeight(parsed.weight);
+        }
+        if (parsed.currentPurity !== undefined && parsed.currentPurity !== '') {
+          setCurrentPurity(parsed.currentPurity);
+        }
+        if (parsed.targetPurity !== undefined && parsed.targetPurity !== '') {
+          setTargetPurity(parsed.targetPurity);
+        }
+        if (parsed.customTargetPurity !== undefined && parsed.customTargetPurity !== '') {
+          setCustomTargetPurity(parsed.customTargetPurity);
+        }
+        if (parsed.goldPurityToAdd !== undefined && parsed.goldPurityToAdd !== '') {
+          setGoldPurityToAdd(parsed.goldPurityToAdd);
+        }
+        if (parsed.customGoldPurity !== undefined && parsed.customGoldPurity !== '') {
+          setCustomGoldPurity(parsed.customGoldPurity);
+        }
+        
+        // Load results if they exist
+        if (parsed.resultType !== undefined && parsed.resultType !== '') {
+          setResultType(parsed.resultType);
+        }
+        if (parsed.weightToAdd !== undefined && parsed.weightToAdd !== null) {
+          setWeightToAdd(parsed.weightToAdd);
+        }
+        if (parsed.totalWeight !== undefined && parsed.totalWeight !== null) {
+          setTotalWeight(parsed.totalWeight);
+        }
+      } catch (error) {
+        console.error('Error loading saved data (Purity):', error);
+      }
+    }
+  }, []);
+
+  // Save values to localStorage whenever they change
+  const saveToLocalStorage = () => {
+    const dataToSave = {
+      weight,
+      currentPurity,
+      targetPurity,
+      customTargetPurity,
+      goldPurityToAdd,
+      customGoldPurity,
+      // Include results
+      resultType,
+      weightToAdd,
+      totalWeight
+    };
+    console.log('Saving to localStorage (Purity):', dataToSave); // Debug log
+    localStorage.setItem('purityCalculator', JSON.stringify(dataToSave));
+  };
+
+  // Save to localStorage whenever any input or result changes
+  useEffect(() => {
+    saveToLocalStorage();
+  }, [weight, currentPurity, targetPurity, customTargetPurity, goldPurityToAdd, customGoldPurity,
+      resultType, weightToAdd, totalWeight]);
+
   // Common gold purity values
   const commonPurities = [
     { value: 91.6, label: t('22k') },
@@ -180,6 +249,10 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
     setResultType('');
     setWeightToAdd(null);
     setTotalWeight(null);
+    
+    // Clear localStorage
+    localStorage.removeItem('purityCalculator');
+    
     onReset?.();
   };
 
