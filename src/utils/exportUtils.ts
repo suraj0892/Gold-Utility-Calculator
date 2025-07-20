@@ -24,12 +24,44 @@ export interface ExportData {
   }>;
 }
 
-// Format number in Indian format with currency symbol
+// Format number in Indian format with currency symbol (safe for PDF)
 const formatCurrency = (amount: number): string => {
-  return `₹${amount.toLocaleString('en-IN', { 
+  return `Rs. ${amount.toLocaleString('en-IN', { 
     minimumFractionDigits: 2, 
     maximumFractionDigits: 2 
   })}`;
+};
+
+// Format number without currency (for better PDF compatibility)
+const formatNumber = (amount: number): string => {
+  return amount.toLocaleString('en-IN', { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+  });
+};
+
+// Simple number formatting for PDF (avoiding locale issues)
+const formatNumberForPDF = (amount: number): string => {
+  // Format number with commas in Indian style
+  const parts = amount.toFixed(2).split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts[1];
+  
+  // Add commas in Indian style (last 3 digits, then every 2 digits)
+  let formattedInteger = '';
+  if (integerPart.length <= 3) {
+    formattedInteger = integerPart;
+  } else {
+    const lastThree = integerPart.slice(-3);
+    const remaining = integerPart.slice(0, -3);
+    const chunks = [];
+    for (let i = remaining.length; i > 0; i -= 2) {
+      chunks.unshift(remaining.slice(Math.max(0, i - 2), i));
+    }
+    formattedInteger = chunks.join(',') + ',' + lastThree;
+  }
+  
+  return `${formattedInteger}.${decimalPart}`;
 };
 
 // Export results section as PNG
@@ -74,13 +106,17 @@ export const exportToPDF = async (data: ExportData, filename: string = 'interest
     const contentWidth = pageWidth - 2 * margin;
     let yPosition = margin;
 
-    // Helper function to add text with auto wrap
+    // Helper function to add text with auto wrap and better encoding
     const addText = (text: string, fontSize: number = 12, isBold: boolean = false, color: [number, number, number] = [0, 0, 0]) => {
       pdf.setFontSize(fontSize);
       pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
       pdf.setTextColor(color[0], color[1], color[2]);
       
-      const lines = pdf.splitTextToSize(text, contentWidth);
+      // Clean the text to avoid encoding issues
+      const cleanText = text.replace(/[^\x00-\x7F]/g, ''); // Remove non-ASCII characters if any
+      const safeText = cleanText || text; // Fallback to original if cleaning removes everything
+      
+      const lines = pdf.splitTextToSize(safeText, contentWidth);
       lines.forEach((line: string) => {
         if (yPosition > pageHeight - margin) {
           pdf.addPage();
@@ -104,7 +140,7 @@ export const exportToPDF = async (data: ExportData, filename: string = 'interest
 
     // Input Values Section
     addText('Input Values:', 14, true, [142, 89, 36]);
-    addText(`Principal Amount: ${formatCurrency(data.principalAmount)}`);
+    addText(`Principal Amount: Rs. ${formatNumberForPDF(data.principalAmount)}`);
     addText(`Interest Rate: ${data.interestRate}% ${data.interestPeriod}`);
     addText(`Start Date: ${data.startDate}`);
     addText(`End Date: ${data.endDate}`);
@@ -115,8 +151,8 @@ export const exportToPDF = async (data: ExportData, filename: string = 'interest
 
     // Results Section
     addText('Calculation Results:', 14, true, [142, 89, 36]);
-    addText(`Interest Amount: ${formatCurrency(data.interestAmount)}`);
-    addText(`Total Amount: ${formatCurrency(data.totalAmount)}`, 12, true, [156, 124, 56]);
+    addText(`Interest Amount: Rs. ${formatNumberForPDF(data.interestAmount)}`);
+    addText(`Total Amount: Rs. ${formatNumberForPDF(data.totalAmount)}`, 12, true, [156, 124, 56]);
     yPosition += 5;
 
     // Monthly Breakdown (if available)
@@ -173,12 +209,14 @@ export const exportToPDF = async (data: ExportData, filename: string = 'interest
         const rowData = [
           `${month.month} ${month.year}`,
           month.daysInMonth.toString(),
-          formatCurrency(month.monthlyInterest),
-          formatCurrency(month.cumulativeInterest)
+          `Rs. ${formatNumberForPDF(month.monthlyInterest)}`,
+          `Rs. ${formatNumberForPDF(month.cumulativeInterest)}`
         ];
 
         rowData.forEach((data, colIndex) => {
-          pdf.text(data, xPosition, yPosition);
+          // Clean text for better PDF compatibility
+          const cleanData = data.replace(/[^\x00-\x7F]/g, '') || data;
+          pdf.text(cleanData, xPosition, yPosition);
           xPosition += columnWidths[colIndex];
         });
         yPosition += 8;
