@@ -20,12 +20,15 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Divider
+  Divider,
+  InputAdornment
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-  Timeline as TimelineIcon
+  Timeline as TimelineIcon,
+  Add,
+  Remove
 } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -119,6 +122,19 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         setAmountDisplay(cleanValue);
       }
     }
+  };
+
+  // Helper functions for increment/decrement
+  const incrementInterestRate = () => {
+    const current = Number(interestRate) || 0;
+    const newValue = Math.min(current + 0.1, 100);
+    setInterestRate(newValue.toFixed(1));
+  };
+
+  const decrementInterestRate = () => {
+    const current = Number(interestRate) || 0;
+    const newValue = Math.max(current - 0.1, 0);
+    setInterestRate(newValue.toFixed(1));
   };
 
   // Calculate time difference with optional rounding logic
@@ -509,6 +525,43 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 }
               }}
               size="small"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="decrease interest rate"
+                      onClick={decrementInterestRate}
+                      edge="end"
+                      size="small"
+                      disabled={Number(interestRate) <= 0}
+                      sx={{ 
+                        mr: 0.5,
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                        }
+                      }}
+                    >
+                      <Remove fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      aria-label="increase interest rate"
+                      onClick={incrementInterestRate}
+                      edge="end"
+                      size="small"
+                      disabled={Number(interestRate) >= 100}
+                      sx={{ 
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                        }
+                      }}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
               inputProps={{
                 inputMode: 'decimal',
                 pattern: '[0-9]*\\.?[0-9]*'

@@ -13,8 +13,11 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  FormLabel
+  FormLabel,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
+import { Add, Remove } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { formatIndianNumber, numberToWords, numberToWordsTamil } from '../utils/numberUtils';
 
@@ -176,6 +179,43 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     }
   };
 
+  // Helper functions for increment/decrement
+  const incrementGoldWeight = () => {
+    const current = Number(goldWeight) || 0;
+    const newValue = current + 0.1;
+    setGoldWeight(newValue.toFixed(1));
+  };
+
+  const decrementGoldWeight = () => {
+    const current = Number(goldWeight) || 0;
+    const newValue = Math.max(current - 0.1, 0);
+    setGoldWeight(newValue.toFixed(1));
+  };
+
+  const incrementCustomGoldPurity = () => {
+    const current = Number(customGoldPurity) || 0;
+    const newValue = Math.min(current + 0.1, 100);
+    setCustomGoldPurity(newValue.toFixed(1));
+  };
+
+  const decrementCustomGoldPurity = () => {
+    const current = Number(customGoldPurity) || 0;
+    const newValue = Math.max(current - 0.1, 0);
+    setCustomGoldPurity(newValue.toFixed(1));
+  };
+
+  const incrementMiscPercentage = () => {
+    const current = Number(miscPercentage) || 0;
+    const newValue = Math.min(current + 0.1, 1000);
+    setMiscPercentage(newValue.toFixed(1));
+  };
+
+  const decrementMiscPercentage = () => {
+    const current = Number(miscPercentage) || 0;
+    const newValue = Math.max(current - 0.1, 0);
+    setMiscPercentage(newValue.toFixed(1));
+  };
+
   // Effect to calculate when inputs change
   useEffect(() => {
     if (goldWeight && goldPurity && 
@@ -253,8 +293,50 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
               fullWidth
               label={t('goldWeight')}
               value={goldWeight}
-              onChange={(e) => setGoldWeight(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Only allow numbers and decimal point
+                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                  setGoldWeight(value);
+                }
+              }}
               size="small"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="decrease gold weight"
+                      onClick={decrementGoldWeight}
+                      edge="end"
+                      size="small"
+                      disabled={Number(goldWeight) <= 0}
+                      sx={{ 
+                        mr: 0.5,
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                        }
+                      }}
+                    >
+                      <Remove fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      aria-label="increase gold weight"
+                      onClick={incrementGoldWeight}
+                      edge="end"
+                      size="small"
+                      sx={{ 
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                        }
+                      }}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
               inputProps={{
                 inputMode: 'decimal',
                 pattern: '[0-9]*\\.?[0-9]*'
@@ -296,6 +378,43 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                   }
                 }}
                 size="small"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="decrease custom gold purity"
+                        onClick={decrementCustomGoldPurity}
+                        edge="end"
+                        size="small"
+                        disabled={Number(customGoldPurity) <= 0}
+                        sx={{ 
+                          mr: 0.5,
+                          color: '#9c7c38',
+                          '&:hover': {
+                            backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                          }
+                        }}
+                      >
+                        <Remove fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        aria-label="increase custom gold purity"
+                        onClick={incrementCustomGoldPurity}
+                        edge="end"
+                        size="small"
+                        disabled={Number(customGoldPurity) >= 100}
+                        sx={{ 
+                          color: '#9c7c38',
+                          '&:hover': {
+                            backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                          }
+                        }}
+                      >
+                        <Add fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
                 inputProps={{
                   inputMode: 'decimal',
                   pattern: '[0-9]*\\.?[0-9]*'
@@ -408,6 +527,43 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                   }
                 }}
                 size="small"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="decrease misc percentage"
+                        onClick={decrementMiscPercentage}
+                        edge="end"
+                        size="small"
+                        disabled={Number(miscPercentage) <= 0}
+                        sx={{ 
+                          mr: 0.5,
+                          color: '#9c7c38',
+                          '&:hover': {
+                            backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                          }
+                        }}
+                      >
+                        <Remove fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        aria-label="increase misc percentage"
+                        onClick={incrementMiscPercentage}
+                        edge="end"
+                        size="small"
+                        disabled={Number(miscPercentage) >= 1000}
+                        sx={{ 
+                          color: '#9c7c38',
+                          '&:hover': {
+                            backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                          }
+                        }}
+                      >
+                        <Add fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
                 inputProps={{
                   inputMode: 'decimal',
                   pattern: '[0-9]*\\.?[0-9]*'

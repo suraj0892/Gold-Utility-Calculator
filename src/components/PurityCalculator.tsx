@@ -9,8 +9,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  SelectChangeEvent
+  SelectChangeEvent,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
+import { Add, Remove } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 interface PurityCalculatorProps {
@@ -53,6 +56,58 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
       setTargetPurity(value);
       setCustomTargetPurity('');
     }
+  };
+
+  // Helper functions for weight increment/decrement
+  const incrementWeight = () => {
+    const current = Number(weight) || 0;
+    const newValue = current + 0.1;
+    setWeight(newValue.toFixed(1));
+  };
+
+  const decrementWeight = () => {
+    const current = Number(weight) || 0;
+    const newValue = Math.max(current - 0.1, 0);
+    setWeight(newValue.toFixed(1));
+  };
+
+  // Helper functions for current purity increment/decrement
+  const incrementCurrentPurity = () => {
+    const current = Number(currentPurity) || 0;
+    const newValue = Math.min(current + 0.1, 100);
+    setCurrentPurity(newValue.toFixed(1));
+  };
+
+  const decrementCurrentPurity = () => {
+    const current = Number(currentPurity) || 0;
+    const newValue = Math.max(current - 0.1, 0);
+    setCurrentPurity(newValue.toFixed(1));
+  };
+
+  // Helper functions for custom target purity increment/decrement
+  const incrementCustomTargetPurity = () => {
+    const current = Number(customTargetPurity) || 0;
+    const newValue = Math.min(current + 0.1, 100);
+    setCustomTargetPurity(newValue.toFixed(1));
+  };
+
+  const decrementCustomTargetPurity = () => {
+    const current = Number(customTargetPurity) || 0;
+    const newValue = Math.max(current - 0.1, 0);
+    setCustomTargetPurity(newValue.toFixed(1));
+  };
+
+  // Helper functions for custom gold purity increment/decrement
+  const incrementCustomGoldPurity = () => {
+    const current = Number(customGoldPurity) || 0;
+    const newValue = Math.min(current + 0.1, 100);
+    setCustomGoldPurity(newValue.toFixed(1));
+  };
+
+  const decrementCustomGoldPurity = () => {
+    const current = Number(customGoldPurity) || 0;
+    const newValue = Math.max(current - 0.1, 0);
+    setCustomGoldPurity(newValue.toFixed(1));
   };
 
   // Function to calculate results based on formula
@@ -158,8 +213,50 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
               fullWidth
               label={t('currentWeight')}
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Only allow numbers and decimal point
+                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                  setWeight(value);
+                }
+              }}
               size="small"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="decrease weight"
+                      onClick={decrementWeight}
+                      edge="end"
+                      size="small"
+                      disabled={Number(weight) <= 0}
+                      sx={{ 
+                        mr: 0.5,
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                        }
+                      }}
+                    >
+                      <Remove fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      aria-label="increase weight"
+                      onClick={incrementWeight}
+                      edge="end"
+                      size="small"
+                      sx={{ 
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                        }
+                      }}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
               inputProps={{
                 inputMode: 'decimal',
                 pattern: '[0-9]*\\.?[0-9]*'
@@ -185,6 +282,43 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                 }
               }}
               size="small"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="decrease current purity"
+                      onClick={decrementCurrentPurity}
+                      edge="end"
+                      size="small"
+                      disabled={Number(currentPurity) <= 0}
+                      sx={{ 
+                        mr: 0.5,
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                        }
+                      }}
+                    >
+                      <Remove fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      aria-label="increase current purity"
+                      onClick={incrementCurrentPurity}
+                      edge="end"
+                      size="small"
+                      disabled={Number(currentPurity) >= 100}
+                      sx={{ 
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                        }
+                      }}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
               inputProps={{
                 inputMode: 'decimal',
                 pattern: '[0-9]*\\.?[0-9]*'
@@ -234,6 +368,43 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                   }
                 }}
                 size="small"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="decrease custom target purity"
+                        onClick={decrementCustomTargetPurity}
+                        edge="end"
+                        size="small"
+                        disabled={Number(customTargetPurity) <= 0}
+                        sx={{ 
+                          mr: 0.5,
+                          color: '#9c7c38',
+                          '&:hover': {
+                            backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                          }
+                        }}
+                      >
+                        <Remove fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        aria-label="increase custom target purity"
+                        onClick={incrementCustomTargetPurity}
+                        edge="end"
+                        size="small"
+                        disabled={Number(customTargetPurity) >= 100}
+                        sx={{ 
+                          color: '#9c7c38',
+                          '&:hover': {
+                            backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                          }
+                        }}
+                      >
+                        <Add fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
                 inputProps={{
                   inputMode: 'decimal',
                   pattern: '[0-9]*\\.?[0-9]*'
@@ -312,6 +483,43 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                           setCustomGoldPurity(value);
                         }
                       }
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="decrease custom gold purity"
+                            onClick={decrementCustomGoldPurity}
+                            edge="end"
+                            size="small"
+                            disabled={Number(customGoldPurity) <= 0}
+                            sx={{ 
+                              mr: 0.5,
+                              color: '#9c7c38',
+                              '&:hover': {
+                                backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                              }
+                            }}
+                          >
+                            <Remove fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            aria-label="increase custom gold purity"
+                            onClick={incrementCustomGoldPurity}
+                            edge="end"
+                            size="small"
+                            disabled={Number(customGoldPurity) >= 100}
+                            sx={{ 
+                              color: '#9c7c38',
+                              '&:hover': {
+                                backgroundColor: 'rgba(156, 124, 56, 0.1)'
+                              }
+                            }}
+                          >
+                            <Add fontSize="small" />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                     inputProps={{
                       inputMode: 'decimal',
