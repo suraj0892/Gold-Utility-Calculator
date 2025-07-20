@@ -41,6 +41,7 @@
   "enterAllValues": "Enter all values to see results",
   "reset": "Reset",
   "goldWeight": "Gold Weight (grams)",
+  "evaluationDate": "Evaluation Date",
   "goldPurity": "Gold Purity (%)",
   "selectAmountPurity": "Select Gold Purity",
   "selectRateType": "Select Rate Type",

@@ -409,15 +409,18 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       setEndDate(newValue);
                     }
                   }}
-                  format="DD MMM YYYY"
+                  format="DD-MM-YYYY"
                   maxDate={endDate || undefined}
                   disableFuture
                   slotProps={{
                     textField: {
                       size: 'small',
                       fullWidth: true,
+                      placeholder: "DD-MM-YYYY",
                       inputProps: {
-                        readOnly: true,
+                        inputMode: 'numeric',
+                        pattern: '[0-9-]*',
+                        maxLength: 10,
                         style: { cursor: 'pointer' }
                       },
                       sx: {
@@ -427,9 +430,63 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                         },
                         '& .MuiInputBase-root': {
                           cursor: 'pointer',
-                        }
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '&:hover fieldset': {
+                            borderColor: '#9c7c38',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#9c7c38',
+                          },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#9c7c38',
+                        },
                       }
-                    }
+                    },
+                    openPickerButton: {
+                      sx: {
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)',
+                        },
+                      },
+                    },
+                  }}
+                  sx={{
+                    '& .MuiPickersDay-root': {
+                      '&:hover': {
+                        backgroundColor: 'rgba(156, 124, 56, 0.1)',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#9c7c38 !important',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.8) !important',
+                        },
+                      },
+                    },
+                    '& .MuiPickersYear-yearButton': {
+                      '&:hover': {
+                        backgroundColor: 'rgba(156, 124, 56, 0.1)',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#9c7c38 !important',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.8) !important',
+                        },
+                      },
+                    },
+                    '& .MuiPickersMonth-monthButton': {
+                      '&:hover': {
+                        backgroundColor: 'rgba(156, 124, 56, 0.1)',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#9c7c38 !important',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.8) !important',
+                        },
+                      },
+                    },
                   }}
                 />
 
@@ -444,15 +501,18 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       setStartDate(newValue);
                     }
                   }}
-                  format="DD MMM YYYY"
+                  format="DD-MM-YYYY"
                   minDate={startDate || undefined}
                   disableFuture
                   slotProps={{
                     textField: {
                       size: 'small',
                       fullWidth: true,
+                      placeholder: "DD-MM-YYYY",
                       inputProps: {
-                        readOnly: true,
+                        inputMode: 'numeric',
+                        pattern: '[0-9-]*',
+                        maxLength: 10,
                         style: { cursor: 'pointer' }
                       },
                       sx: {
@@ -462,9 +522,63 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                         },
                         '& .MuiInputBase-root': {
                           cursor: 'pointer',
-                        }
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '&:hover fieldset': {
+                            borderColor: '#9c7c38',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#9c7c38',
+                          },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#9c7c38',
+                        },
                       }
-                    }
+                    },
+                    openPickerButton: {
+                      sx: {
+                        color: '#9c7c38',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.1)',
+                        },
+                      },
+                    },
+                  }}
+                  sx={{
+                    '& .MuiPickersDay-root': {
+                      '&:hover': {
+                        backgroundColor: 'rgba(156, 124, 56, 0.1)',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#9c7c38 !important',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.8) !important',
+                        },
+                      },
+                    },
+                    '& .MuiPickersYear-yearButton': {
+                      '&:hover': {
+                        backgroundColor: 'rgba(156, 124, 56, 0.1)',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#9c7c38 !important',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.8) !important',
+                        },
+                      },
+                    },
+                    '& .MuiPickersMonth-monthButton': {
+                      '&:hover': {
+                        backgroundColor: 'rgba(156, 124, 56, 0.1)',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#9c7c38 !important',
+                        '&:hover': {
+                          backgroundColor: 'rgba(156, 124, 56, 0.8) !important',
+                        },
+                      },
+                    },
                   }}
                 />
               </Box>
