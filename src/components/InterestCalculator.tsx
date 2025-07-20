@@ -21,14 +21,20 @@ import {
   Paper,
   IconButton,
   Divider,
-  InputAdornment
+  InputAdornment,
+  Tooltip,
+  CircularProgress,
+  Snackbar
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   Timeline as TimelineIcon,
   Add,
-  Remove
+  Remove,
+  Download as DownloadIcon,
+  PictureAsPdf as PdfIcon,
+  Image as ImageIcon
 } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -36,6 +42,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { formatIndianNumber, numberToWords, numberToWordsTamil } from '../utils/numberUtils';
+import { exportToPNG, exportToPDF, ExportData } from '../utils/exportUtils';
 
 interface InterestCalculatorProps {
   onReset?: () => void;
@@ -63,6 +70,11 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   const [interestPeriod, setInterestPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [interestType, setInterestType] = useState<'simple' | 'compound'>('simple');
   const [useRounding, setUseRounding] = useState<boolean>(false);
+
+  // Export state
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [exportMessage, setExportMessage] = useState<string>('');
+  const [showExportSnackbar, setShowExportSnackbar] = useState<boolean>(false);
 
   // Helper function to convert between monthly and yearly rates
   const convertInterestRate = (rate: number, fromPeriod: 'monthly' | 'yearly', toPeriod: 'monthly' | 'yearly') => {
@@ -112,10 +124,16 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
           setAmountDisplay(parsed.amountDisplay);
         }
         if (parsed.startDate !== undefined && parsed.startDate !== null) {
-          setStartDate(dayjs(parsed.startDate));
+          const startDateObj = dayjs(parsed.startDate);
+          if (startDateObj.isValid()) {
+            setStartDate(startDateObj);
+          }
         }
         if (parsed.endDate !== undefined && parsed.endDate !== null) {
-          setEndDate(dayjs(parsed.endDate));
+          const endDateObj = dayjs(parsed.endDate);
+          if (endDateObj.isValid()) {
+            setEndDate(endDateObj);
+          }
         }
         if (parsed.interestRate !== undefined && parsed.interestRate !== '') {
           setInterestRate(parsed.interestRate);
@@ -157,30 +175,48 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
 
   // Save values to localStorage whenever they change
   const saveToLocalStorage = () => {
-    const dataToSave = {
-      amount,
-      amountDisplay,
-      startDate: startDate ? startDate.toISOString() : null,
-      endDate: endDate ? endDate.toISOString() : null,
-      interestRate,
-      interestPeriod,
-      interestType,
-      useRounding,
-      // Include results
-      principalAmount,
-      interestAmount,
-      totalAmount,
-      timePeriod,
-      monthlyBreakdown,
-      showBreakdown
-    };
-    console.log('Saving to localStorage (Interest):', dataToSave); // Debug log
-    localStorage.setItem('interestCalculator', JSON.stringify(dataToSave));
+    try {
+      // Helper function to safely convert date to ISO string
+      const safeDateToISO = (date: Dayjs | null): string | null => {
+        try {
+          return date && date.isValid() && !isNaN(date.valueOf()) ? date.toISOString() : null;
+        } catch (error) {
+          console.warn('Error converting date to ISO:', error);
+          return null;
+        }
+      };
+
+      const dataToSave = {
+        amount,
+        amountDisplay,
+        startDate: safeDateToISO(startDate),
+        endDate: safeDateToISO(endDate),
+        interestRate,
+        interestPeriod,
+        interestType,
+        useRounding,
+        // Include results
+        principalAmount,
+        interestAmount,
+        totalAmount,
+        timePeriod,
+        monthlyBreakdown,
+        showBreakdown
+      };
+      console.log('Saving to localStorage (Interest):', dataToSave); // Debug log
+      localStorage.setItem('interestCalculator', JSON.stringify(dataToSave));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
   };
 
-  // Save to localStorage whenever any input or result changes
+  // Save to localStorage whenever any input or result changes (with debouncing)
   useEffect(() => {
-    saveToLocalStorage();
+    const timeoutId = setTimeout(() => {
+      saveToLocalStorage();
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
   }, [amount, amountDisplay, startDate, endDate, interestRate, interestPeriod, interestType, useRounding,
       principalAmount, interestAmount, totalAmount, timePeriod, monthlyBreakdown, showBreakdown]);
 
@@ -277,10 +313,16 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     type: 'simple' | 'compound',
     applyRounding: boolean = false
   ): MonthlyBreakdown[] => {
-    const breakdown: MonthlyBreakdown[] = [];
-    let current = start.clone();
-    let cumulativeInterest = 0;
-    let currentPrincipal = principal;
+    // Validate inputs
+    if (!isValidDate(start) || !isValidDate(end) || !principal || !rate || principal <= 0 || rate < 0) {
+      return [];
+    }
+
+    try {
+      const breakdown: MonthlyBreakdown[] = [];
+      let current = start.clone();
+      let cumulativeInterest = 0;
+      let currentPrincipal = principal;
     
     while (current.isBefore(end, 'month') || current.isSame(end, 'month')) {
       const monthStart = current.startOf('month');
@@ -336,11 +378,37 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     }
     
     return breakdown;
+    } catch (error) {
+      console.error('Error calculating monthly breakdown:', error);
+      return [];
+    }
   };
+
+  // Helper function to check if a date is valid and complete
+  const isValidDate = (date: Dayjs | null): boolean => {
+    if (!date) return false;
+    try {
+      // Check if date is valid, not NaN, and has a reasonable year (not just partial input)
+      return date.isValid() && 
+             !isNaN(date.valueOf()) && 
+             date.year() > 1900 && 
+             date.year() < 2100 &&
+             date.month() >= 0 && 
+             date.month() <= 11 &&
+             date.date() >= 1 && 
+             date.date() <= 31;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const isValidDateRange = isValidDate(startDate) && isValidDate(endDate) && 
+    startDate && endDate && (endDate.isAfter(startDate, 'day') || endDate.isSame(startDate, 'day'));
 
   // Calculate interest (simple or compound)
   const calculateInterest = () => {
-    if (!amount || !startDate || !endDate || !interestRate) {
+    // Enhanced validation with proper date checking
+    if (!amount || !isValidDate(startDate) || !isValidDate(endDate) || !interestRate || !isValidDateRange) {
       setPrincipalAmount(null);
       setInterestAmount(null);
       setTotalAmount(null);
@@ -349,8 +417,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
       return;
     }
 
-    const principal = Number(amount);
-    const rate = Number(interestRate);
+    try {
+      const principal = Number(amount);
+      const rate = Number(interestRate);
     
     const timeDiff = calculateTimeDifference(startDate, endDate, useRounding);
     if (!timeDiff) {
@@ -407,11 +476,23 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     // Calculate monthly breakdown
     const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, useRounding);
     setMonthlyBreakdown(breakdown);
+    } catch (error) {
+      console.error('Error calculating interest:', error);
+      setPrincipalAmount(null);
+      setInterestAmount(null);
+      setTotalAmount(null);
+      setTimePeriod(null);
+      setMonthlyBreakdown([]);
+    }
   };
 
-  // Calculate interest when inputs change
+  // Calculate interest when inputs change (with debouncing)
   useEffect(() => {
-    calculateInterest();
+    const timeoutId = setTimeout(() => {
+      calculateInterest();
+    }, 500); // 500ms debounce for calculations
+
+    return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, startDate, endDate, interestRate, interestPeriod, interestType, useRounding]);
 
@@ -437,14 +518,77 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     onReset?.();
   };
 
-  const isValidDateRange = startDate && endDate && endDate.isAfter(startDate, 'day') || endDate?.isSame(startDate, 'day');
+  // Export functions
+  const handleExportPNG = async () => {
+    if (!totalAmount || !principalAmount || !interestAmount) {
+      setExportMessage(t('noDataToExport'));
+      setShowExportSnackbar(true);
+      return;
+    }
+
+    setIsExporting(true);
+    setExportMessage(t('exportingPng'));
+    setShowExportSnackbar(true);
+
+    try {
+      await exportToPNG('interest-results-section', 'interest-calculation-results');
+      setExportMessage(t('exportSuccess'));
+    } catch (error) {
+      console.error('PNG Export error:', error);
+      setExportMessage(t('exportError'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    if (!totalAmount || !principalAmount || !interestAmount || !startDate || !endDate || !timePeriod) {
+      setExportMessage(t('noDataToExport'));
+      setShowExportSnackbar(true);
+      return;
+    }
+
+    setIsExporting(true);
+    setExportMessage(t('exportingPdf'));
+    setShowExportSnackbar(true);
+
+    try {
+      const exportData: ExportData = {
+        title: t('interestCalculator'),
+        principalAmount: Number(amount),
+        interestRate: Number(interestRate),
+        interestPeriod: interestPeriod === 'yearly' ? t('perYear') : t('perMonth'),
+        startDate: startDate.format('DD/MM/YYYY'),
+        endDate: endDate.format('DD/MM/YYYY'),
+        timePeriod: `${timePeriod.years} ${t('years')}, ${timePeriod.months} ${t('months')}, ${timePeriod.days} ${t('days')}`,
+        interestType: interestType === 'simple' ? t('simpleInterest') : t('compoundInterest'),
+        useRounding: useRounding,
+        interestAmount: interestAmount,
+        totalAmount: totalAmount,
+        monthlyBreakdown: monthlyBreakdown.length > 0 ? monthlyBreakdown : undefined
+      };
+
+      await exportToPDF(exportData, 'interest-calculation-report');
+      setExportMessage(t('exportSuccess'));
+    } catch (error) {
+      console.error('PDF Export error:', error);
+      setExportMessage(t('exportError'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setShowExportSnackbar(false);
+  };
 
   return (
-    <Stack 
-      direction={{ xs: 'column', lg: 'row' }} 
-      spacing={{ xs: 2, lg: 4 }}
-      sx={{ width: '100%' }}
-    >
+    <>
+      <Stack 
+        direction={{ xs: 'column', lg: 'row' }} 
+        spacing={4} 
+        sx={{ width: '100%' }}
+      >
       {/* Input Section */}
       <Box sx={{ flex: 1, minWidth: { xs: '100%', lg: '400px' } }}>
         <Typography variant="h5" gutterBottom sx={{ 
@@ -496,11 +640,21 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   label={t('startDate')}
                   value={startDate}
                   onChange={(newValue) => {
+                    // Always set the value for UI, but validate before any logic
                     setStartDate(newValue);
-                    // If end date is before new start date, update end date
-                    if (endDate && newValue && endDate.isBefore(newValue, 'day')) {
-                      setEndDate(newValue);
+                  }}
+                  onAccept={(newValue) => {
+                    // Only run validation logic when date is accepted (user finishes input)
+                    if (newValue && newValue.isValid()) {
+                      // If end date is before new start date, update end date
+                      if (endDate && endDate.isValid() && endDate.isBefore(newValue, 'day')) {
+                        setEndDate(newValue);
+                      }
                     }
+                  }}
+                  onError={(error) => {
+                    // Handle date picker errors gracefully
+                    console.log('Start date error:', error);
                   }}
                   format="DD-MM-YYYY"
                   maxDate={endDate || undefined}
@@ -510,6 +664,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       size: 'small',
                       fullWidth: true,
                       placeholder: "DD-MM-YYYY",
+                      error: startDate !== null && !isValidDate(startDate),
                       inputProps: {
                         inputMode: 'numeric',
                         pattern: '[0-9-]*',
@@ -588,11 +743,21 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   label={t('endDate')}
                   value={endDate}
                   onChange={(newValue) => {
+                    // Always set the value for UI, but validate before any logic
                     setEndDate(newValue);
-                    // If start date is after new end date, update start date
-                    if (startDate && newValue && startDate.isAfter(newValue, 'day')) {
-                      setStartDate(newValue);
+                  }}
+                  onAccept={(newValue) => {
+                    // Only run validation logic when date is accepted (user finishes input)
+                    if (newValue && newValue.isValid()) {
+                      // If start date is after new end date, update start date
+                      if (startDate && startDate.isValid() && startDate.isAfter(newValue, 'day')) {
+                        setStartDate(newValue);
+                      }
                     }
+                  }}
+                  onError={(error) => {
+                    // Handle date picker errors gracefully
+                    console.log('End date error:', error);
                   }}
                   format="DD-MM-YYYY"
                   minDate={startDate || undefined}
@@ -602,6 +767,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       size: 'small',
                       fullWidth: true,
                       placeholder: "DD-MM-YYYY",
+                      error: endDate !== null && !isValidDate(endDate),
                       inputProps: {
                         inputMode: 'numeric',
                         pattern: '[0-9-]*',
@@ -910,23 +1076,79 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
 
       {/* Results Section */}
       <Box sx={{ flex: 1, minWidth: { xs: '100%', lg: '400px' } }}>
-        <Typography variant="h5" gutterBottom sx={{ 
-          color: '#8E5924',
-          transition: 'color 0.3s ease',
+        {/* Results Header with Export Icons */}
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
           mb: { xs: 2, lg: 3 }
         }}>
-          {t('results')}
-        </Typography>
-        <Box sx={{ 
-          mt: { xs: 1, lg: 2 }, 
-          p: { xs: 2, lg: 4 }, 
-          bgcolor: 'rgba(248, 246, 240, 0.8)',
-          borderRadius: 2, 
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          border: '1px solid rgba(200, 117, 51, 0.3)',
-          transition: 'all 0.3s ease',
-          minHeight: { xs: '250px', lg: '300px' }
-        }}>
+          <Typography variant="h5" sx={{ 
+            color: '#8E5924',
+            transition: 'color 0.3s ease',
+          }}>
+            {t('results')}
+          </Typography>
+          
+          {/* Export Icons */}
+          {totalAmount && (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Tooltip title={t('exportToPng')}>
+                <span>
+                  <IconButton
+                    onClick={handleExportPNG}
+                    disabled={isExporting}
+                    size="small"
+                    sx={{
+                      color: '#4CAF50',
+                      '&:hover': {
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                      },
+                      '&:disabled': {
+                        color: '#ccc',
+                      },
+                    }}
+                  >
+                    {isExporting ? <CircularProgress size={20} /> : <ImageIcon />}
+                  </IconButton>
+                </span>
+              </Tooltip>
+              
+              <Tooltip title={t('exportToPdf')}>
+                <span>
+                  <IconButton
+                    onClick={handleExportPDF}
+                    disabled={isExporting}
+                    size="small"
+                    sx={{
+                      color: '#f44336',
+                      '&:hover': {
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                      },
+                      '&:disabled': {
+                        color: '#ccc',
+                      },
+                    }}
+                  >
+                    {isExporting ? <CircularProgress size={20} /> : <PdfIcon />}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+          )}
+        </Box>
+        <Box 
+          id="interest-results-section"
+          sx={{ 
+            mt: { xs: 1, lg: 2 }, 
+            p: { xs: 2, lg: 4 }, 
+            bgcolor: 'rgba(248, 246, 240, 0.8)',
+            borderRadius: 2, 
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(200, 117, 51, 0.3)',
+            transition: 'all 0.3s ease',
+            minHeight: { xs: '250px', lg: '300px' }
+          }}>
           {(amount && startDate && endDate && interestRate && isValidDateRange) ? (
             <Stack spacing={{ xs: 2, lg: 3 }}>
               {/* Time Period */}
@@ -1206,6 +1428,23 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         </Box>
       </Box>
     </Stack>
+
+    {/* Export Snackbar */}
+    <Snackbar
+      open={showExportSnackbar}
+      autoHideDuration={4000}
+      onClose={handleCloseSnackbar}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    >
+      <Alert 
+        onClose={handleCloseSnackbar} 
+        severity={exportMessage.includes('Error') ? 'error' : 'success'}
+        sx={{ width: '100%' }}
+      >
+        {exportMessage}
+      </Alert>
+    </Snackbar>
+    </>
   );
 };
 

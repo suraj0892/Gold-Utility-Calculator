@@ -112,5 +112,13 @@
   "yesRoundDaysToMonths": "Yes (Round days to months)",
   "roundingEnabled": "Rounding enabled: Days ≥15 rounded up to 1 month, days <15 counted as 0.5 month",
   "exactCalculation": "Exact calculation: All days calculated precisely",
-  "countedAsHalfMonth": "counted as 0.5 month"
+  "countedAsHalfMonth": "counted as 0.5 month",
+  "exportToPng": "Export as PNG",
+  "exportToPdf": "Export as PDF",
+  "exportTooltip": "Export Results",
+  "exportingPng": "Exporting as PNG...",
+  "exportingPdf": "Exporting as PDF...",
+  "exportSuccess": "Export completed successfully!",
+  "exportError": "Error occurred during export",
+  "noDataToExport": "No data available to export. Please complete the calculation first."
 }
