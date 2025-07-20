@@ -15,17 +15,20 @@ import {
   ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { StorageManager } from '../utils/storageUtils';
 
 const LanguageToggle: React.FC = () => {
   const { i18n } = useTranslation();
+  const storageManager = StorageManager.getInstance();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleLanguageChange = (event: SelectChangeEvent) => {
     const newLanguage = event.target.value;
     i18n.changeLanguage(newLanguage);
-    // Explicitly save to localStorage to ensure persistence
+    // Save to both i18next localStorage and our storage utility for persistence
     localStorage.setItem('i18nextLng', newLanguage);
+    storageManager.setUserPreference('language', newLanguage);
   };
 
   const languages = {

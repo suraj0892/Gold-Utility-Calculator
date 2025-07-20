@@ -25,6 +25,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { exportPurityToPNG, exportPurityToPDF, PurityExportData } from '../utils/exportUtils';
+import { getCalculatorData, setCalculatorData, removeCalculatorData } from '../utils/storageUtils';
 
 interface PurityCalculatorProps {
   onReset?: () => void;
@@ -55,44 +56,43 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
-  // Load values from localStorage on component mount
+  // Load values from sessionStorage on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('purityCalculator');
-    console.log('Loading from localStorage (Purity):', savedData); // Debug log
+    const savedData = getCalculatorData('purityCalculator');
+    console.log('Loading from sessionStorage (Purity):', savedData); // Debug log
     if (savedData) {
       try {
-        const parsed = JSON.parse(savedData);
-        console.log('Parsed data (Purity):', parsed); // Debug log
+        console.log('Parsed data (Purity):', savedData); // Debug log
         
         // Only set values if they exist and are not empty
-        if (parsed.weight !== undefined && parsed.weight !== '') {
-          setWeight(parsed.weight);
+        if (savedData.weight !== undefined && savedData.weight !== '') {
+          setWeight(savedData.weight);
         }
-        if (parsed.currentPurity !== undefined && parsed.currentPurity !== '') {
-          setCurrentPurity(parsed.currentPurity);
+        if (savedData.currentPurity !== undefined && savedData.currentPurity !== '') {
+          setCurrentPurity(savedData.currentPurity);
         }
-        if (parsed.targetPurity !== undefined && parsed.targetPurity !== '') {
-          setTargetPurity(parsed.targetPurity);
+        if (savedData.targetPurity !== undefined && savedData.targetPurity !== '') {
+          setTargetPurity(savedData.targetPurity);
         }
-        if (parsed.customTargetPurity !== undefined && parsed.customTargetPurity !== '') {
-          setCustomTargetPurity(parsed.customTargetPurity);
+        if (savedData.customTargetPurity !== undefined && savedData.customTargetPurity !== '') {
+          setCustomTargetPurity(savedData.customTargetPurity);
         }
-        if (parsed.goldPurityToAdd !== undefined && parsed.goldPurityToAdd !== '') {
-          setGoldPurityToAdd(parsed.goldPurityToAdd);
+        if (savedData.goldPurityToAdd !== undefined && savedData.goldPurityToAdd !== '') {
+          setGoldPurityToAdd(savedData.goldPurityToAdd);
         }
-        if (parsed.customGoldPurity !== undefined && parsed.customGoldPurity !== '') {
-          setCustomGoldPurity(parsed.customGoldPurity);
+        if (savedData.customGoldPurity !== undefined && savedData.customGoldPurity !== '') {
+          setCustomGoldPurity(savedData.customGoldPurity);
         }
         
         // Load results if they exist
-        if (parsed.resultType !== undefined && parsed.resultType !== '') {
-          setResultType(parsed.resultType);
+        if (savedData.resultType !== undefined && savedData.resultType !== '') {
+          setResultType(savedData.resultType);
         }
-        if (parsed.weightToAdd !== undefined && parsed.weightToAdd !== null) {
-          setWeightToAdd(parsed.weightToAdd);
+        if (savedData.weightToAdd !== undefined && savedData.weightToAdd !== null) {
+          setWeightToAdd(savedData.weightToAdd);
         }
-        if (parsed.totalWeight !== undefined && parsed.totalWeight !== null) {
-          setTotalWeight(parsed.totalWeight);
+        if (savedData.totalWeight !== undefined && savedData.totalWeight !== null) {
+          setTotalWeight(savedData.totalWeight);
         }
       } catch (error) {
         console.error('Error loading saved data (Purity):', error);
@@ -100,8 +100,8 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
     }
   }, []);
 
-  // Save values to localStorage whenever they change
-  const saveToLocalStorage = () => {
+  // Save values to sessionStorage whenever they change
+  const saveToSessionStorage = () => {
     const dataToSave = {
       weight,
       currentPurity,
@@ -114,13 +114,13 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
       weightToAdd,
       totalWeight
     };
-    console.log('Saving to localStorage (Purity):', dataToSave); // Debug log
-    localStorage.setItem('purityCalculator', JSON.stringify(dataToSave));
+    console.log('Saving to sessionStorage (Purity):', dataToSave); // Debug log
+    setCalculatorData('purityCalculator', dataToSave);
   };
 
-  // Save to localStorage whenever any input or result changes
+  // Save to sessionStorage whenever any input or result changes
   useEffect(() => {
-    saveToLocalStorage();
+    saveToSessionStorage();
   }, [weight, currentPurity, targetPurity, customTargetPurity, goldPurityToAdd, customGoldPurity,
       resultType, weightToAdd, totalWeight]);
 
@@ -267,8 +267,8 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
     setWeightToAdd(null);
     setTotalWeight(null);
     
-    // Clear localStorage
-    localStorage.removeItem('purityCalculator');
+    // Clear sessionStorage
+    removeCalculatorData('purityCalculator');
     
     onReset?.();
   };

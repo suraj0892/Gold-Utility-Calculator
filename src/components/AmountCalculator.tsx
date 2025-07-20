@@ -30,6 +30,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { formatIndianNumber, numberToWords, numberToWordsTamil } from '../utils/numberUtils';
 import { exportAmountToPNG, exportAmountToPDF, AmountExportData } from '../utils/exportUtils';
+import { getCalculatorData, setCalculatorData, removeCalculatorData } from '../utils/storageUtils';
 
 interface AmountCalculatorProps {
   onReset?: () => void;
@@ -69,59 +70,58 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     return Math.round((num + Number.EPSILON) * factor) / factor;
   };
 
-  // Load values from localStorage on component mount
+  // Load values from sessionStorage on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('amountCalculator');
-    console.log('Loading from localStorage:', savedData); // Debug log
+    const savedData = getCalculatorData('amountCalculator');
+    console.log('Loading from sessionStorage:', savedData); // Debug log
     if (savedData) {
       try {
-        const parsed = JSON.parse(savedData);
-        console.log('Parsed data:', parsed); // Debug log
+        console.log('Parsed data:', savedData); // Debug log
         
         // Only set values if they exist and are not empty
-        if (parsed.goldWeight !== undefined && parsed.goldWeight !== '') {
-          setGoldWeight(parsed.goldWeight);
+        if (savedData.goldWeight !== undefined && savedData.goldWeight !== '') {
+          setGoldWeight(savedData.goldWeight);
         }
-        if (parsed.goldPurity !== undefined && parsed.goldPurity !== '') {
-          setGoldPurity(parsed.goldPurity);
+        if (savedData.goldPurity !== undefined && savedData.goldPurity !== '') {
+          setGoldPurity(savedData.goldPurity);
         }
-        if (parsed.customGoldPurity !== undefined && parsed.customGoldPurity !== '') {
-          setCustomGoldPurity(parsed.customGoldPurity);
+        if (savedData.customGoldPurity !== undefined && savedData.customGoldPurity !== '') {
+          setCustomGoldPurity(savedData.customGoldPurity);
         }
-        if (parsed.goldRate22k !== undefined && parsed.goldRate22k !== '') {
-          setGoldRate22k(parsed.goldRate22k);
+        if (savedData.goldRate22k !== undefined && savedData.goldRate22k !== '') {
+          setGoldRate22k(savedData.goldRate22k);
         }
-        if (parsed.goldRate22kDisplay !== undefined && parsed.goldRate22kDisplay !== '') {
-          setGoldRate22kDisplay(parsed.goldRate22kDisplay);
+        if (savedData.goldRate22kDisplay !== undefined && savedData.goldRate22kDisplay !== '') {
+          setGoldRate22kDisplay(savedData.goldRate22kDisplay);
         }
-        if (parsed.goldRate24k !== undefined && parsed.goldRate24k !== '') {
-          setGoldRate24k(parsed.goldRate24k);
+        if (savedData.goldRate24k !== undefined && savedData.goldRate24k !== '') {
+          setGoldRate24k(savedData.goldRate24k);
         }
-        if (parsed.goldRate24kDisplay !== undefined && parsed.goldRate24kDisplay !== '') {
-          setGoldRate24kDisplay(parsed.goldRate24kDisplay);
+        if (savedData.goldRate24kDisplay !== undefined && savedData.goldRate24kDisplay !== '') {
+          setGoldRate24kDisplay(savedData.goldRate24kDisplay);
         }
-        if (parsed.miscChargeType !== undefined && parsed.miscChargeType !== '') {
-          setMiscChargeType(parsed.miscChargeType);
+        if (savedData.miscChargeType !== undefined && savedData.miscChargeType !== '') {
+          setMiscChargeType(savedData.miscChargeType);
         }
-        if (parsed.miscAmount !== undefined && parsed.miscAmount !== '') {
-          setMiscAmount(parsed.miscAmount);
+        if (savedData.miscAmount !== undefined && savedData.miscAmount !== '') {
+          setMiscAmount(savedData.miscAmount);
         }
-        if (parsed.miscAmountDisplay !== undefined && parsed.miscAmountDisplay !== '') {
-          setMiscAmountDisplay(parsed.miscAmountDisplay);
+        if (savedData.miscAmountDisplay !== undefined && savedData.miscAmountDisplay !== '') {
+          setMiscAmountDisplay(savedData.miscAmountDisplay);
         }
-        if (parsed.miscPercentage !== undefined && parsed.miscPercentage !== '') {
-          setMiscPercentage(parsed.miscPercentage);
+        if (savedData.miscPercentage !== undefined && savedData.miscPercentage !== '') {
+          setMiscPercentage(savedData.miscPercentage);
         }
         
         // Load results if they exist
-        if (parsed.totalAmount !== undefined && parsed.totalAmount !== null) {
-          setTotalAmount(parsed.totalAmount);
+        if (savedData.totalAmount !== undefined && savedData.totalAmount !== null) {
+          setTotalAmount(savedData.totalAmount);
         }
-        if (parsed.goldValue !== undefined && parsed.goldValue !== null) {
-          setGoldValue(parsed.goldValue);
+        if (savedData.goldValue !== undefined && savedData.goldValue !== null) {
+          setGoldValue(savedData.goldValue);
         }
-        if (parsed.miscValue !== undefined && parsed.miscValue !== null) {
-          setMiscValue(parsed.miscValue);
+        if (savedData.miscValue !== undefined && savedData.miscValue !== null) {
+          setMiscValue(savedData.miscValue);
         }
       } catch (error) {
         console.error('Error loading saved data:', error);
@@ -129,8 +129,8 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     }
   }, []);
 
-  // Save values to localStorage whenever they change
-  const saveToLocalStorage = () => {
+  // Save values to sessionStorage whenever they change
+  const saveToSessionStorage = () => {
     const dataToSave = {
       goldWeight,
       goldPurity,
@@ -148,13 +148,13 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
       goldValue,
       miscValue
     };
-    console.log('Saving to localStorage:', dataToSave); // Debug log
-    localStorage.setItem('amountCalculator', JSON.stringify(dataToSave));
+    console.log('Saving to sessionStorage:', dataToSave); // Debug log
+    setCalculatorData('amountCalculator', dataToSave);
   };
 
-  // Save to localStorage whenever any input or result changes
+  // Save to sessionStorage whenever any input or result changes
   useEffect(() => {
-    saveToLocalStorage();
+    saveToSessionStorage();
   }, [goldWeight, goldPurity, customGoldPurity, goldRate22k, goldRate22kDisplay, 
       goldRate24k, goldRate24kDisplay, miscChargeType, miscAmount, miscAmountDisplay, miscPercentage,
       totalAmount, goldValue, miscValue]);
@@ -377,8 +377,8 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     setGoldValue(null);
     setMiscValue(null);
     
-    // Clear localStorage
-    localStorage.removeItem('amountCalculator');
+    // Clear sessionStorage
+    removeCalculatorData('amountCalculator');
     
     onReset?.();
   };

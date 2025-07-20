@@ -43,6 +43,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { formatIndianNumber, numberToWords, numberToWordsTamil } from '../utils/numberUtils';
 import { exportToPNG, exportToPDF, ExportData } from '../utils/exportUtils';
+import { getCalculatorData, setCalculatorData, removeCalculatorData } from '../utils/storageUtils';
 
 interface InterestCalculatorProps {
   onReset?: () => void;
@@ -107,65 +108,64 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   const [monthlyBreakdown, setMonthlyBreakdown] = useState<MonthlyBreakdown[]>([]);
   const [showBreakdown, setShowBreakdown] = useState<boolean>(false);
 
-  // Load values from localStorage on component mount
+  // Load values from sessionStorage on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('interestCalculator');
-    console.log('Loading from localStorage (Interest):', savedData); // Debug log
+    const savedData = getCalculatorData('interestCalculator');
+    console.log('Loading from sessionStorage (Interest):', savedData); // Debug log
     if (savedData) {
       try {
-        const parsed = JSON.parse(savedData);
-        console.log('Parsed data (Interest):', parsed); // Debug log
+        console.log('Parsed data (Interest):', savedData); // Debug log
         
         // Only set values if they exist and are not empty
-        if (parsed.amount !== undefined && parsed.amount !== '') {
-          setAmount(parsed.amount);
+        if (savedData.amount !== undefined && savedData.amount !== '') {
+          setAmount(savedData.amount);
         }
-        if (parsed.amountDisplay !== undefined && parsed.amountDisplay !== '') {
-          setAmountDisplay(parsed.amountDisplay);
+        if (savedData.amountDisplay !== undefined && savedData.amountDisplay !== '') {
+          setAmountDisplay(savedData.amountDisplay);
         }
-        if (parsed.startDate !== undefined && parsed.startDate !== null) {
-          const startDateObj = dayjs(parsed.startDate);
+        if (savedData.startDate !== undefined && savedData.startDate !== null) {
+          const startDateObj = dayjs(savedData.startDate);
           if (startDateObj.isValid()) {
             setStartDate(startDateObj);
           }
         }
-        if (parsed.endDate !== undefined && parsed.endDate !== null) {
-          const endDateObj = dayjs(parsed.endDate);
+        if (savedData.endDate !== undefined && savedData.endDate !== null) {
+          const endDateObj = dayjs(savedData.endDate);
           if (endDateObj.isValid()) {
             setEndDate(endDateObj);
           }
         }
-        if (parsed.interestRate !== undefined && parsed.interestRate !== '') {
-          setInterestRate(parsed.interestRate);
+        if (savedData.interestRate !== undefined && savedData.interestRate !== '') {
+          setInterestRate(savedData.interestRate);
         }
-        if (parsed.interestPeriod !== undefined && parsed.interestPeriod !== '') {
-          setInterestPeriod(parsed.interestPeriod);
+        if (savedData.interestPeriod !== undefined && savedData.interestPeriod !== '') {
+          setInterestPeriod(savedData.interestPeriod);
         }
-        if (parsed.interestType !== undefined && parsed.interestType !== '') {
-          setInterestType(parsed.interestType);
+        if (savedData.interestType !== undefined && savedData.interestType !== '') {
+          setInterestType(savedData.interestType);
         }
-        if (parsed.useRounding !== undefined) {
-          setUseRounding(parsed.useRounding);
+        if (savedData.useRounding !== undefined) {
+          setUseRounding(savedData.useRounding);
         }
         
         // Load results if they exist
-        if (parsed.principalAmount !== undefined && parsed.principalAmount !== null) {
-          setPrincipalAmount(parsed.principalAmount);
+        if (savedData.principalAmount !== undefined && savedData.principalAmount !== null) {
+          setPrincipalAmount(savedData.principalAmount);
         }
-        if (parsed.interestAmount !== undefined && parsed.interestAmount !== null) {
-          setInterestAmount(parsed.interestAmount);
+        if (savedData.interestAmount !== undefined && savedData.interestAmount !== null) {
+          setInterestAmount(savedData.interestAmount);
         }
-        if (parsed.totalAmount !== undefined && parsed.totalAmount !== null) {
-          setTotalAmount(parsed.totalAmount);
+        if (savedData.totalAmount !== undefined && savedData.totalAmount !== null) {
+          setTotalAmount(savedData.totalAmount);
         }
-        if (parsed.timePeriod !== undefined && parsed.timePeriod !== null) {
-          setTimePeriod(parsed.timePeriod);
+        if (savedData.timePeriod !== undefined && savedData.timePeriod !== null) {
+          setTimePeriod(savedData.timePeriod);
         }
-        if (parsed.monthlyBreakdown !== undefined && Array.isArray(parsed.monthlyBreakdown)) {
-          setMonthlyBreakdown(parsed.monthlyBreakdown);
+        if (savedData.monthlyBreakdown !== undefined && Array.isArray(savedData.monthlyBreakdown)) {
+          setMonthlyBreakdown(savedData.monthlyBreakdown);
         }
-        if (parsed.showBreakdown !== undefined) {
-          setShowBreakdown(parsed.showBreakdown);
+        if (savedData.showBreakdown !== undefined) {
+          setShowBreakdown(savedData.showBreakdown);
         }
       } catch (error) {
         console.error('Error loading saved data (Interest):', error);
@@ -173,8 +173,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     }
   }, []);
 
-  // Save values to localStorage whenever they change
-  const saveToLocalStorage = () => {
+  // Save values to sessionStorage whenever they change
+  const saveToSessionStorage = () => {
     try {
       // Helper function to safely convert date to ISO string
       const safeDateToISO = (date: Dayjs | null): string | null => {
@@ -203,17 +203,17 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         monthlyBreakdown,
         showBreakdown
       };
-      console.log('Saving to localStorage (Interest):', dataToSave); // Debug log
-      localStorage.setItem('interestCalculator', JSON.stringify(dataToSave));
+      console.log('Saving to sessionStorage (Interest):', dataToSave); // Debug log
+      setCalculatorData('interestCalculator', dataToSave);
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      console.error('Error saving to sessionStorage:', error);
     }
   };
 
-  // Save to localStorage whenever any input or result changes (with debouncing)
+  // Save to sessionStorage whenever any input or result changes (with debouncing)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      saveToLocalStorage();
+      saveToSessionStorage();
     }, 300); // 300ms debounce
 
     return () => clearTimeout(timeoutId);
@@ -512,8 +512,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     setMonthlyBreakdown([]);
     setShowBreakdown(false);
     
-    // Clear localStorage
-    localStorage.removeItem('interestCalculator');
+    // Clear sessionStorage
+    removeCalculatorData('interestCalculator');
     
     onReset?.();
   };

@@ -25,15 +25,19 @@ import LanguageToggle from './components/LanguageToggle';
 import PurityCalculator from './components/PurityCalculator';
 import AmountCalculator from './components/AmountCalculator';
 import InterestCalculator from './components/InterestCalculator';
+import { StorageManager } from './utils/storageUtils';
 
 function App() {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
-  // Get initial selected menu from localStorage or default to 'purity'
+  // Initialize StorageManager when app starts
+  const storageManager = StorageManager.getInstance();
+  
+  // Get initial selected menu from user preferences or default to 'purity'
   const getInitialSelectedMenu = () => {
-    const savedMenu = localStorage.getItem('goldCalculator_selectedMenu');
+    const savedMenu = storageManager.getUserPreference('selectedMenu');
     return savedMenu || 'purity';
   };
   
@@ -41,23 +45,26 @@ function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(!isMobile);
   const [selectedMenu, setSelectedMenu] = useState(getInitialSelectedMenu());
 
-  // Save selected menu to localStorage whenever it changes
+  // Save selected menu to user preferences whenever it changes
   useEffect(() => {
-    localStorage.setItem('goldCalculator_selectedMenu', selectedMenu);
-  }, [selectedMenu]);
+    storageManager.setUserPreference('selectedMenu', selectedMenu);
+  }, [selectedMenu, storageManager]);
 
-  // Initialize language from localStorage or default to English
+  // Initialize language from user preferences or default to English
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('i18nextLng');
+    const savedLanguage = storageManager.getUserPreference('language') || localStorage.getItem('i18nextLng');
     if (savedLanguage && ['en', 'ta'].includes(savedLanguage)) {
       if (i18n.language !== savedLanguage) {
         i18n.changeLanguage(savedLanguage);
+        // Save to our storage utility for future use
+        storageManager.setUserPreference('language', savedLanguage);
       }
     } else if (!savedLanguage) {
       // Only set English as default if no language preference exists
       i18n.changeLanguage('en');
+      storageManager.setUserPreference('language', 'en');
     }
-  }, [i18n]);
+  }, [i18n, storageManager]);
 
   const handleDrawerToggle = () => {
     setIsDrawerOpen(!isDrawerOpen);
