@@ -25,6 +25,8 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ selectedMenu, onMenuSelect }) =
         return t('purityCalculator');
       case 'amount':
         return t('amountCalculator');
+      case 'interest':
+        return t('interestCalculator');
       default:
         return '';
     }

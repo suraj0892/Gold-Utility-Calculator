@@ -131,7 +131,7 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
   return (
     <Stack 
       direction={{ xs: 'column', lg: 'row' }} 
-      spacing={4} 
+      spacing={{ xs: 2, lg: 4 }}
       sx={{ width: '100%' }}
     >
       {/* Input Section */}
@@ -139,21 +139,21 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
         <Typography variant="h5" gutterBottom sx={{ 
           color: '#9c7c38',
           transition: 'color 0.3s ease',
-          mb: 3
+          mb: { xs: 2, lg: 3 }
         }}>
           {t('inputValues')}
         </Typography>
         <Box 
           sx={{ 
-            mt: 2, 
-            p: 3, 
+            mt: { xs: 1, lg: 2 }, 
+            p: { xs: 2, lg: 3 }, 
             backgroundColor: 'rgba(248, 246, 236, 0.6)',
             borderRadius: 2,
             border: '1px solid rgba(212, 175, 55, 0.3)',
             transition: 'all 0.3s ease'
           }}
         >
-          <Stack spacing={2.5}>
+          <Stack spacing={{ xs: 2, lg: 2.5 }}>
             <TextField
               fullWidth
               label={t('currentWeight')}
@@ -163,6 +163,11 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
               inputProps={{
                 inputMode: 'decimal',
                 pattern: '[0-9]*\\.?[0-9]*'
+              }}
+              sx={{
+                '& .MuiInputBase-input': {
+                  fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                }
               }}
             />
             <TextField
@@ -184,6 +189,11 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                 inputMode: 'decimal',
                 pattern: '[0-9]*\\.?[0-9]*'
               }}
+              sx={{
+                '& .MuiInputBase-input': {
+                  fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                }
+              }}
             />
             <FormControl fullWidth size="small">
               <InputLabel id="target-purity-select-label">{t('selectTargetPurity')}</InputLabel>
@@ -193,6 +203,11 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                 value={targetPurity.toString()}
                 label={t('selectTargetPurity')}
                 onChange={handlePuritySelect}
+                sx={{
+                  '& .MuiSelect-select': {
+                    fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                  }
+                }}
               >
                 {commonPurities.map((option) => (
                   <MenuItem key={option.value} value={option.value.toString()}>
@@ -223,25 +238,35 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                   inputMode: 'decimal',
                   pattern: '[0-9]*\\.?[0-9]*'
                 }}
+                sx={{
+                  '& .MuiInputBase-input': {
+                    fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                  }
+                }}
               />
             )}
           </Stack>
           
           {resultType === 'gold' && (
             <Box sx={{ 
-              mt: 4, 
-              pt: 3, 
-              pb: 3, 
+              mt: { xs: 3, lg: 4 }, 
+              pt: { xs: 2, lg: 3 }, 
+              pb: { xs: 2, lg: 3 }, 
               backgroundColor: 'rgba(212, 175, 55, 0.1)',
               borderRadius: 2, 
-              px: 3, 
+              px: { xs: 2, lg: 3 }, 
               borderLeft: '3px solid #D4AF37',
               transition: 'all 0.3s ease'
             }}>
-              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'medium', color: '#9c7c38' }}>
+              <Typography variant="subtitle1" sx={{ 
+                mb: 2, 
+                fontWeight: 'medium', 
+                color: '#9c7c38',
+                fontSize: { xs: '1rem', lg: '1.125rem' }
+              }}>
                 {t('selectGoldPurity')}:
               </Typography>
-              <Stack spacing={2}>
+              <Stack spacing={{ xs: 1.5, lg: 2 }}>
                 <FormControl size="small" fullWidth>
                   <InputLabel id="gold-purity-select-label">{t('goldPurityToAdd')}</InputLabel>
                   <Select
@@ -255,6 +280,11 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                         setGoldPurityToAdd('custom');
                       } else {
                         setGoldPurityToAdd(value);
+                      }
+                    }}
+                    sx={{
+                      '& .MuiSelect-select': {
+                        fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
                       }
                     }}
                   >
@@ -287,6 +317,11 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                       inputMode: 'decimal',
                       pattern: '[0-9]*\\.?[0-9]*'
                     }}
+                    sx={{
+                      '& .MuiInputBase-input': {
+                        fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                      }
+                    }}
                   />
                 )}
               </Stack>
@@ -294,7 +329,11 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
           )}
           
           {/* Reset Button */}
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ 
+            mt: { xs: 3, lg: 4 }, 
+            display: 'flex', 
+            justifyContent: 'flex-end' 
+          }}>
             <Button
               variant="outlined"
               size="small"
@@ -307,9 +346,9 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                   backgroundColor: 'rgba(212, 175, 55, 0.04)',
                 },
                 fontWeight: 'medium',
-                px: 3,
+                px: { xs: 2, sm: 3 },
                 py: 1,
-                fontSize: '0.875rem',
+                fontSize: { xs: '14px', sm: '0.875rem' },
               }}
             >
               {t('reset')}
@@ -323,37 +362,56 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
         <Typography variant="h5" gutterBottom sx={{ 
           color: '#8E5924',
           transition: 'color 0.3s ease',
-          mb: 3
+          mb: { xs: 2, lg: 3 }
         }}>
           {t('results')}
         </Typography>
         <Box sx={{ 
-          mt: 2, 
-          p: 4, 
+          mt: { xs: 1, lg: 2 }, 
+          p: { xs: 2, lg: 4 }, 
           bgcolor: 'rgba(248, 246, 240, 0.8)',
           borderRadius: 2, 
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           border: '1px solid rgba(200, 117, 51, 0.3)',
           transition: 'all 0.3s ease',
-          minHeight: '300px'
+          minHeight: { xs: '250px', lg: '300px' }
         }}>
           {(weight && currentPurity && targetPurity && 
             !(targetPurity === 'custom' && (!customTargetPurity || customTargetPurity === ''))
           ) ? (
             <>
               {resultType === 'equal' && (
-                <Box sx={{ p: 2, bgcolor: 'rgba(0, 150, 136, 0.1)', borderRadius: 1 }}>
-                  <Typography variant="h6" sx={{ color: 'success.main' }}>
+                <Box sx={{ 
+                  p: { xs: 1.5, lg: 2 }, 
+                  bgcolor: 'rgba(0, 150, 136, 0.1)', 
+                  borderRadius: 1 
+                }}>
+                  <Typography variant="h6" sx={{ 
+                    color: 'success.main',
+                    fontSize: { xs: '1rem', lg: '1.25rem' }
+                  }}>
                     {t('noAdjustmentNeeded')}
                   </Typography>
                 </Box>
               )}
               {resultType === '' && weightToAdd === null && (
-                <Box sx={{ p: 2, bgcolor: 'rgba(255, 152, 0, 0.1)', borderRadius: 1, borderLeft: '4px solid #FF9800' }}>
-                  <Typography variant="h6" sx={{ color: '#E65100', mb: 1 }}>
+                <Box sx={{ 
+                  p: { xs: 1.5, lg: 2 }, 
+                  bgcolor: 'rgba(255, 152, 0, 0.1)', 
+                  borderRadius: 1, 
+                  borderLeft: '4px solid #FF9800' 
+                }}>
+                  <Typography variant="h6" sx={{ 
+                    color: '#E65100', 
+                    mb: 1,
+                    fontSize: { xs: '1rem', lg: '1.25rem' }
+                  }}>
                     {t('impossibleCalculation')}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#BF360C' }}>
+                  <Typography variant="body2" sx={{ 
+                    color: '#BF360C',
+                    fontSize: { xs: '0.875rem', lg: '0.875rem' }
+                  }}>
                     {(() => {
                       const actualTargetPurity = targetPurity === 'custom' ? 
                         Number(customTargetPurity) : Number(targetPurity);
@@ -375,16 +433,27 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                 </Box>
               )}
               {resultType === 'copper' && (
-                <Box sx={{ p: 2, bgcolor: 'rgba(200, 117, 51, 0.15)', borderRadius: 1, borderLeft: '4px solid #C87533' }}>
+                <Box sx={{ 
+                  p: { xs: 1.5, lg: 2 }, 
+                  bgcolor: 'rgba(200, 117, 51, 0.15)', 
+                  borderRadius: 1, 
+                  borderLeft: '4px solid #C87533' 
+                }}>
                   <Typography 
                     variant="h6" 
-                    sx={{ color: 'secondary.main' }}
+                    sx={{ 
+                      color: 'secondary.main',
+                      fontSize: { xs: '1rem', lg: '1.25rem' }
+                    }}
                     dangerouslySetInnerHTML={{ __html: t('addCopper', { weight: weightToAdd?.toFixed(3) }) }}
                   />
                   <Typography 
                     variant="body1" 
                     color="textSecondary" 
-                    sx={{ mt: 1 }}
+                    sx={{ 
+                      mt: 1,
+                      fontSize: { xs: '0.875rem', lg: '1rem' }
+                    }}
                   >
                     {t('toDecreasePurity', { 
                       current: Number(currentPurity).toFixed(2),
@@ -398,7 +467,7 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
               {resultType === 'gold' && (
                 <>
                   <Box sx={{ 
-                    p: 2, 
+                    p: { xs: 1.5, lg: 2 }, 
                     bgcolor: 'rgba(212, 175, 55, 0.15)',
                     borderRadius: 1, 
                     borderLeft: '4px solid #D4AF37',
@@ -406,7 +475,10 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                   }}>
                     <Typography 
                       variant="h6" 
-                      sx={{ color: 'primary.main' }}
+                      sx={{ 
+                        color: 'primary.main',
+                        fontSize: { xs: '1rem', lg: '1.25rem' }
+                      }}
                       dangerouslySetInnerHTML={{ 
                         __html: t('addGold', { 
                           weight: weightToAdd?.toFixed(3),
@@ -419,7 +491,10 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                     <Typography 
                       variant="body1" 
                       color="textSecondary" 
-                      sx={{ mt: 1 }}
+                      sx={{ 
+                        mt: 1,
+                        fontSize: { xs: '0.875rem', lg: '1rem' }
+                      }}
                     >
                       {t('toIncreasePurity', { 
                         current: Number(currentPurity).toFixed(2),
@@ -432,16 +507,30 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                 </>
               )}
               {/* Final Results section */}
-              <Box sx={{ mt: 3, pt: 2, pb: 1, borderTop: '1px solid #eaeaea' }}>
-                <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 1.5 }}>
+              <Box sx={{ 
+                mt: { xs: 2, lg: 3 }, 
+                pt: 2, 
+                pb: 1, 
+                borderTop: '1px solid #eaeaea' 
+              }}>
+                <Typography variant="h6" sx={{ 
+                  fontSize: { xs: '1rem', lg: '1.1rem' }, 
+                  mb: 1.5 
+                }}>
                   {t('finalResults')}
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, ml: 1 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: { xs: 1, lg: 1.5 }, 
+                  ml: 1 
+                }}>
                   <Typography 
                     variant="body1"
+                    sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}
                     dangerouslySetInnerHTML={{ __html: t('totalWeight', { weight: totalWeight?.toFixed(3) }) }}
                   />
-                  <Typography variant="body1" color="textSecondary">
+                  <Typography variant="body1" color="textSecondary" sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}>
                     <span dangerouslySetInnerHTML={{ 
                       __html: t('pureGoldContent', { 
                         weight: (totalWeight && (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity))) ? 
@@ -449,7 +538,7 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                       })
                     }} />
                   </Typography>
-                  <Typography variant="body1" color="textSecondary">
+                  <Typography variant="body1" color="textSecondary" sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}>
                     <span dangerouslySetInnerHTML={{ 
                       __html: t('copperContent', { 
                         weight: (totalWeight && (targetPurity !== 'custom' ? Number(targetPurity) : Number(customTargetPurity))) ? 
@@ -461,7 +550,11 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
               </Box>
             </>
           ) : (
-            <Typography variant="body1" color="textSecondary" sx={{ textAlign: 'center', mt: 8 }}>
+            <Typography variant="body1" color="textSecondary" sx={{ 
+              textAlign: 'center', 
+              mt: { xs: 6, lg: 8 },
+              fontSize: { xs: '0.875rem', lg: '1rem' }
+            }}>
               {t('enterAllValues')}
             </Typography>
           )}

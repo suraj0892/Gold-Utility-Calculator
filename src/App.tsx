@@ -24,6 +24,7 @@ import Breadcrumb from './components/Breadcrumb';
 import LanguageToggle from './components/LanguageToggle';
 import PurityCalculator from './components/PurityCalculator';
 import AmountCalculator from './components/AmountCalculator';
+import InterestCalculator from './components/InterestCalculator';
 
 function App() {
   const { t } = useTranslation();
@@ -95,6 +96,8 @@ function App() {
         return <PurityCalculator />;
       case 'amount':
         return <AmountCalculator />;
+      case 'interest':
+        return <InterestCalculator />;
       default:
         return null;
     }

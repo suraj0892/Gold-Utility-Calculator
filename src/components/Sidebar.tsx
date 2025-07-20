@@ -15,7 +15,8 @@ import {
 import {
   MenuOpen as MenuOpenIcon,
   Calculate as CalculateIcon,
-  AccountBalance as AccountBalanceIcon
+  AccountBalance as AccountBalanceIcon,
+  TrendingUp as TrendingUpIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -46,6 +47,11 @@ const Sidebar: React.FC<SidebarProps> = ({
       id: 'amount',
       label: t('amountCalculator'),
       icon: <AccountBalanceIcon />
+    },
+    {
+      id: 'interest',
+      label: t('interestCalculator'),
+      icon: <TrendingUpIcon />
     }
   ];
 
