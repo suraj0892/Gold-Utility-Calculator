@@ -102,5 +102,14 @@
   "where": "Where:",
   "principal": "Principal",
   "rate": "Rate",
-  "time": "Time"
+  "time": "Time",
+  "interestType": "Interest Type",
+  "simpleInterest": "Simple Interest",
+  "compoundInterest": "Compound Interest",
+  "timePeriodRounding": "Time Period Rounding",
+  "noExactCalculation": "No (Exact calculation)",
+  "yesRoundDaysToMonths": "Yes (Round days to months)",
+  "roundingEnabled": "Rounding enabled: Days ≥15 rounded up to 1 month, days <15 counted as 0.5 month",
+  "exactCalculation": "Exact calculation: All days calculated precisely",
+  "countedAsHalfMonth": "counted as 0.5 month"
 }
