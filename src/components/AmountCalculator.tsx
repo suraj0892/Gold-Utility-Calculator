@@ -15,11 +15,21 @@ import {
   Radio,
   FormLabel,
   IconButton,
-  InputAdornment
+  InputAdornment,
+  Tooltip,
+  Snackbar,
+  Alert,
+  CircularProgress
 } from '@mui/material';
-import { Add, Remove } from '@mui/icons-material';
+import { 
+  Add, 
+  Remove, 
+  PictureAsPdf as PdfIcon,
+  Image as ImageIcon
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { formatIndianNumber, numberToWords, numberToWordsTamil } from '../utils/numberUtils';
+import { exportAmountToPNG, exportAmountToPDF, AmountExportData } from '../utils/exportUtils';
 
 interface AmountCalculatorProps {
   onReset?: () => void;
@@ -45,6 +55,13 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
   const [goldValue, setGoldValue] = useState<number | null>(null);
   const [miscValue, setMiscValue] = useState<number | null>(null);
+
+  // Export-related states
+  const [isExportingPng, setIsExportingPng] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   // Helper function for round half up
   const roundHalfUp = (num: number, decimals: number = 2): number => {
@@ -364,6 +381,82 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
     localStorage.removeItem('amountCalculator');
     
     onReset?.();
+  };
+
+  // Export handler functions
+  const handleExportPng = async () => {
+    if (!hasValidResults()) {
+      setSnackbarMessage(t('noDataToExport'));
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    setIsExportingPng(true);
+    try {
+      await exportAmountToPNG('amount-results-section');
+      setSnackbarMessage(t('exportSuccess'));
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('PNG export error:', error);
+      setSnackbarMessage(t('exportError'));
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsExportingPng(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    if (!hasValidResults()) {
+      setSnackbarMessage(t('noDataToExport'));
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    setIsExportingPdf(true);
+    try {
+      const actualGoldPurity = goldPurity === 'custom' ? Number(customGoldPurity) : Number(goldPurity);
+      const pureGoldWeight = Number(goldWeight) * (actualGoldPurity / 100);
+      
+      const exportData: AmountExportData = {
+        title: 'Amount Calculator Results',
+        goldWeight: Number(goldWeight),
+        goldPurity: actualGoldPurity,
+        goldRate24k: Number(goldRate24k),
+        miscChargeType: miscChargeType,
+        miscAmount: miscChargeType === 'amount' ? Number(miscAmount) : undefined,
+        miscPercentage: miscChargeType === 'percentage' ? Number(miscPercentage) : undefined,
+        totalAmount: totalAmount || 0,
+        goldValue: goldValue || 0,
+        miscValue: miscValue || 0,
+        pureGoldWeight: pureGoldWeight
+      };
+
+      await exportAmountToPDF(exportData);
+      setSnackbarMessage(t('exportSuccess'));
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('PDF export error:', error);
+      setSnackbarMessage(t('exportError'));
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
+  const hasValidResults = () => {
+    return goldWeight && goldPurity && 
+      !(goldPurity === 'custom' && (!customGoldPurity || customGoldPurity === '')) &&
+      goldRate24k && totalAmount !== null;
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -703,14 +796,67 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
 
       {/* Results Section */}
       <Box sx={{ flex: 1, minWidth: { xs: '100%', lg: '400px' } }}>
-        <Typography variant="h5" gutterBottom sx={{ 
-          color: '#8E5924',
-          transition: 'color 0.3s ease',
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
           mb: 3
         }}>
-          {t('results')}
-        </Typography>
-        <Box sx={{ 
+          <Typography variant="h5" sx={{ 
+            color: '#8E5924',
+            transition: 'color 0.3s ease'
+          }}>
+            {t('results')}
+          </Typography>
+          
+          {hasValidResults() && (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Tooltip title={t('amountExportToPng')}>
+                <span>
+                  <IconButton
+                    onClick={handleExportPng}
+                    disabled={isExportingPng}
+                    size="small"
+                    sx={{
+                      color: '#4CAF50',
+                      '&:hover': {
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                      },
+                      '&:disabled': {
+                        color: '#ccc',
+                      },
+                    }}
+                  >
+                    {isExportingPng ? <CircularProgress size={20} /> : <ImageIcon />}
+                  </IconButton>
+                </span>
+              </Tooltip>
+              
+              <Tooltip title={t('amountExportToPdf')}>
+                <span>
+                  <IconButton
+                    onClick={handleExportPdf}
+                    disabled={isExportingPdf}
+                    size="small"
+                    sx={{
+                      color: '#f44336',
+                      '&:hover': {
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                      },
+                      '&:disabled': {
+                        color: '#ccc',
+                      },
+                    }}
+                  >
+                    {isExportingPdf ? <CircularProgress size={20} /> : <PdfIcon />}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+          )}
+        </Box>
+        
+        <Box id="amount-results-section" sx={{ 
           mt: 2, 
           p: 4, 
           bgcolor: 'rgba(248, 246, 240, 0.8)',
@@ -836,6 +982,18 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
           )}
         </Box>
       </Box>
+      
+      {/* Snackbar for export notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 };

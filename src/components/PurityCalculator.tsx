@@ -11,10 +11,20 @@ import {
   MenuItem,
   SelectChangeEvent,
   IconButton,
-  InputAdornment
+  InputAdornment,
+  Tooltip,
+  Snackbar,
+  Alert,
+  CircularProgress
 } from '@mui/material';
-import { Add, Remove } from '@mui/icons-material';
+import { 
+  Add, 
+  Remove, 
+  PictureAsPdf as PdfIcon,
+  Image as ImageIcon
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { exportPurityToPNG, exportPurityToPDF, PurityExportData } from '../utils/exportUtils';
 
 interface PurityCalculatorProps {
   onReset?: () => void;
@@ -37,6 +47,13 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
   const [resultType, setResultType] = useState<'equal' | 'copper' | 'gold' | ''>('');
   const [weightToAdd, setWeightToAdd] = useState<number | null>(null);
   const [totalWeight, setTotalWeight] = useState<number | null>(null);
+
+  // Export-related states
+  const [isExportingPng, setIsExportingPng] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   // Load values from localStorage on component mount
   useEffect(() => {
@@ -254,6 +271,78 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
     localStorage.removeItem('purityCalculator');
     
     onReset?.();
+  };
+
+  // Export handler functions
+  const handleExportPng = async () => {
+    if (!hasValidResults()) {
+      setSnackbarMessage(t('noDataToExport'));
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    setIsExportingPng(true);
+    try {
+      await exportPurityToPNG('purity-results-section');
+      setSnackbarMessage(t('exportSuccess'));
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('PNG export error:', error);
+      setSnackbarMessage(t('exportError'));
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsExportingPng(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    if (!hasValidResults()) {
+      setSnackbarMessage(t('noDataToExport'));
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    setIsExportingPdf(true);
+    try {
+      const exportData: PurityExportData = {
+        title: 'Purity Calculator Results',
+        currentWeight: Number(weight),
+        currentPurity: Number(currentPurity),
+        targetPurity: targetPurity === 'custom' ? Number(customTargetPurity) : Number(targetPurity),
+        goldPurityToAdd: goldPurityToAdd === 'custom' ? Number(customGoldPurity) : Number(goldPurityToAdd),
+        resultType: resultType as 'equal' | 'copper' | 'gold',
+        weightToAdd: weightToAdd || undefined,
+        totalWeight: totalWeight || undefined,
+        pureGoldContent: Number(weight) * (Number(currentPurity) / 100),
+        copperContent: Number(weight) * (1 - Number(currentPurity) / 100)
+      };
+
+      await exportPurityToPDF(exportData);
+      setSnackbarMessage(t('exportSuccess'));
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('PDF export error:', error);
+      setSnackbarMessage(t('exportError'));
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
+  const hasValidResults = () => {
+    return weight && currentPurity && targetPurity && 
+      !(targetPurity === 'custom' && (!customTargetPurity || customTargetPurity === '')) &&
+      resultType;
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -640,14 +729,67 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
 
       {/* Results Section */}
       <Box sx={{ flex: 1, minWidth: { xs: '100%', lg: '400px' } }}>
-        <Typography variant="h5" gutterBottom sx={{ 
-          color: '#8E5924',
-          transition: 'color 0.3s ease',
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
           mb: { xs: 2, lg: 3 }
         }}>
-          {t('results')}
-        </Typography>
-        <Box sx={{ 
+          <Typography variant="h5" sx={{ 
+            color: '#8E5924',
+            transition: 'color 0.3s ease'
+          }}>
+            {t('results')}
+          </Typography>
+          
+          {hasValidResults() && (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Tooltip title={t('purityExportToPng')}>
+                <span>
+                  <IconButton
+                    onClick={handleExportPng}
+                    disabled={isExportingPng}
+                    size="small"
+                    sx={{
+                      color: '#4CAF50',
+                      '&:hover': {
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                      },
+                      '&:disabled': {
+                        color: '#ccc',
+                      },
+                    }}
+                  >
+                    {isExportingPng ? <CircularProgress size={20} /> : <ImageIcon />}
+                  </IconButton>
+                </span>
+              </Tooltip>
+              
+              <Tooltip title={t('purityExportToPdf')}>
+                <span>
+                  <IconButton
+                    onClick={handleExportPdf}
+                    disabled={isExportingPdf}
+                    size="small"
+                    sx={{
+                      color: '#f44336',
+                      '&:hover': {
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                      },
+                      '&:disabled': {
+                        color: '#ccc',
+                      },
+                    }}
+                  >
+                    {isExportingPdf ? <CircularProgress size={20} /> : <PdfIcon />}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+          )}
+        </Box>
+        
+        <Box id="purity-results-section" sx={{ 
           mt: { xs: 1, lg: 2 }, 
           p: { xs: 2, lg: 4 }, 
           bgcolor: 'rgba(248, 246, 240, 0.8)',
@@ -841,6 +983,18 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
           )}
         </Box>
       </Box>
+      
+      {/* Snackbar for export notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 };

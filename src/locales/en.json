@@ -120,5 +120,9 @@
   "exportingPdf": "Exporting as PDF...",
   "exportSuccess": "Export completed successfully!",
   "exportError": "Error occurred during export",
-  "noDataToExport": "No data available to export. Please complete the calculation first."
+  "noDataToExport": "No data available to export. Please complete the calculation first.",
+  "purityExportToPng": "Export Purity Results as PNG",
+  "purityExportToPdf": "Export Purity Results as PDF",
+  "amountExportToPng": "Export Amount Results as PNG",
+  "amountExportToPdf": "Export Amount Results as PDF"
 }
