@@ -10,8 +10,23 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  FormLabel
+  FormLabel,
+  Collapse,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Divider
 } from '@mui/material';
+import {
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+  Timeline as TimelineIcon
+} from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -21,6 +36,16 @@ import { formatIndianNumber, numberToWords, numberToWordsTamil } from '../utils/
 
 interface InterestCalculatorProps {
   onReset?: () => void;
+}
+
+interface MonthlyBreakdown {
+  month: string;
+  monthNumber: number;
+  year: number;
+  daysInMonth: number;
+  monthlyInterest: number;
+  cumulativeInterest: number;
+  totalAmount: number;
 }
 
 const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
@@ -39,6 +64,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   const [interestAmount, setInterestAmount] = useState<number | null>(null);
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
   const [timePeriod, setTimePeriod] = useState<{ years: number; months: number; days: number } | null>(null);
+  const [monthlyBreakdown, setMonthlyBreakdown] = useState<MonthlyBreakdown[]>([]);
+  const [showBreakdown, setShowBreakdown] = useState<boolean>(false);
 
   // Set current date as default end date (removed since we're setting it in state declaration)
   // useEffect(() => {
@@ -98,6 +125,59 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     return { years, months, days };
   };
 
+  // Calculate monthly breakdown
+  const calculateMonthlyBreakdown = (
+    principal: number,
+    rate: number,
+    start: Dayjs,
+    end: Dayjs,
+    period: 'monthly' | 'yearly'
+  ): MonthlyBreakdown[] => {
+    const breakdown: MonthlyBreakdown[] = [];
+    let current = start.clone();
+    let cumulativeInterest = 0;
+    
+    while (current.isBefore(end, 'month') || current.isSame(end, 'month')) {
+      const monthStart = current.startOf('month');
+      const monthEnd = current.endOf('month');
+      
+      // Determine the actual start and end dates for this month
+      const actualStart = current.isSame(start, 'month') ? start : monthStart;
+      const actualEnd = current.isSame(end, 'month') ? end : monthEnd;
+      
+      // Calculate days in this month for the interest period
+      const daysInMonth = actualEnd.diff(actualStart, 'day') + 1;
+      
+      // Calculate monthly interest based on the selected period
+      let monthlyInterest: number;
+      if (period === 'yearly') {
+        // For yearly rate, convert to daily rate and multiply by days
+        const dailyRate = rate / 365;
+        monthlyInterest = (principal * dailyRate * daysInMonth) / 100;
+      } else {
+        // For monthly rate, calculate proportionally based on days
+        const totalDaysInMonth = current.daysInMonth();
+        monthlyInterest = (principal * rate * (daysInMonth / totalDaysInMonth)) / 100;
+      }
+      
+      cumulativeInterest += monthlyInterest;
+      
+      breakdown.push({
+        month: current.format('MMM'),
+        monthNumber: current.month() + 1,
+        year: current.year(),
+        daysInMonth,
+        monthlyInterest,
+        cumulativeInterest,
+        totalAmount: principal + cumulativeInterest
+      });
+      
+      current = current.add(1, 'month');
+    }
+    
+    return breakdown;
+  };
+
   // Calculate simple interest
   const calculateInterest = () => {
     if (!amount || !startDate || !endDate || !interestRate) {
@@ -105,6 +185,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
       setInterestAmount(null);
       setTotalAmount(null);
       setTimePeriod(null);
+      setMonthlyBreakdown([]);
       return;
     }
 
@@ -117,6 +198,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
       setInterestAmount(null);
       setTotalAmount(null);
       setTimePeriod(null);
+      setMonthlyBreakdown([]);
       return;
     }
 
@@ -137,6 +219,10 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
 
     setInterestAmount(interest);
     setTotalAmount(total);
+    
+    // Calculate monthly breakdown
+    const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod);
+    setMonthlyBreakdown(breakdown);
   };
 
   // Calculate interest when inputs change
@@ -156,6 +242,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     setInterestAmount(null);
     setTotalAmount(null);
     setTimePeriod(null);
+    setMonthlyBreakdown([]);
+    setShowBreakdown(false);
     onReset?.();
   };
 
@@ -470,13 +558,54 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 borderRadius: 1, 
                 borderLeft: '4px solid #FF9800'
               }}>
-                <Typography variant="h6" sx={{ 
-                  color: '#F57C00', 
-                  mb: 1,
-                  fontSize: { xs: '1rem', lg: '1.25rem' }
-                }}>
-                  {t('interestAmount')}
-                </Typography>
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    cursor: monthlyBreakdown.length > 0 ? 'pointer' : 'default',
+                    '&:hover': monthlyBreakdown.length > 0 ? {
+                      '& .breakdown-icon': {
+                        transform: 'scale(1.1)',
+                        color: '#E65100',
+                      }
+                    } : {}
+                  }}
+                  onClick={() => {
+                    if (monthlyBreakdown.length > 0) {
+                      setShowBreakdown(!showBreakdown);
+                    }
+                  }}
+                >
+                  <Typography variant="h6" sx={{ 
+                    color: '#F57C00', 
+                    mb: 1,
+                    fontSize: { xs: '1rem', lg: '1.25rem' }
+                  }}>
+                    {t('interestAmount')}
+                  </Typography>
+                  {monthlyBreakdown.length > 0 && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TimelineIcon 
+                        className="breakdown-icon"
+                        sx={{ 
+                          fontSize: '1.2rem', 
+                          color: '#F57C00',
+                          transition: 'all 0.2s ease'
+                        }} 
+                      />
+                      <IconButton 
+                        size="small" 
+                        sx={{ 
+                          color: '#F57C00',
+                          '&:hover': { backgroundColor: 'rgba(245, 124, 0, 0.1)' }
+                        }}
+                      >
+                        {showBreakdown ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                      </IconButton>
+                    </Box>
+                  )}
+                </Box>
                 <Typography variant="body1" sx={{ 
                   fontWeight: 'medium',
                   fontSize: { xs: '0.875rem', lg: '1rem' }
@@ -496,6 +625,76 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                     }
                   </Typography>
                 )}
+                
+                {/* Monthly Breakdown */}
+                <Collapse in={showBreakdown}>
+                  <Box sx={{ mt: 2 }}>
+                    <Divider sx={{ mb: 2, backgroundColor: 'rgba(245, 124, 0, 0.3)' }} />
+                    <Typography variant="h6" sx={{ 
+                      color: '#E65100', 
+                      mb: 2,
+                      fontSize: { xs: '0.9rem', lg: '1rem' },
+                      fontWeight: 'bold'
+                    }}>
+                      Monthly Interest Breakdown
+                    </Typography>
+                    <TableContainer 
+                      component={Paper} 
+                      sx={{ 
+                        maxHeight: 300, 
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        border: '1px solid rgba(245, 124, 0, 0.2)'
+                      }}
+                    >
+                      <Table size="small" stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
+                              Month
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
+                              Days
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
+                              Monthly Interest
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
+                              Total Interest
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {monthlyBreakdown.map((month, index) => (
+                            <TableRow 
+                              key={index}
+                              sx={{ 
+                                '&:nth-of-type(odd)': { 
+                                  backgroundColor: 'rgba(255, 152, 0, 0.02)' 
+                                },
+                                '&:hover': { 
+                                  backgroundColor: 'rgba(255, 152, 0, 0.05)' 
+                                }
+                              }}
+                            >
+                              <TableCell sx={{ fontSize: '0.8rem' }}>
+                                {month.month} {month.year}
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontSize: '0.8rem' }}>
+                                {month.daysInMonth}
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontSize: '0.8rem' }}>
+                                ₹ {formatIndianNumber(month.monthlyInterest)}
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontSize: '0.8rem', fontWeight: 'medium' }}>
+                                ₹ {formatIndianNumber(month.cumulativeInterest)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                </Collapse>
               </Box>
 
               {/* Total Amount */}
