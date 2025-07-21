@@ -24,7 +24,8 @@ import {
   InputAdornment,
   Tooltip,
   CircularProgress,
-  Snackbar
+  Snackbar,
+  Chip
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -1166,173 +1167,232 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         <Box 
           id="interest-results-section"
           sx={{ 
-            mt: { xs: 1, lg: 2 }, 
-            p: { xs: 2, lg: 4 }, 
+            mt: { xs: 2, lg: 3 }, 
+            p: { xs: 3, lg: 4 }, 
             bgcolor: 'rgba(248, 246, 240, 0.8)',
             borderRadius: 2, 
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             border: '1px solid rgba(200, 117, 51, 0.3)',
             transition: 'all 0.3s ease',
-            minHeight: { xs: '250px', lg: '300px' }
+            minHeight: { xs: '300px', lg: '380px' }
           }}>
           {(amount && startDate && endDate && interestRate && isValidDateRange) ? (
-            <Stack spacing={{ xs: 2, lg: 3 }}>
-              {/* Time Period */}
-              {timePeriod && (
+            <Stack spacing={{ xs: 2.5, lg: 3 }}>
+              {/* Summary Card */}
+              <Box sx={{ 
+                p: { xs: 2.5, lg: 3 }, 
+                bgcolor: 'rgba(212, 175, 55, 0.1)',
+                borderRadius: 1, 
+                borderLeft: '4px solid #D4AF37'
+              }}>
+                {/* Results Grid */}
+                <Box sx={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' },
+                  gap: { xs: 3, lg: 3.5 }
+                }}>
+                  {/* Principal */}
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" sx={{ 
+                      color: '#666', 
+                      fontSize: { xs: '0.85rem', lg: '0.9rem' },
+                      mb: 0.8,
+                      fontWeight: 'medium'
+                    }}>
+                      {t('principalAmount')}
+                    </Typography>
+                    <Typography variant="h6" sx={{ 
+                      color: '#388E3C',
+                      fontSize: { xs: '1.1rem', lg: '1.2rem' },
+                      fontWeight: 'bold'
+                    }}>
+                      ₹ {principalAmount ? formatIndianNumber(principalAmount) : '0.00'}
+                    </Typography>
+                  </Box>
+
+                  {/* Interest */}
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" sx={{ 
+                      color: '#666', 
+                      fontSize: { xs: '0.85rem', lg: '0.9rem' },
+                      mb: 0.8,
+                      fontWeight: 'medium'
+                    }}>
+                      {t('interestAmount')}
+                    </Typography>
+                    <Typography variant="h6" sx={{ 
+                      color: '#F57C00',
+                      fontSize: { xs: '1.1rem', lg: '1.2rem' },
+                      fontWeight: 'bold'
+                    }}>
+                      ₹ {interestAmount ? formatIndianNumber(interestAmount) : '0.00'}
+                    </Typography>
+                  </Box>
+
+                  {/* Total */}
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" sx={{ 
+                      color: '#666', 
+                      fontSize: { xs: '0.85rem', lg: '0.9rem' },
+                      mb: 0.8,
+                      fontWeight: 'medium'
+                    }}>
+                      {t('totalAmount')}
+                    </Typography>
+                    <Typography variant="h5" sx={{ 
+                      color: '#9c7c38',
+                      fontSize: { xs: '1.3rem', lg: '1.4rem' },
+                      fontWeight: 'bold'
+                    }}>
+                      ₹ {totalAmount ? formatIndianNumber(totalAmount) : '0.00'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Calculation Details - Compact Layout */}
+              <Box sx={{ 
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', lg: '3fr 2fr' },
+                gap: { xs: 1.5, lg: 2 }
+              }}>
+                {/* Calculation Info */}
                 <Box sx={{ 
                   p: { xs: 1.5, lg: 2 }, 
-                  bgcolor: 'rgba(33, 150, 243, 0.1)', 
+                  bgcolor: 'rgba(33, 150, 243, 0.08)', 
                   borderRadius: 1, 
-                  borderLeft: '4px solid #2196F3'
+                  borderLeft: '3px solid #2196F3'
                 }}>
-                  <Typography variant="h6" sx={{ 
+                  <Typography variant="subtitle2" sx={{ 
                     color: '#1976D2', 
                     mb: 1,
-                    fontSize: { xs: '1rem', lg: '1.25rem' }
+                    fontSize: { xs: '0.8rem', lg: '0.85rem' },
+                    fontWeight: 'bold'
                   }}>
-                    {t('timePeriod')}
+                    📊 {t('calculationDetails')}
                   </Typography>
-                  <Typography variant="body1" sx={{
-                    fontSize: { xs: '0.875rem', lg: '1rem' }
-                  }}>
-                    {timePeriod.years > 0 && `${timePeriod.years} ${t('years')} `}
-                    {timePeriod.months > 0 && `${timePeriod.months} ${t('months')} `}
-                    {timePeriod.days > 0 && `${timePeriod.days} ${t('days')}`}
-                  </Typography>
-                  <Typography variant="body2" sx={{ 
-                    color: '#666', 
-                    mt: 0.5, 
-                    fontStyle: 'italic',
-                    fontSize: { xs: '0.75rem', lg: '0.8rem' }
-                  }}>
-                    * {t('exactCalculation')}
-                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.8, lg: 1 } }}>
+                    {timePeriod && (
+                      <Chip 
+                        label={`${timePeriod.years > 0 ? `${timePeriod.years} ${timePeriod.years === 1 ? t('year') : t('years')} ` : ''}${timePeriod.months > 0 ? `${timePeriod.months} ${timePeriod.months === 1 ? t('month') : t('months')} ` : ''}${timePeriod.days > 0 ? `${timePeriod.days} ${timePeriod.days === 1 ? t('day') : t('days')}` : ''}`.trim()}
+                        size="small"
+                        sx={{ 
+                          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                          color: '#1976D2',
+                          fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                          fontWeight: 'medium'
+                        }}
+                      />
+                    )}
+                    
+                    <Chip 
+                      label={`${interestRate}% ${interestPeriod === 'yearly' ? t('perYear') : t('perMonth')}`}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        color: '#1976D2',
+                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                        fontWeight: 'medium'
+                      }}
+                    />
+                    
+                    <Chip 
+                      label={interestType === 'simple' ? t('simpleInterest') : t('compoundInterest')}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        color: '#1976D2',
+                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                        fontWeight: 'medium'
+                      }}
+                    />
+                  </Box>
                 </Box>
-              )}
 
-              {/* Daily Rate Information */}
-              {interestRate && principalAmount && (
-                <Box sx={{ 
-                  p: { xs: 1.5, lg: 2 }, 
-                  bgcolor: 'rgba(156, 39, 176, 0.1)', 
-                  borderRadius: 1, 
-                  borderLeft: '4px solid #9C27B0'
-                }}>
-                  <Typography variant="h6" sx={{ 
-                    color: '#7B1FA2', 
-                    mb: 1,
-                    fontSize: { xs: '1rem', lg: '1.25rem' }
+                {/* Daily Rate Info */}
+                {interestRate && principalAmount && (
+                  <Box sx={{ 
+                    p: { xs: 1.5, lg: 2 }, 
+                    bgcolor: 'rgba(156, 39, 176, 0.08)', 
+                    borderRadius: 1, 
+                    borderLeft: '3px solid #9C27B0'
                   }}>
-                    Daily Interest Amount
-                  </Typography>
-                  <Typography variant="body1" sx={{
-                    fontSize: { xs: '0.875rem', lg: '1rem' }
-                  }}>
-                    {(() => {
-                      const rate = Number(interestRate);
-                      const principal = Number(principalAmount);
-                      let yearlyRate: number;
-                      if (interestPeriod === 'yearly') {
-                        yearlyRate = rate;
-                      } else {
-                        yearlyRate = rate * 12;
-                      }
-                      const dailyRate = yearlyRate / 365;
-                      const dailyAmount = (principal * dailyRate) / 100;
-                      return `₹ ${formatIndianNumber(dailyAmount)} per day`;
-                    })()}
-                  </Typography>
-                  <Typography variant="body2" sx={{ 
-                    color: '#666', 
-                    mt: 0.5, 
-                    fontStyle: 'italic',
-                    fontSize: { xs: '0.75rem', lg: '0.8rem' }
-                  }}>
-                    * Daily rate: {(() => {
-                      const rate = Number(interestRate);
-                      let yearlyRate: number;
-                      if (interestPeriod === 'yearly') {
-                        yearlyRate = rate;
-                      } else {
-                        yearlyRate = rate * 12;
-                      }
-                      const dailyRate = yearlyRate / 365;
-                      return `${dailyRate.toFixed(6)}%`;
-                    })()} ({interestPeriod === 'yearly' ? `${interestRate}% yearly` : `${Number(interestRate) * 12}% yearly`} ÷ 365 days)
-                  </Typography>
-                </Box>
-              )}
-
-              {/* Principal Amount */}
-              <Box sx={{ 
-                p: { xs: 1.5, lg: 2 }, 
-                bgcolor: 'rgba(76, 175, 80, 0.1)', 
-                borderRadius: 1, 
-                borderLeft: '4px solid #4CAF50'
-              }}>
-                <Typography variant="h6" sx={{ 
-                  color: '#388E3C', 
-                  mb: 1,
-                  fontSize: { xs: '1rem', lg: '1.25rem' }
-                }}>
-                  {t('principalAmount')}
-                </Typography>
-                <Typography variant="body1" sx={{ 
-                  fontWeight: 'medium',
-                  fontSize: { xs: '0.875rem', lg: '1rem' }
-                }}>
-                  ₹ {principalAmount ? formatIndianNumber(principalAmount) : '0.00'}
-                </Typography>
-                {principalAmount && (
-                  <Typography variant="body2" sx={{ 
-                    color: '#666', 
-                    mt: 1, 
-                    fontStyle: 'italic',
-                    fontSize: { xs: '0.75rem', lg: '0.875rem' }
-                  }}>
-                    {i18n.language === 'ta' ? 
-                      numberToWordsTamil(principalAmount) : 
-                      numberToWords(principalAmount)
-                    }
-                  </Typography>
+                    <Typography variant="subtitle2" sx={{ 
+                      color: '#7B1FA2', 
+                      mb: 1,
+                      fontSize: { xs: '0.8rem', lg: '0.85rem' },
+                      fontWeight: 'bold'
+                    }}>
+                      📅 {t('dailyInfo')}
+                    </Typography>
+                    
+                    <Typography variant="body2" sx={{ 
+                      fontSize: { xs: '0.75rem', lg: '0.8rem' },
+                      mb: 0.5,
+                      color: '#7B1FA2',
+                      fontWeight: 'medium'
+                    }}>
+                      <strong>₹ {(() => {
+                        const rate = Number(interestRate);
+                        const principal = Number(principalAmount);
+                        let yearlyRate: number;
+                        if (interestPeriod === 'yearly') {
+                          yearlyRate = rate;
+                        } else {
+                          yearlyRate = rate * 12;
+                        }
+                        const dailyRate = yearlyRate / 365;
+                        const dailyAmount = (principal * dailyRate) / 100;
+                        return formatIndianNumber(dailyAmount);
+                      })()}</strong> {t('perDay')}
+                    </Typography>
+                    
+                    <Typography variant="body2" sx={{ 
+                      fontSize: { xs: '0.65rem', lg: '0.7rem' },
+                      color: '#666',
+                      fontWeight: 'medium'
+                    }}>
+                      ({(() => {
+                        const rate = Number(interestRate);
+                        let yearlyRate: number;
+                        if (interestPeriod === 'yearly') {
+                          yearlyRate = rate;
+                        } else {
+                          yearlyRate = rate * 12;
+                        }
+                        const dailyRate = yearlyRate / 365;
+                        return dailyRate.toFixed(4);
+                      })()}% {t('dailyRate')})
+                    </Typography>
+                  </Box>
                 )}
               </Box>
 
-              {/* Interest Amount */}
-              <Box sx={{ 
-                p: { xs: 1.5, lg: 2 }, 
-                bgcolor: 'rgba(255, 152, 0, 0.1)', 
-                borderRadius: 1, 
-                borderLeft: '4px solid #FF9800'
-              }}>
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    cursor: monthlyBreakdown.length > 0 ? 'pointer' : 'default',
-                    '&:hover': monthlyBreakdown.length > 0 ? {
-                      '& .breakdown-icon': {
-                        transform: 'scale(1.1)',
-                        color: '#E65100',
+              {/* Monthly Breakdown Toggle - Expanded */}
+              {monthlyBreakdown.length > 0 && (
+                <Box sx={{ 
+                  p: { xs: 2, lg: 2.5 }, 
+                  bgcolor: 'rgba(255, 152, 0, 0.08)', 
+                  borderRadius: 1, 
+                  borderLeft: '3px solid #FF9800'
+                }}>
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        '& .breakdown-icon': {
+                          transform: 'scale(1.1)',
+                          color: '#E65100',
+                        }
                       }
-                    } : {}
-                  }}
-                  onClick={() => {
-                    if (monthlyBreakdown.length > 0) {
-                      setShowBreakdown(!showBreakdown);
-                    }
-                  }}
-                >
-                  <Typography variant="h6" sx={{ 
-                    color: '#F57C00', 
-                    mb: 1,
-                    fontSize: { xs: '1rem', lg: '1.25rem' }
-                  }}>
-                    {t('interestAmount')}
-                  </Typography>
-                  {monthlyBreakdown.length > 0 && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    }}
+                    onClick={() => setShowBreakdown(!showBreakdown)}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                       <TimelineIcon 
                         className="breakdown-icon"
                         sx={{ 
@@ -1341,151 +1401,200 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                           transition: 'all 0.2s ease'
                         }} 
                       />
-                      <IconButton 
-                        size="small" 
-                        sx={{ 
-                          color: '#F57C00',
-                          '&:hover': { backgroundColor: 'rgba(245, 124, 0, 0.1)' }
-                        }}
-                      >
-                        {showBreakdown ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                      </IconButton>
+                      <Typography variant="subtitle2" sx={{ 
+                        color: '#F57C00', 
+                        fontSize: { xs: '0.9rem', lg: '0.95rem' },
+                        fontWeight: 'bold'
+                      }}>
+                        {t('monthlyBreakdown')} ({interestType === 'simple' ? t('simpleInterest') : t('compoundInterest')})
+                      </Typography>
                     </Box>
-                  )}
-                </Box>
-                <Typography variant="body1" sx={{ 
-                  fontWeight: 'medium',
-                  fontSize: { xs: '0.875rem', lg: '1rem' }
-                }}>
-                  ₹ {interestAmount ? formatIndianNumber(interestAmount) : '0.00'}
-                </Typography>
-                {interestAmount && (
-                  <Typography variant="body2" sx={{ 
-                    color: '#666', 
-                    mt: 1, 
-                    fontStyle: 'italic',
-                    fontSize: { xs: '0.75rem', lg: '0.875rem' }
-                  }}>
-                    {i18n.language === 'ta' ? 
-                      numberToWordsTamil(interestAmount) : 
-                      numberToWords(interestAmount)
-                    }
-                  </Typography>
-                )}
-                
-                {/* Monthly Breakdown */}
-                <Collapse in={showBreakdown}>
-                  <Box sx={{ mt: 2 }}>
-                    <Divider sx={{ mb: 2, backgroundColor: 'rgba(245, 124, 0, 0.3)' }} />
-                    <Typography variant="h6" sx={{ 
-                      color: '#E65100', 
-                      mb: 2,
-                      fontSize: { xs: '0.9rem', lg: '1rem' },
-                      fontWeight: 'bold'
-                    }}>
-                      Monthly {interestType === 'simple' ? t('simpleInterest') : t('compoundInterest')} Breakdown
-                      {` (${t('noExactCalculation').toLowerCase()})`}
-                    </Typography>
-                    <TableContainer 
-                      component={Paper} 
+                    <IconButton 
+                      size="small" 
                       sx={{ 
-                        maxHeight: 300, 
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                        border: '1px solid rgba(245, 124, 0, 0.2)'
+                        color: '#F57C00',
+                        p: 0.5,
+                        '&:hover': { backgroundColor: 'rgba(245, 124, 0, 0.1)' }
                       }}
                     >
-                      <Table size="small" stickyHeader>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
-                              Month
-                            </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
-                              Days
-                            </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
-                              Principal Amount
-                            </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
-                              Monthly Interest
-                            </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
-                              Total Interest
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {monthlyBreakdown.map((month, index) => (
-                            <TableRow 
-                              key={index}
-                              sx={{ 
-                                '&:nth-of-type(odd)': { 
-                                  backgroundColor: 'rgba(255, 152, 0, 0.02)' 
-                                },
-                                '&:hover': { 
-                                  backgroundColor: 'rgba(255, 152, 0, 0.05)' 
-                                }
-                              }}
-                            >
-                              <TableCell sx={{ fontSize: '0.8rem' }}>
-                                {month.month} {month.year}
+                      {showBreakdown ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+                    </IconButton>
+                  </Box>
+                  
+                  {/* Breakdown Table */}
+                  <Collapse in={showBreakdown}>
+                    <Box sx={{ mt: 2 }}>
+                      <TableContainer 
+                        component={Paper} 
+                        sx={{ 
+                          maxHeight: 350, 
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          border: '1px solid rgba(245, 124, 0, 0.2)',
+                          borderRadius: 1,
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                        }}
+                      >
+                        <Table size="small" stickyHeader>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell sx={{ 
+                                fontWeight: 'bold', 
+                                backgroundColor: '#FFF3E0', 
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
+                                py: 1.2,
+                                borderBottom: '2px solid #FFB74D'
+                              }}>
+                                Month
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.8rem' }}>
-                                {month.daysInMonth}
+                              <TableCell align="right" sx={{ 
+                                fontWeight: 'bold', 
+                                backgroundColor: '#FFF3E0', 
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
+                                py: 1.2,
+                                borderBottom: '2px solid #FFB74D'
+                              }}>
+                                Days
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.8rem' }}>
-                                ₹ {formatIndianNumber(month.principalForCalculation)}
+                              <TableCell align="right" sx={{ 
+                                fontWeight: 'bold', 
+                                backgroundColor: '#FFF3E0', 
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
+                                py: 1.2,
+                                borderBottom: '2px solid #FFB74D'
+                              }}>
+                                Principal
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.8rem' }}>
-                                ₹ {formatIndianNumber(month.monthlyInterest)}
+                              <TableCell align="right" sx={{ 
+                                fontWeight: 'bold', 
+                                backgroundColor: '#FFF3E0', 
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
+                                py: 1.2,
+                                borderBottom: '2px solid #FFB74D'
+                              }}>
+                                Monthly Interest
                               </TableCell>
-                              <TableCell align="right" sx={{ fontSize: '0.8rem', fontWeight: 'medium' }}>
-                                ₹ {formatIndianNumber(month.cumulativeInterest)}
+                              <TableCell align="right" sx={{ 
+                                fontWeight: 'bold', 
+                                backgroundColor: '#FFF3E0', 
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
+                                py: 1.2,
+                                borderBottom: '2px solid #FFB74D',
+                                color: '#F57C00'
+                              }}>
+                                Total Interest
                               </TableCell>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Box>
-                </Collapse>
-              </Box>
-
-              {/* Total Amount */}
-              <Box sx={{ 
-                p: { xs: 1.5, lg: 2 }, 
-                bgcolor: 'rgba(212, 175, 55, 0.15)',
-                borderRadius: 1, 
-                borderLeft: '4px solid #D4AF37'
-              }}>
-                <Typography variant="h6" sx={{ 
-                  color: '#B8941F', 
-                  mb: 1,
-                  fontSize: { xs: '1rem', lg: '1.25rem' }
-                }}>
-                  {t('totalAmount')}
-                </Typography>
-                <Typography variant="h5" sx={{ 
-                  fontWeight: 'bold', 
-                  color: '#9c7c38',
-                  fontSize: { xs: '1.25rem', lg: '1.5rem' }
-                }}>
-                  ₹ {totalAmount ? formatIndianNumber(totalAmount) : '0.00'}
-                </Typography>
-                {totalAmount && (
-                  <Typography variant="body2" sx={{ 
-                    color: '#666', 
-                    mt: 1, 
-                    fontStyle: 'italic',
-                    fontSize: { xs: '0.75rem', lg: '0.875rem' }
-                  }}>
-                    {i18n.language === 'ta' ? 
-                      numberToWordsTamil(totalAmount) : 
-                      numberToWords(totalAmount)
-                    }
-                  </Typography>
-                )}
-              </Box>
+                          </TableHead>
+                          <TableBody>
+                            {monthlyBreakdown.map((month, index) => (
+                              <TableRow 
+                                key={index}
+                                sx={{ 
+                                  '&:nth-of-type(odd)': { 
+                                    backgroundColor: 'rgba(255, 152, 0, 0.04)' 
+                                  },
+                                  '&:hover': { 
+                                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                                    transform: 'translateY(-1px)',
+                                    transition: 'all 0.2s ease'
+                                  }
+                                }}
+                              >
+                                <TableCell sx={{ 
+                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
+                                  py: 1,
+                                  fontWeight: 'medium',
+                                  color: '#424242'
+                                }}>
+                                  {month.month} {month.year}
+                                </TableCell>
+                                <TableCell align="right" sx={{ 
+                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
+                                  py: 1,
+                                  color: '#666'
+                                }}>
+                                  {month.daysInMonth}
+                                </TableCell>
+                                <TableCell align="right" sx={{ 
+                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
+                                  py: 1,
+                                  color: '#2E7D32',
+                                  fontWeight: 'medium'
+                                }}>
+                                  ₹ {formatIndianNumber(month.principalForCalculation)}
+                                </TableCell>
+                                <TableCell align="right" sx={{ 
+                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
+                                  py: 1,
+                                  color: '#1976D2',
+                                  fontWeight: 'medium'
+                                }}>
+                                  ₹ {formatIndianNumber(month.monthlyInterest)}
+                                </TableCell>
+                                <TableCell align="right" sx={{ 
+                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
+                                  py: 1, 
+                                  fontWeight: 'bold',
+                                  color: '#F57C00',
+                                  backgroundColor: index === monthlyBreakdown.length - 1 ? 'rgba(245, 124, 0, 0.1)' : 'transparent'
+                                }}>
+                                  ₹ {formatIndianNumber(month.cumulativeInterest)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {/* Summary Row */}
+                            <TableRow sx={{ 
+                              backgroundColor: 'rgba(245, 124, 0, 0.15)',
+                              borderTop: '2px solid #FFB74D'
+                            }}>
+                              <TableCell sx={{ 
+                                fontWeight: 'bold',
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' },
+                                py: 1.2,
+                                color: '#E65100'
+                              }}>
+                                Total
+                              </TableCell>
+                              <TableCell align="right" sx={{ 
+                                fontWeight: 'bold',
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' },
+                                py: 1.2,
+                                color: '#E65100'
+                              }}>
+                                {monthlyBreakdown.reduce((sum, month) => sum + month.daysInMonth, 0)}
+                              </TableCell>
+                              <TableCell align="right" sx={{ 
+                                fontWeight: 'bold',
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' },
+                                py: 1.2,
+                                color: '#E65100'
+                              }}>
+                                ₹ {principalAmount ? formatIndianNumber(principalAmount) : '0.00'}
+                              </TableCell>
+                              <TableCell align="right" sx={{ 
+                                fontWeight: 'bold',
+                                fontSize: { xs: '0.75rem', lg: '0.8rem' },
+                                py: 1.2,
+                                color: '#E65100'
+                              }}>
+                                ₹ {interestAmount ? formatIndianNumber(interestAmount) : '0.00'}
+                              </TableCell>
+                              <TableCell align="right" sx={{ 
+                                fontWeight: 'bold',
+                                fontSize: { xs: '0.8rem', lg: '0.85rem' },
+                                py: 1.2,
+                                color: '#E65100'
+                              }}>
+                                ₹ {interestAmount ? formatIndianNumber(interestAmount) : '0.00'}
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
+                  </Collapse>
+                </Box>
+              )}
             </Stack>
           ) : (
             <Typography variant="body1" color="textSecondary" sx={{ 

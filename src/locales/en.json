@@ -124,5 +124,13 @@
   "purityExportToPng": "Export Purity Results as PNG",
   "purityExportToPdf": "Export Purity Results as PDF",
   "amountExportToPng": "Export Amount Results as PNG",
-  "amountExportToPdf": "Export Amount Results as PDF"
+  "amountExportToPdf": "Export Amount Results as PDF",
+  "year": "year",
+  "month": "month",
+  "day": "day",
+  "calculationDetails": "Calculation Details",
+  "dailyInfo": "Daily Info",
+  "dailyRate": "daily rate",
+  "monthlyBreakdown": "Monthly Breakdown",
+  "perDay": "per day"
 }

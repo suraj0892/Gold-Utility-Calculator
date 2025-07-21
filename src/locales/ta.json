@@ -124,5 +124,13 @@
   "purityExportToPng": "தூய்மை முடிவுகளை PNG ஆக ஏற்றுமதி",
   "purityExportToPdf": "தூய்மை முடிவுகளை PDF ஆக ஏற்றுமதி",
   "amountExportToPng": "தொகை முடிவுகளை PNG ஆக ஏற்றுமதி",
-  "amountExportToPdf": "தொகை முடிவுகளை PDF ஆக ஏற்றுமதி"
+  "amountExportToPdf": "தொகை முடிவுகளை PDF ஆக ஏற்றுமதி",
+  "year": "வருடம்",
+  "month": "மாதம்",
+  "day": "நாள்",
+  "calculationDetails": "கணக்கீட்டு விவரங்கள்",
+  "dailyInfo": "தினசரி தகவல்",
+  "dailyRate": "தினசரி விகிதம்",
+  "monthlyBreakdown": "மாதாந்திர பிரிவு",
+  "perDay": "ஒரு நாளுக்கு"
 }
