@@ -71,6 +71,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   const [interestRate, setInterestRate] = useState<number | string>('');
   const [interestPeriod, setInterestPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [interestType, setInterestType] = useState<'simple' | 'compound'>('simple');
+  // Feature toggle: Time Period Rounding is disabled
   const [useRounding, setUseRounding] = useState<boolean>(false);
 
   // Export state
@@ -145,9 +146,10 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         if (savedData.interestType !== undefined && savedData.interestType !== '') {
           setInterestType(savedData.interestType);
         }
-        if (savedData.useRounding !== undefined) {
-          setUseRounding(savedData.useRounding);
-        }
+        // useRounding is now always false (feature toggle disabled)
+        // if (savedData.useRounding !== undefined) {
+        //   setUseRounding(savedData.useRounding);
+        // }
         
         // Load results if they exist
         if (savedData.principalAmount !== undefined && savedData.principalAmount !== null) {
@@ -195,7 +197,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         interestRate,
         interestPeriod,
         interestType,
-        useRounding,
+        useRounding: false, // Feature toggle: always false
         // Include results
         principalAmount,
         interestAmount,
@@ -218,7 +220,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     }, 300); // 300ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [amount, amountDisplay, startDate, endDate, interestRate, interestPeriod, interestType, useRounding,
+  }, [amount, amountDisplay, startDate, endDate, interestRate, interestPeriod, interestType,
       principalAmount, interestAmount, totalAmount, timePeriod, monthlyBreakdown, showBreakdown]);
 
   // Set current date as default end date (removed since we're setting it in state declaration)
@@ -448,7 +450,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
       const principal = Number(amount);
       const rate = Number(interestRate);
     
-    const timeDiff = calculateTimeDifference(startDate, endDate, useRounding);
+    const timeDiff = calculateTimeDifference(startDate, endDate, false); // Feature toggle: useRounding always false
     if (!timeDiff) {
       setPrincipalAmount(null);
       setInterestAmount(null);
@@ -478,14 +480,14 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
 
     if (interestType === 'simple') {
       // For simple interest, use the same approach as the monthly breakdown for consistency
-      const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, useRounding);
+      const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, false); // Feature toggle: useRounding always false
       const totalInterestFromBreakdown = breakdown.reduce((sum, month) => sum + month.monthlyInterest, 0);
       interest = totalInterestFromBreakdown;
       total = principal + interest;
     } else {
       // For compound interest, we need to sum up the monthly breakdown
       // since daily compounding is complex to calculate directly
-      const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, useRounding);
+      const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, false); // Feature toggle: useRounding always false
       const totalInterestFromBreakdown = breakdown.reduce((sum, month) => sum + month.monthlyInterest, 0);
       interest = totalInterestFromBreakdown;
       total = principal + interest;
@@ -495,7 +497,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     setTotalAmount(total);
     
     // Calculate monthly breakdown
-    const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, useRounding);
+    const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, false); // Feature toggle: useRounding always false
     setMonthlyBreakdown(breakdown);
     } catch (error) {
       console.error('Error calculating interest:', error);
@@ -515,7 +517,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
 
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount, startDate, endDate, interestRate, interestPeriod, interestType, useRounding]);
+  }, [amount, startDate, endDate, interestRate, interestPeriod, interestType]);
 
   const handleReset = () => {
     setAmount('');
@@ -525,7 +527,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     setInterestRate('');
     setInterestPeriod('yearly');
     setInterestType('simple');
-    setUseRounding(false);
+    // useRounding is always false (feature toggle disabled)
+    // setUseRounding(false);
     setPrincipalAmount(null);
     setInterestAmount(null);
     setTotalAmount(null);
@@ -583,7 +586,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         endDate: endDate.format('DD/MM/YYYY'),
         timePeriod: `${timePeriod.years} ${t('years')}, ${timePeriod.months} ${t('months')}, ${timePeriod.days} ${t('days')}`,
         interestType: interestType === 'simple' ? t('simpleInterest') : t('compoundInterest'),
-        useRounding: useRounding,
+        useRounding: false, // Feature toggle: always false
         interestAmount: interestAmount,
         totalAmount: totalAmount,
         monthlyBreakdown: monthlyBreakdown.length > 0 ? monthlyBreakdown : undefined
@@ -1033,7 +1036,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
               </RadioGroup>
             </FormControl>
 
-            {/* Rounding Option */}
+            {/* Rounding Option - DISABLED (Feature Toggle) */}
+            {/* 
             <FormControl component="fieldset" size="small">
               <FormLabel component="legend" sx={{ 
                 fontSize: { xs: '14px', sm: '0.875rem' }, 
@@ -1064,6 +1068,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 />
               </RadioGroup>
             </FormControl>
+            */}
           </Stack>
           
           {/* Reset Button */}
@@ -1192,29 +1197,16 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   }}>
                     {timePeriod.years > 0 && `${timePeriod.years} ${t('years')} `}
                     {timePeriod.months > 0 && `${timePeriod.months} ${t('months')} `}
-                    {timePeriod.days > 0 && !useRounding && `${timePeriod.days} ${t('days')}`}
-                    {timePeriod.days > 0 && useRounding && timePeriod.days < 15 && `${timePeriod.days} ${t('days')} (${t('countedAsHalfMonth')})`}
+                    {timePeriod.days > 0 && `${timePeriod.days} ${t('days')}`}
                   </Typography>
-                  {useRounding && (
-                    <Typography variant="body2" sx={{ 
-                      color: '#666', 
-                      mt: 0.5, 
-                      fontStyle: 'italic',
-                      fontSize: { xs: '0.75rem', lg: '0.8rem' }
-                    }}>
-                      * {t('roundingEnabled')}
-                    </Typography>
-                  )}
-                  {!useRounding && (
-                    <Typography variant="body2" sx={{ 
-                      color: '#666', 
-                      mt: 0.5, 
-                      fontStyle: 'italic',
-                      fontSize: { xs: '0.75rem', lg: '0.8rem' }
-                    }}>
-                      * {t('exactCalculation')}
-                    </Typography>
-                  )}
+                  <Typography variant="body2" sx={{ 
+                    color: '#666', 
+                    mt: 0.5, 
+                    fontStyle: 'italic',
+                    fontSize: { xs: '0.75rem', lg: '0.8rem' }
+                  }}>
+                    * {t('exactCalculation')}
+                  </Typography>
                 </Box>
               )}
 
@@ -1392,8 +1384,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       fontWeight: 'bold'
                     }}>
                       Monthly {interestType === 'simple' ? t('simpleInterest') : t('compoundInterest')} Breakdown
-                      {useRounding && ` (${t('yesRoundDaysToMonths').toLowerCase()})`}
-                      {!useRounding && ` (${t('noExactCalculation').toLowerCase()})`}
+                      {` (${t('noExactCalculation').toLowerCase()})`}
                     </Typography>
                     <TableContainer 
                       component={Paper} 
