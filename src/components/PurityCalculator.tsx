@@ -38,7 +38,7 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
   // State for input values
   const [weight, setWeight] = useState<number | string>('');
   const [currentPurity, setCurrentPurity] = useState<number | string>(99.5);
-  const [targetPurity, setTargetPurity] = useState<number | string | 'custom'>('');
+  const [targetPurity, setTargetPurity] = useState<number | string | 'custom'>(91.7);
   const [customTargetPurity, setCustomTargetPurity] = useState<number | string>('');
   
   // State for gold purity to add
@@ -127,6 +127,8 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
 
   // Common gold purity values
   const commonPurities = [
+    { value: 91.8, label: '91.8%' },
+    { value: 91.7, label: '91.7%' },
     { value: 91.6, label: t('22k') },
     { value: 75, label: t('18k') },
     { value: 58.3, label: t('14k') },
