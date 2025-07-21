@@ -132,5 +132,12 @@
   "dailyInfo": "Daily Info",
   "dailyRate": "daily rate",
   "monthlyBreakdown": "Monthly Breakdown",
-  "perDay": "per day"
+  "perDay": "per day",
+  "originalWeight": "original weight",
+  "goldToAdd": "gold to add",
+  "finalComposition": "Final Composition",
+  "purity": "purity",
+  "per24kGram": "per 24k gram",
+  "valueBreakdown": "Value Breakdown",
+  "totalWeightLabel": "total weight"
 }

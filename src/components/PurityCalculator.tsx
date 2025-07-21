@@ -15,7 +15,8 @@ import {
   Tooltip,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Chip
 } from '@mui/material';
 import { 
   Add, 
@@ -791,116 +792,164 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
         
         <Box id="purity-results-section" sx={{ 
           mt: { xs: 1, lg: 2 }, 
-          p: { xs: 2, lg: 4 }, 
+          p: { xs: 3, lg: 4 }, 
           bgcolor: 'rgba(248, 246, 240, 0.8)',
           borderRadius: 2, 
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
           border: '1px solid rgba(200, 117, 51, 0.3)',
           transition: 'all 0.3s ease',
-          minHeight: { xs: '250px', lg: '300px' }
+          minHeight: { xs: '350px', lg: '400px' }
         }}>
           {(weight && currentPurity && targetPurity && 
             !(targetPurity === 'custom' && (!customTargetPurity || customTargetPurity === ''))
           ) ? (
             <>
-              {resultType === 'equal' && (
-                <Box sx={{ 
-                  p: { xs: 1.5, lg: 2 }, 
-                  bgcolor: 'rgba(0, 150, 136, 0.1)', 
-                  borderRadius: 1 
-                }}>
-                  <Typography variant="h6" sx={{ 
-                    color: 'success.main',
-                    fontSize: { xs: '1rem', lg: '1.25rem' }
-                  }}>
-                    {t('noAdjustmentNeeded')}
-                  </Typography>
-                </Box>
-              )}
-              {resultType === '' && weightToAdd === null && (
-                <Box sx={{ 
-                  p: { xs: 1.5, lg: 2 }, 
-                  bgcolor: 'rgba(255, 152, 0, 0.1)', 
-                  borderRadius: 1, 
-                  borderLeft: '4px solid #FF9800' 
-                }}>
-                  <Typography variant="h6" sx={{ 
-                    color: '#E65100', 
-                    mb: 1,
-                    fontSize: { xs: '1rem', lg: '1.25rem' }
-                  }}>
-                    {t('impossibleCalculation')}
-                  </Typography>
-                  <Typography variant="body2" sx={{ 
-                    color: '#BF360C',
-                    fontSize: { xs: '0.875rem', lg: '0.875rem' }
-                  }}>
-                    {(() => {
-                      const actualTargetPurity = targetPurity === 'custom' ? 
-                        Number(customTargetPurity) : Number(targetPurity);
-                      const actualGoldPurityToAdd = goldPurityToAdd === 'custom' ? 
-                        (customGoldPurity ? Number(customGoldPurity) : 100) : 
-                        Number(goldPurityToAdd);
-                      
-                      if (actualTargetPurity === 100 && actualGoldPurityToAdd < 100) {
-                        return t('cannotReach100Percent', { purity: actualGoldPurityToAdd.toFixed(2) });
-                      } else if (actualGoldPurityToAdd <= actualTargetPurity) {
-                        return t('cannotIncreaseWithLowerPurity', { 
-                          goldPurity: actualGoldPurityToAdd.toFixed(2),
-                          targetPurity: actualTargetPurity.toFixed(2)
-                        });
-                      }
-                      return t('calculationNotPossible');
-                    })()}
-                  </Typography>
-                </Box>
-              )}
-              {resultType === 'copper' && (
-                <Box sx={{ 
-                  p: { xs: 1.5, lg: 2 }, 
-                  bgcolor: 'rgba(200, 117, 51, 0.15)', 
-                  borderRadius: 1, 
-                  borderLeft: '4px solid #C87533' 
-                }}>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      color: 'secondary.main',
-                      fontSize: { xs: '1rem', lg: '1.25rem' }
-                    }}
-                    dangerouslySetInnerHTML={{ __html: t('addCopper', { weight: weightToAdd?.toFixed(3) }) }}
-                  />
-                  <Typography 
-                    variant="body1" 
-                    color="textSecondary" 
-                    sx={{ 
-                      mt: 1,
-                      fontSize: { xs: '0.875rem', lg: '1rem' }
-                    }}
-                  >
-                    {t('toDecreasePurity', { 
-                      current: Number(currentPurity).toFixed(2),
-                      target: targetPurity === 'custom' ? 
-                        Number(customTargetPurity).toFixed(2) : 
-                        Number(targetPurity).toFixed(2)
-                    })}
-                  </Typography>
-                </Box>
-              )}
-              {resultType === 'gold' && (
-                <>
+              {/* Main Result Section */}
+              <Box sx={{ 
+                mb: { xs: 2, lg: 3 }
+              }}>
+                {resultType === 'equal' && (
                   <Box sx={{ 
-                    p: { xs: 1.5, lg: 2 }, 
-                    bgcolor: 'rgba(212, 175, 55, 0.15)',
-                    borderRadius: 1, 
-                    borderLeft: '4px solid #D4AF37',
-                    transition: 'all 0.3s ease'
+                    p: { xs: 2, lg: 3 }, 
+                    bgcolor: 'rgba(0, 150, 136, 0.12)', 
+                    borderRadius: 1.5,
+                    borderLeft: '4px solid #00897B',
+                    mb: 2
                   }}>
+                    <Typography variant="h5" sx={{ 
+                      color: '#00695C',
+                      fontSize: { xs: '1.1rem', lg: '1.4rem' },
+                      fontWeight: 'bold',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1
+                    }}>
+                      ✅ {t('noAdjustmentNeeded')}
+                    </Typography>
+                  </Box>
+                )}
+                
+                {resultType === '' && weightToAdd === null && (
+                  <Box sx={{ 
+                    p: { xs: 2, lg: 3 }, 
+                    bgcolor: 'rgba(255, 152, 0, 0.12)', 
+                    borderRadius: 1.5, 
+                    borderLeft: '4px solid #FF9800',
+                    mb: 2
+                  }}>
+                    <Typography variant="h5" sx={{ 
+                      color: '#E65100', 
+                      mb: 1.5,
+                      fontSize: { xs: '1.1rem', lg: '1.4rem' },
+                      fontWeight: 'bold',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1
+                    }}>
+                      ⚠️ {t('impossibleCalculation')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ 
+                      color: '#BF360C',
+                      fontSize: { xs: '0.9rem', lg: '1rem' },
+                      lineHeight: 1.5
+                    }}>
+                      {(() => {
+                        const actualTargetPurity = targetPurity === 'custom' ? 
+                          Number(customTargetPurity) : Number(targetPurity);
+                        const actualGoldPurityToAdd = goldPurityToAdd === 'custom' ? 
+                          (customGoldPurity ? Number(customGoldPurity) : 100) : 
+                          Number(goldPurityToAdd);
+                        
+                        if (actualTargetPurity === 100 && actualGoldPurityToAdd < 100) {
+                          return t('cannotReach100Percent', { purity: actualGoldPurityToAdd.toFixed(2) });
+                        } else if (actualGoldPurityToAdd <= actualTargetPurity) {
+                          return t('cannotIncreaseWithLowerPurity', { 
+                            goldPurity: actualGoldPurityToAdd.toFixed(2),
+                            targetPurity: actualTargetPurity.toFixed(2)
+                          });
+                        }
+                        return t('calculationNotPossible');
+                      })()}
+                    </Typography>
+                  </Box>
+                )}
+                
+                {resultType === 'copper' && (
+                  <Box sx={{ 
+                    p: { xs: 2, lg: 3 }, 
+                    bgcolor: 'rgba(200, 117, 51, 0.12)', 
+                    borderRadius: 1.5, 
+                    borderLeft: '4px solid #C87533',
+                    mb: 2
+                  }}>
+                    <Typography 
+                      variant="h5" 
+                      sx={{ 
+                        color: '#8E5924',
+                        fontSize: { xs: '1.1rem', lg: '1.4rem' },
+                        fontWeight: 'bold',
+                        mb: 1.5,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      🥉 Add Copper
+                    </Typography>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        color: 'secondary.main',
+                        fontSize: { xs: '1rem', lg: '1.2rem' },
+                        mb: 1
+                      }}
+                      dangerouslySetInnerHTML={{ __html: t('addCopper', { weight: weightToAdd?.toFixed(3) }) }}
+                    />
+                    <Typography 
+                      variant="body1" 
+                      color="textSecondary" 
+                      sx={{ 
+                        fontSize: { xs: '0.9rem', lg: '1rem' }
+                      }}
+                    >
+                      {t('toDecreasePurity', { 
+                        current: Number(currentPurity).toFixed(2),
+                        target: targetPurity === 'custom' ? 
+                          Number(customTargetPurity).toFixed(2) : 
+                          Number(targetPurity).toFixed(2)
+                      })}
+                    </Typography>
+                  </Box>
+                )}
+                
+                {resultType === 'gold' && (
+                  <Box sx={{ 
+                    p: { xs: 2, lg: 3 }, 
+                    bgcolor: 'rgba(212, 175, 55, 0.12)',
+                    borderRadius: 1.5, 
+                    borderLeft: '4px solid #D4AF37',
+                    mb: 2
+                  }}>
+                    <Typography 
+                      variant="h5" 
+                      sx={{ 
+                        color: '#B8860B',
+                        fontSize: { xs: '1.1rem', lg: '1.4rem' },
+                        fontWeight: 'bold',
+                        mb: 1.5,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      🥇 Add Gold
+                    </Typography>
                     <Typography 
                       variant="h6" 
                       sx={{ 
                         color: 'primary.main',
-                        fontSize: { xs: '1rem', lg: '1.25rem' }
+                        fontSize: { xs: '1rem', lg: '1.2rem' },
+                        mb: 1
                       }}
                       dangerouslySetInnerHTML={{ 
                         __html: t('addGold', { 
@@ -915,8 +964,7 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                       variant="body1" 
                       color="textSecondary" 
                       sx={{ 
-                        mt: 1,
-                        fontSize: { xs: '0.875rem', lg: '1rem' }
+                        fontSize: { xs: '0.9rem', lg: '1rem' }
                       }}
                     >
                       {t('toIncreasePurity', { 
@@ -927,30 +975,123 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
                       })}
                     </Typography>
                   </Box>
-                </>
-              )}
-              {/* Final Results section */}
+                )}
+              </Box>
+
+              {/* Calculation Details Section */}
               <Box sx={{ 
-                mt: { xs: 2, lg: 3 }, 
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', lg: '3fr 2fr' },
+                gap: { xs: 1.5, lg: 2 },
+                mb: { xs: 2, lg: 3 }
+              }}>
+                {/* Calculation Info */}
+                <Box sx={{ 
+                  p: { xs: 1.5, lg: 2 }, 
+                  bgcolor: 'rgba(33, 150, 243, 0.08)', 
+                  borderRadius: 1, 
+                  borderLeft: '3px solid #2196F3'
+                }}>
+                  <Typography variant="subtitle2" sx={{ 
+                    color: '#1976D2', 
+                    mb: 1,
+                    fontSize: { xs: '0.8rem', lg: '0.85rem' },
+                    fontWeight: 'bold'
+                  }}>
+                    📊 {t('calculationDetails')}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.8, lg: 1 } }}>
+                    <Chip 
+                      label={`${Number(weight).toFixed(3)}g ${t('originalWeight')}`}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        color: '#1976D2',
+                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                        fontWeight: 'medium'
+                      }}
+                    />
+                    
+                    <Chip 
+                      label={`${Number(currentPurity).toFixed(2)}% → ${(targetPurity === 'custom' ? Number(customTargetPurity) : Number(targetPurity)).toFixed(2)}%`}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        color: '#1976D2',
+                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                        fontWeight: 'medium'
+                      }}
+                    />
+                    
+                    {resultType === 'gold' && (
+                      <Chip 
+                        label={`${(goldPurityToAdd === 'custom' ? Number(customGoldPurity || 100) : Number(goldPurityToAdd)).toFixed(2)}% ${t('goldToAdd')}`}
+                        size="small"
+                        sx={{ 
+                          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                          color: '#1976D2',
+                          fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                          fontWeight: 'medium'
+                        }}
+                      />
+                    )}
+                  </Box>
+                </Box>
+
+                {/* Final Composition */}
+                <Box sx={{ 
+                  p: { xs: 1.5, lg: 2 }, 
+                  bgcolor: 'rgba(156, 39, 176, 0.08)', 
+                  borderRadius: 1, 
+                  borderLeft: '3px solid #9C27B0'
+                }}>
+                  <Typography variant="subtitle2" sx={{ 
+                    color: '#7B1FA2', 
+                    mb: 1,
+                    fontSize: { xs: '0.8rem', lg: '0.85rem' },
+                    fontWeight: 'bold'
+                  }}>
+                    ⚖️ {t('finalComposition')}
+                  </Typography>
+                  
+                  <Typography variant="body2" sx={{ 
+                    fontSize: { xs: '0.75rem', lg: '0.8rem' },
+                    mb: 0.5,
+                    color: '#7B1FA2',
+                    fontWeight: 'medium'
+                  }}>
+                    <strong>{totalWeight?.toFixed(3)}g</strong> {t('totalWeightLabel')}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Final Results Section */}
+              <Box sx={{ 
                 pt: 2, 
-                pb: 1, 
-                borderTop: '1px solid #eaeaea' 
+                borderTop: '2px dashed rgba(200, 117, 51, 0.3)'
               }}>
                 <Typography variant="h6" sx={{ 
                   fontSize: { xs: '1rem', lg: '1.1rem' }, 
-                  mb: 1.5 
+                  mb: 1.5,
+                  color: '#8E5924',
+                  fontWeight: 'bold'
                 }}>
-                  {t('finalResults')}
+                  📋 {t('finalResults')}
                 </Typography>
                 <Box sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  gap: { xs: 1, lg: 1.5 }, 
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', lg: 'repeat(3, 1fr)' },
+                  gap: { xs: 1, lg: 1.5 },
                   ml: 1 
                 }}>
                   <Typography 
                     variant="body1"
-                    sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}
+                    sx={{ 
+                      fontSize: { xs: '0.875rem', lg: '1rem' },
+                      color: '#1976D2',
+                      fontWeight: 'medium'
+                    }}
                     dangerouslySetInnerHTML={{ __html: t('totalWeight', { weight: totalWeight?.toFixed(3) }) }}
                   />
                   <Typography variant="body1" color="textSecondary" sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}>
@@ -975,8 +1116,9 @@ const PurityCalculator: React.FC<PurityCalculatorProps> = ({ onReset }) => {
           ) : (
             <Typography variant="body1" color="textSecondary" sx={{ 
               textAlign: 'center', 
-              mt: { xs: 6, lg: 8 },
-              fontSize: { xs: '0.875rem', lg: '1rem' }
+              mt: { xs: 8, lg: 10 },
+              fontSize: { xs: '0.9rem', lg: '1rem' },
+              fontStyle: 'italic'
             }}>
               {t('enterAllValues')}
             </Typography>

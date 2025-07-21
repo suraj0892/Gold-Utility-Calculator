@@ -683,7 +683,6 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   }}
                   format="DD-MM-YYYY"
                   maxDate={endDate || undefined}
-                  disableFuture
                   slotProps={{
                     textField: {
                       size: 'small',
@@ -786,7 +785,6 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   }}
                   format="DD-MM-YYYY"
                   minDate={startDate || undefined}
-                  disableFuture
                   slotProps={{
                     textField: {
                       size: 'small',

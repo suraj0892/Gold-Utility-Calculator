@@ -19,7 +19,8 @@ import {
   Tooltip,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Chip
 } from '@mui/material';
 import { 
   Add, 
@@ -857,30 +858,50 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
         </Box>
         
         <Box id="amount-results-section" sx={{ 
-          mt: 2, 
-          p: 4, 
+          mt: { xs: 1, lg: 2 }, 
+          p: { xs: 3, lg: 4 }, 
           bgcolor: 'rgba(248, 246, 240, 0.8)',
           borderRadius: 2, 
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
           border: '1px solid rgba(200, 117, 51, 0.3)',
           transition: 'all 0.3s ease',
-          minHeight: '300px'
+          minHeight: { xs: '350px', lg: '400px' }
         }}>
           {(goldWeight && goldPurity && 
             !(goldPurity === 'custom' && (!customGoldPurity || customGoldPurity === '')) &&
             goldRate24k
           ) ? (
             <>
+              {/* Main Result Section */}
               <Box sx={{ 
-                p: 2, 
-                bgcolor: 'rgba(212, 175, 55, 0.15)',
-                borderRadius: 1, 
+                p: { xs: 2, lg: 3 }, 
+                bgcolor: 'rgba(212, 175, 55, 0.12)',
+                borderRadius: 1.5, 
                 borderLeft: '4px solid #D4AF37',
-                transition: 'all 0.3s ease'
+                mb: { xs: 2, lg: 3 }
               }}>
                 <Typography 
-                  variant="h6" 
-                  sx={{ color: 'primary.main', mb: 2 }}
+                  variant="h5" 
+                  sx={{ 
+                    color: '#B8860B', 
+                    mb: 2,
+                    fontSize: { xs: '1.1rem', lg: '1.4rem' },
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}
+                >
+                  💰 Total Amount
+                </Typography>
+                <Typography 
+                  variant="h4" 
+                  sx={{ 
+                    color: 'primary.main',
+                    fontSize: { xs: '1.4rem', lg: '1.8rem' },
+                    fontWeight: 'bold',
+                    mb: 2
+                  }}
                   dangerouslySetInnerHTML={{ 
                     __html: t('totalAmountResult', { 
                       amount: totalAmount ? formatIndianNumber(totalAmount) : '0.00'
@@ -892,7 +913,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                 {totalAmount && totalAmount > 0 && (
                   <Box sx={{ 
                     mt: 2, 
-                    p: 2, 
+                    p: { xs: 1.5, lg: 2 }, 
                     backgroundColor: 'rgba(76, 175, 80, 0.1)', 
                     borderRadius: 1,
                     border: '1px solid rgba(76, 175, 80, 0.3)'
@@ -903,7 +924,8 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                         fontStyle: 'italic', 
                         color: '#2E7D32',
                         fontWeight: 'medium',
-                        lineHeight: 1.4
+                        lineHeight: 1.4,
+                        fontSize: { xs: '0.8rem', lg: '0.9rem' }
                       }}
                     >
                       <strong>{t('amountInWords')}:</strong><br />
@@ -915,15 +937,127 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                   </Box>
                 )}
               </Box>
-              
-              {/* Breakdown Section */}
-              <Box sx={{ mt: 3, pt: 2, pb: 1, borderTop: '1px solid #eaeaea' }}>
-                <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 1.5 }}>
-                  {t('breakdown')}
+
+              {/* Calculation Details Section */}
+              <Box sx={{ 
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', lg: '3fr 2fr' },
+                gap: { xs: 1.5, lg: 2 },
+                mb: { xs: 2, lg: 3 }
+              }}>
+                {/* Calculation Info */}
+                <Box sx={{ 
+                  p: { xs: 1.5, lg: 2 }, 
+                  bgcolor: 'rgba(33, 150, 243, 0.08)', 
+                  borderRadius: 1, 
+                  borderLeft: '3px solid #2196F3'
+                }}>
+                  <Typography variant="subtitle2" sx={{ 
+                    color: '#1976D2', 
+                    mb: 1,
+                    fontSize: { xs: '0.8rem', lg: '0.85rem' },
+                    fontWeight: 'bold'
+                  }}>
+                    📊 {t('calculationDetails')}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.8, lg: 1 } }}>
+                    <Chip 
+                      label={`${Number(goldWeight).toFixed(3)}g ${t('goldWeight').replace(/<[^>]*>/g, '').split(':')[0]}`}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        color: '#1976D2',
+                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                        fontWeight: 'medium'
+                      }}
+                    />
+                    
+                    <Chip 
+                      label={`${(goldPurity === 'custom' ? Number(customGoldPurity) : Number(goldPurity)).toFixed(2)}% ${t('purity')}`}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        color: '#1976D2',
+                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                        fontWeight: 'medium'
+                      }}
+                    />
+                    
+                    <Chip 
+                      label={`₹${formatIndianNumber(Number(goldRate24k))} ${t('per24kGram')}`}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        color: '#1976D2',
+                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
+                        fontWeight: 'medium'
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                {/* Value Breakdown */}
+                <Box sx={{ 
+                  p: { xs: 1.5, lg: 2 }, 
+                  bgcolor: 'rgba(156, 39, 176, 0.08)', 
+                  borderRadius: 1, 
+                  borderLeft: '3px solid #9C27B0'
+                }}>
+                  <Typography variant="subtitle2" sx={{ 
+                    color: '#7B1FA2', 
+                    mb: 1,
+                    fontSize: { xs: '0.8rem', lg: '0.85rem' },
+                    fontWeight: 'bold'
+                  }}>
+                    💎 {t('valueBreakdown')}
+                  </Typography>
+                  
+                  <Typography variant="body2" sx={{ 
+                    fontSize: { xs: '0.75rem', lg: '0.8rem' },
+                    mb: 0.5,
+                    color: '#7B1FA2',
+                    fontWeight: 'medium'
+                  }}>
+                    <strong>₹{goldValue ? formatIndianNumber(goldValue) : '0.00'}</strong> {t('goldValue').replace(/<[^>]*>/g, '').split(':')[0]}
+                  </Typography>
+                  
+                  <Typography variant="body2" sx={{ 
+                    fontSize: { xs: '0.75rem', lg: '0.8rem' },
+                    color: '#7B1FA2',
+                    fontWeight: 'medium'
+                  }}>
+                    <strong>₹{miscValue ? formatIndianNumber(miscValue) : '0.00'}</strong> {t('miscCharges')}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Detailed Breakdown Section */}
+              <Box sx={{ 
+                pt: 2, 
+                borderTop: '2px dashed rgba(200, 117, 51, 0.3)'
+              }}>
+                <Typography variant="h6" sx={{ 
+                  fontSize: { xs: '1rem', lg: '1.1rem' }, 
+                  mb: 1.5,
+                  color: '#8E5924',
+                  fontWeight: 'bold'
+                }}>
+                  📋 {t('breakdown')}
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, ml: 1 }}>
+                <Box sx={{ 
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, 1fr)' },
+                  gap: { xs: 1, lg: 1.5 },
+                  ml: 1 
+                }}>
                   <Typography 
                     variant="body1"
+                    sx={{ 
+                      fontSize: { xs: '0.875rem', lg: '1rem' },
+                      color: '#1976D2',
+                      fontWeight: 'medium'
+                    }}
                     dangerouslySetInnerHTML={{ 
                       __html: t('goldValue', { 
                         value: goldValue ? formatIndianNumber(goldValue) : '0.00'
@@ -932,20 +1066,25 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                   />
                   <Typography 
                     variant="body1"
+                    sx={{ 
+                      fontSize: { xs: '0.875rem', lg: '1rem' },
+                      color: '#1976D2',
+                      fontWeight: 'medium'
+                    }}
                     dangerouslySetInnerHTML={{ 
                       __html: t('miscChargesValue', { 
                         value: miscValue ? formatIndianNumber(miscValue) : '0.00'
                       })
                     }}
                   />
-                  <Typography variant="body1" color="textSecondary">
+                  <Typography variant="body1" color="textSecondary" sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}>
                     <span dangerouslySetInnerHTML={{ 
                       __html: t('goldWeight', { 
                         weight: Number(goldWeight).toFixed(3) || '0.000'
                       })
                     }} />
                   </Typography>
-                  <Typography variant="body1" color="textSecondary">
+                  <Typography variant="body1" color="textSecondary" sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}>
                     <span dangerouslySetInnerHTML={{ 
                       __html: t('goldPurityUsed', { 
                         purity: (goldPurity === 'custom' ? 
@@ -954,7 +1093,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                       })
                     }} />
                   </Typography>
-                  <Typography variant="body1" color="textSecondary">
+                  <Typography variant="body1" color="textSecondary" sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}>
                     <span dangerouslySetInnerHTML={{ 
                       __html: t('rateUsed', { 
                         type: '24k',
@@ -962,7 +1101,7 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
                       })
                     }} />
                   </Typography>
-                  <Typography variant="body1" color="textSecondary">
+                  <Typography variant="body1" color="textSecondary" sx={{ fontSize: { xs: '0.875rem', lg: '1rem' } }}>
                     <span dangerouslySetInnerHTML={{ 
                       __html: t('pureGoldWeightUsed', { 
                         weight: (goldWeight && goldPurity !== 'custom' ? 
@@ -976,7 +1115,12 @@ const AmountCalculator: React.FC<AmountCalculatorProps> = ({ onReset }) => {
               </Box>
             </>
           ) : (
-            <Typography variant="body1" color="textSecondary" sx={{ textAlign: 'center', mt: 8 }}>
+            <Typography variant="body1" color="textSecondary" sx={{ 
+              textAlign: 'center', 
+              mt: { xs: 8, lg: 10 },
+              fontSize: { xs: '0.9rem', lg: '1rem' },
+              fontStyle: 'italic'
+            }}>
               {t('enterAllValues')}
             </Typography>
           )}

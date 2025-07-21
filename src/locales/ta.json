@@ -132,5 +132,12 @@
   "dailyInfo": "தினசரி தகவல்",
   "dailyRate": "தினசரி விகிதம்",
   "monthlyBreakdown": "மாதாந்திர பிரிவு",
-  "perDay": "ஒரு நாளுக்கு"
+  "perDay": "ஒரு நாளுக்கு",
+  "originalWeight": "அசல் எடை",
+  "goldToAdd": "சேர்க்க வேண்டிய தங்கம்",
+  "finalComposition": "இறுதி கலவை",
+  "purity": "தூய்மை",
+  "per24kGram": "ஒரு 24k கிராம்",
+  "valueBreakdown": "மதிப்பு பிரிவு",
+  "totalWeightLabel": "மொத்த எடை"
 }
