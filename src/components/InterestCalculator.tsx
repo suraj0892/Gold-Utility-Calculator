@@ -1094,7 +1094,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center',
-          mb: 3
+          mb: 2
         }}>
           <Typography variant="h5" sx={{ 
             color: '#8E5924',
@@ -1154,7 +1154,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
           id="interest-results-section"
           sx={{ 
             mt: 2, 
-            p: 4, 
+            p: 2, 
             bgcolor: 'rgba(248, 246, 240, 0.8)',
             borderRadius: 2, 
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -1165,10 +1165,10 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
             overflow: 'hidden'
           }}>
           {(amount && startDate && endDate && interestRate && isValidDateRange) ? (
-            <Stack spacing={2}>
+            <Stack spacing={1.5}>
               {/* Summary Card */}
               <Box sx={{ 
-                p: 2, 
+                p: 1.5, 
                 bgcolor: 'rgba(212, 175, 55, 0.1)',
                 borderRadius: 1, 
                 borderLeft: '4px solid #D4AF37'
@@ -1177,7 +1177,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 <Box sx={{ 
                   display: 'grid', 
                   gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' },
-                  gap: 2.5
+                  gap: 1
                 }}>
                   {/* Principal */}
                   <Box sx={{ textAlign: 'center' }}>
@@ -1242,25 +1242,25 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
               <Box sx={{ 
                 display: 'grid', 
                 gridTemplateColumns: { xs: '1fr' },
-                gap: 2
+                gap: 1.5
               }}>
                 {/* Calculation Details */}
                 <Box sx={{ 
-                  p: 1.2, 
+                  p: 1, 
                   bgcolor: 'rgba(33, 150, 243, 0.08)', 
                   borderRadius: 1, 
                   borderLeft: '3px solid #2196F3'
                 }}>
                   <Typography variant="subtitle2" sx={{ 
                     color: '#1976D2', 
-                    mb: 0.5,
+                    mb: 0.3,
                     fontSize: '0.8rem',
                     fontWeight: 'bold'
                   }}>
                     📊 {t('calculationDetails')}
                   </Typography>
                   
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     {timePeriod && (
                       <Chip 
                         label={`${timePeriod.years > 0 ? `${timePeriod.years} ${timePeriod.years === 1 ? t('year') : t('years')} ` : ''}${timePeriod.months > 0 ? `${timePeriod.months} ${timePeriod.months === 1 ? t('month') : t('months')} ` : ''}${timePeriod.days > 0 ? `${timePeriod.days} ${timePeriod.days === 1 ? t('day') : t('days')}` : ''}`.trim()}
@@ -1342,7 +1342,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
               {/* Monthly Breakdown Toggle - Expanded */}
               {monthlyBreakdown.length > 0 && (
                 <Box sx={{ 
-                  p: 2, 
+                  p: 1.5, 
                   bgcolor: 'rgba(255, 152, 0, 0.08)', 
                   borderRadius: 1, 
                   borderLeft: '3px solid #FF9800'
@@ -1393,12 +1393,12 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   
                   {/* Breakdown Table */}
                   <Collapse in={showBreakdown}>
-                    <Box sx={{ mt: 1.5 }}>
+                    <Box sx={{ mt: 1 }}>
                       <TableContainer 
                         component={Paper} 
                         sx={{ 
-                          height: monthlyBreakdown.length > 5 ? 180 : 'auto',
-                          maxHeight: 180,
+                          height: monthlyBreakdown.length > 5 ? 200 : 'auto',
+                          maxHeight: 200,
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
                           border: '2px solid rgba(245, 124, 0, 0.3)',
                           borderRadius: 1,
@@ -1425,53 +1425,53 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                               <TableCell sx={{ 
                                 fontWeight: 'bold', 
                                 backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' }, 
-                                py: { xs: 0.15, sm: 0.25, md: 0.3 },
-                                px: { xs: 0.1, sm: 0.25, md: 0.3 },
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }, 
+                                py: { xs: 0.3, sm: 0.4, md: 0.5 },
+                                px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                 borderBottom: '2px solid #FFB74D',
                                 borderRight: '1px solid #FFB74D',
-                                width: { xs: '33px', sm: '60px', md: '70px' },
+                                width: { xs: '45px', sm: '80px', md: '100px' },
                                 textAlign: 'center',
-                                lineHeight: 1.0
+                                lineHeight: 1.2
                               }}>
                                 Month<br />Year
                               </TableCell>
                               <TableCell align="center" sx={{ 
                                 fontWeight: 'bold', 
                                 backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' }, 
-                                py: { xs: 0.15, sm: 0.25, md: 0.3 },
-                                px: { xs: 0.1, sm: 0.25, md: 0.3 },
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }, 
+                                py: { xs: 0.3, sm: 0.4, md: 0.5 },
+                                px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                 borderBottom: '2px solid #FFB74D',
                                 borderRight: '1px solid #FFB74D',
-                                width: { xs: '20px', sm: '35px', md: '40px' },
-                                lineHeight: 1.0
+                                width: { xs: '35px', sm: '50px', md: '60px' },
+                                lineHeight: 1.2
                               }}>
                                 Days
                               </TableCell>
                               <TableCell align="center" sx={{ 
                                 fontWeight: 'bold', 
                                 backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' }, 
-                                py: { xs: 0.15, sm: 0.25, md: 0.3 },
-                                px: { xs: 0.1, sm: 0.25, md: 0.3 },
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }, 
+                                py: { xs: 0.3, sm: 0.4, md: 0.5 },
+                                px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                 borderBottom: '2px solid #FFB74D',
                                 borderRight: '1px solid #FFB74D',
-                                width: { xs: '38px', sm: '70px', md: '85px' },
-                                lineHeight: 1.0
+                                width: { xs: '55px', sm: '90px', md: '120px' },
+                                lineHeight: 1.2
                               }}>
                                 Principal<br />Amount
                               </TableCell>
                               <TableCell align="center" sx={{ 
                                 fontWeight: 'bold', 
                                 backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' }, 
-                                py: { xs: 0.15, sm: 0.25, md: 0.3 },
-                                px: { xs: 0.1, sm: 0.25, md: 0.3 },
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }, 
+                                py: { xs: 0.3, sm: 0.4, md: 0.5 },
+                                px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                 borderBottom: '2px solid #FFB74D',
                                 borderRight: '1px solid #FFB74D',
-                                width: { xs: '38px', sm: '70px', md: '85px' },
-                                lineHeight: 1.0
+                                width: { xs: '55px', sm: '90px', md: '120px' },
+                                lineHeight: 1.2
                               }}>
                                 Monthly<br />Interest
                               </TableCell>
@@ -1493,9 +1493,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                                 }}
                               >
                                 <TableCell align="center" sx={{ 
-                                  fontSize: { xs: '0.45rem', sm: '0.55rem', md: '0.65rem' }, 
-                                  py: { xs: 0.05, sm: 0.1, md: 0.15 },
-                                  px: { xs: 0.1, sm: 0.15, md: 0.2 },
+                                  fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.8rem' }, 
+                                  py: { xs: 0.2, sm: 0.3, md: 0.4 },
+                                  px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                   fontWeight: 'medium',
                                   color: '#424242',
                                   overflow: 'hidden',
@@ -1506,9 +1506,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                                   {month.month} {month.year}
                                 </TableCell>
                                 <TableCell align="center" sx={{ 
-                                  fontSize: { xs: '0.45rem', sm: '0.55rem', md: '0.65rem' }, 
-                                  py: { xs: 0.05, sm: 0.1, md: 0.15 },
-                                  px: { xs: 0.1, sm: 0.15, md: 0.2 },
+                                  fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.8rem' }, 
+                                  py: { xs: 0.2, sm: 0.3, md: 0.4 },
+                                  px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                   color: '#666',
                                   borderRight: '1px solid rgba(245, 124, 0, 0.2)',
                                   borderBottom: '1px solid rgba(245, 124, 0, 0.1)'
@@ -1516,9 +1516,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                                   {month.daysInMonth}
                                 </TableCell>
                                 <TableCell align="center" sx={{ 
-                                  fontSize: { xs: '0.45rem', sm: '0.55rem', md: '0.65rem' }, 
-                                  py: { xs: 0.05, sm: 0.1, md: 0.15 },
-                                  px: { xs: 0.1, sm: 0.15, md: 0.2 },
+                                  fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.8rem' }, 
+                                  py: { xs: 0.2, sm: 0.3, md: 0.4 },
+                                  px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                   color: '#2E7D32',
                                   fontWeight: 'medium',
                                   overflow: 'hidden',
@@ -1529,9 +1529,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                                   ₹{formatIndianNumber(month.principalForCalculation)}
                                 </TableCell>
                                 <TableCell align="center" sx={{ 
-                                  fontSize: { xs: '0.45rem', sm: '0.55rem', md: '0.65rem' }, 
-                                  py: { xs: 0.05, sm: 0.1, md: 0.15 },
-                                  px: { xs: 0.1, sm: 0.15, md: 0.2 },
+                                  fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.8rem' }, 
+                                  py: { xs: 0.2, sm: 0.3, md: 0.4 },
+                                  px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                   color: '#1976D2',
                                   fontWeight: 'medium',
                                   overflow: 'hidden',
@@ -1554,9 +1554,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                             }}>
                               <TableCell align="center" sx={{ 
                                 fontWeight: 'medium',
-                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
-                                py: { xs: 0.1, sm: 0.2, md: 0.25 },
-                                px: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                                py: { xs: 0.3, sm: 0.4, md: 0.5 },
+                                px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                 color: '#1B5E20',
                                 borderRight: '1px solid #FFB74D'
                               }}>
@@ -1564,9 +1564,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                               </TableCell>
                               <TableCell align="center" sx={{ 
                                 fontWeight: 'medium',
-                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
-                                py: { xs: 0.1, sm: 0.2, md: 0.25 },
-                                px: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                                py: { xs: 0.3, sm: 0.4, md: 0.5 },
+                                px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                 color: '#1B5E20',
                                 borderRight: '1px solid #FFB74D'
                               }}>
@@ -1574,9 +1574,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                               </TableCell>
                               <TableCell align="center" sx={{ 
                                 fontWeight: 'medium',
-                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
-                                py: { xs: 0.1, sm: 0.2, md: 0.25 },
-                                px: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                                py: { xs: 0.3, sm: 0.4, md: 0.5 },
+                                px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                 color: '#1B5E20',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -1586,9 +1586,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                               </TableCell>
                               <TableCell align="center" sx={{ 
                                 fontWeight: 'medium',
-                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
-                                py: { xs: 0.1, sm: 0.2, md: 0.25 },
-                                px: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                                py: { xs: 0.3, sm: 0.4, md: 0.5 },
+                                px: { xs: 0.3, sm: 0.4, md: 0.5 },
                                 color: '#1B5E20',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis'
