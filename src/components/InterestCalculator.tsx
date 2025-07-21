@@ -619,21 +619,21 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         <Typography variant="h5" gutterBottom sx={{ 
           color: '#9c7c38',
           transition: 'color 0.3s ease',
-          mb: { xs: 2, lg: 3 }
+          mb: 3
         }}>
           {t('inputValues')}
         </Typography>
         <Box 
           sx={{ 
-            mt: { xs: 1, lg: 2 }, 
-            p: { xs: 2, lg: 3 }, 
+            mt: 2, 
+            p: 2, 
             backgroundColor: 'rgba(248, 246, 236, 0.6)',
             borderRadius: 2,
             border: '1px solid rgba(212, 175, 55, 0.3)',
             transition: 'all 0.3s ease'
           }}
         >
-          <Stack spacing={{ xs: 2, lg: 2.5 }}>
+          <Stack spacing={2}>
             {/* Principal Amount */}
             <TextField
               fullWidth
@@ -643,12 +643,13 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
               size="small"
               inputProps={{
                 inputMode: 'decimal',
-                pattern: '[0-9,]*\\.?[0-9]*'
+                pattern: '[0-9,]*\\.?[0-9]*',
+                style: { fontSize: '16px' } // Prevent zoom on mobile
               }}
               placeholder="0.00"
               sx={{
                 '& .MuiInputBase-input': {
-                  fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                  fontSize: '13px',
                 }
               }}
             />
@@ -658,7 +659,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
               <Box sx={{ 
                 display: 'flex', 
                 flexDirection: { xs: 'column', sm: 'row' },
-                gap: { xs: 2, sm: 2 }
+                gap: 2
               }}>
                 {/* Start Date */}
                 <DatePicker
@@ -697,7 +698,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       },
                       sx: {
                         '& .MuiInputBase-input': {
-                          fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                          fontSize: '14px',
                           cursor: 'pointer',
                         },
                         '& .MuiInputBase-root': {
@@ -799,7 +800,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       },
                       sx: {
                         '& .MuiInputBase-input': {
-                          fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                          fontSize: '14px',
                           cursor: 'pointer',
                         },
                         '& .MuiInputBase-root': {
@@ -876,7 +877,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
             {/* Interest Rate Period Selection */}
             <FormControl component="fieldset" size="small">
               <FormLabel component="legend" sx={{ 
-                fontSize: { xs: '14px', sm: '0.875rem' }, 
+                fontSize: '0.875rem', 
                 color: '#666', 
                 mb: 1 
               }}>
@@ -886,11 +887,6 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 row
                 value={interestPeriod}
                 onChange={(e) => handleInterestPeriodChange(e.target.value as 'monthly' | 'yearly')}
-                sx={{
-                  '& .MuiFormControlLabel-label': {
-                    fontSize: { xs: '14px', sm: '0.875rem' }
-                  }
-                }}
               >
                 <FormControlLabel 
                   value="monthly" 
@@ -960,12 +956,13 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
               }}
               inputProps={{
                 inputMode: 'decimal',
-                pattern: '[0-9]*\\.?[0-9]*'
+                pattern: '[0-9]*\\.?[0-9]*',
+                style: { fontSize: '16px' } // Prevent zoom on mobile
               }}
               placeholder="0.00"
               sx={{
                 '& .MuiInputBase-input': {
-                  fontSize: { xs: '16px', sm: '14px' }, // Prevent zoom on iOS
+                  fontSize: '13px',
                 }
               }}
             />
@@ -980,7 +977,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
               }}>
                 <Typography variant="body2" sx={{ 
                   color: '#B8941F', 
-                  fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                  fontSize: '0.8rem',
                   fontWeight: 'medium'
                 }}>
                   💡 Equivalent rate: {
@@ -991,7 +988,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 </Typography>
                 <Typography variant="body2" sx={{ 
                   color: '#666', 
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  fontSize: '0.75rem',
                   mt: 0.5,
                   fontStyle: 'italic'
                 }}>
@@ -1006,7 +1003,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
             {/* Interest Type Selection */}
             <FormControl component="fieldset" size="small">
               <FormLabel component="legend" sx={{ 
-                fontSize: { xs: '14px', sm: '0.875rem' }, 
+                fontSize: '0.875rem', 
                 color: '#666', 
                 mb: 1 
               }}>
@@ -1016,11 +1013,6 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 row
                 value={interestType}
                 onChange={(e) => setInterestType(e.target.value as 'simple' | 'compound')}
-                sx={{
-                  '& .MuiFormControlLabel-label': {
-                    fontSize: { xs: '14px', sm: '0.875rem' }
-                  }
-                }}
               >
                 <FormControlLabel 
                   value="simple" 
@@ -1071,11 +1063,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
           </Stack>
           
           {/* Reset Button */}
-          <Box sx={{ 
-            mt: { xs: 3, lg: 4 }, 
-            display: 'flex', 
-            justifyContent: 'flex-end' 
-          }}>
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               variant="outlined"
               size="small"
@@ -1088,9 +1076,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   backgroundColor: 'rgba(212, 175, 55, 0.04)',
                 },
                 fontWeight: 'medium',
-                px: { xs: 2, sm: 3 },
+                px: 3,
                 py: 1,
-                fontSize: { xs: '14px', sm: '0.875rem' },
+                fontSize: '0.875rem',
               }}
             >
               {t('reset')}
@@ -1106,7 +1094,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center',
-          mb: { xs: 2, lg: 3 }
+          mb: 3
         }}>
           <Typography variant="h5" sx={{ 
             color: '#8E5924',
@@ -1165,20 +1153,22 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
         <Box 
           id="interest-results-section"
           sx={{ 
-            mt: { xs: 2, lg: 3 }, 
-            p: { xs: 3, lg: 4 }, 
+            mt: 2, 
+            p: 4, 
             bgcolor: 'rgba(248, 246, 240, 0.8)',
             borderRadius: 2, 
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             border: '1px solid rgba(200, 117, 51, 0.3)',
             transition: 'all 0.3s ease',
-            minHeight: { xs: '300px', lg: '380px' }
+            minHeight: '400px',
+            height: 'auto',
+            overflow: 'hidden'
           }}>
           {(amount && startDate && endDate && interestRate && isValidDateRange) ? (
-            <Stack spacing={{ xs: 2.5, lg: 3 }}>
+            <Stack spacing={2}>
               {/* Summary Card */}
               <Box sx={{ 
-                p: { xs: 2.5, lg: 3 }, 
+                p: 2, 
                 bgcolor: 'rgba(212, 175, 55, 0.1)',
                 borderRadius: 1, 
                 borderLeft: '4px solid #D4AF37'
@@ -1187,21 +1177,21 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 <Box sx={{ 
                   display: 'grid', 
                   gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' },
-                  gap: { xs: 3, lg: 3.5 }
+                  gap: 2.5
                 }}>
                   {/* Principal */}
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" sx={{ 
                       color: '#666', 
-                      fontSize: { xs: '0.85rem', lg: '0.9rem' },
-                      mb: 0.8,
+                      fontSize: '0.9rem',
+                      mb: 0.5,
                       fontWeight: 'medium'
                     }}>
                       {t('principalAmount')}
                     </Typography>
                     <Typography variant="h6" sx={{ 
                       color: '#388E3C',
-                      fontSize: { xs: '1.1rem', lg: '1.2rem' },
+                      fontSize: '1.2rem',
                       fontWeight: 'bold'
                     }}>
                       ₹ {principalAmount ? formatIndianNumber(principalAmount) : '0.00'}
@@ -1212,15 +1202,15 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" sx={{ 
                       color: '#666', 
-                      fontSize: { xs: '0.85rem', lg: '0.9rem' },
-                      mb: 0.8,
+                      fontSize: '0.9rem',
+                      mb: 0.5,
                       fontWeight: 'medium'
                     }}>
                       {t('interestAmount')}
                     </Typography>
                     <Typography variant="h6" sx={{ 
                       color: '#F57C00',
-                      fontSize: { xs: '1.1rem', lg: '1.2rem' },
+                      fontSize: '1.2rem',
                       fontWeight: 'bold'
                     }}>
                       ₹ {interestAmount ? formatIndianNumber(interestAmount) : '0.00'}
@@ -1231,15 +1221,15 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" sx={{ 
                       color: '#666', 
-                      fontSize: { xs: '0.85rem', lg: '0.9rem' },
-                      mb: 0.8,
+                      fontSize: '0.9rem',
+                      mb: 0.5,
                       fontWeight: 'medium'
                     }}>
                       {t('totalAmount')}
                     </Typography>
                     <Typography variant="h5" sx={{ 
                       color: '#9c7c38',
-                      fontSize: { xs: '1.3rem', lg: '1.4rem' },
+                      fontSize: '1.4rem',
                       fontWeight: 'bold'
                     }}>
                       ₹ {totalAmount ? formatIndianNumber(totalAmount) : '0.00'}
@@ -1248,29 +1238,29 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 </Box>
               </Box>
 
-              {/* Calculation Details - Compact Layout */}
+              {/* Calculation Details and Daily Rate Info - Side by Side */}
               <Box sx={{ 
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', lg: '3fr 2fr' },
-                gap: { xs: 1.5, lg: 2 }
+                display: 'grid', 
+                gridTemplateColumns: { xs: '1fr' },
+                gap: 2
               }}>
-                {/* Calculation Info */}
+                {/* Calculation Details */}
                 <Box sx={{ 
-                  p: { xs: 1.5, lg: 2 }, 
+                  p: 1.2, 
                   bgcolor: 'rgba(33, 150, 243, 0.08)', 
                   borderRadius: 1, 
                   borderLeft: '3px solid #2196F3'
                 }}>
                   <Typography variant="subtitle2" sx={{ 
                     color: '#1976D2', 
-                    mb: 1,
-                    fontSize: { xs: '0.8rem', lg: '0.85rem' },
+                    mb: 0.5,
+                    fontSize: '0.8rem',
                     fontWeight: 'bold'
                   }}>
                     📊 {t('calculationDetails')}
                   </Typography>
                   
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.8, lg: 1 } }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
                     {timePeriod && (
                       <Chip 
                         label={`${timePeriod.years > 0 ? `${timePeriod.years} ${timePeriod.years === 1 ? t('year') : t('years')} ` : ''}${timePeriod.months > 0 ? `${timePeriod.months} ${timePeriod.months === 1 ? t('month') : t('months')} ` : ''}${timePeriod.days > 0 ? `${timePeriod.days} ${timePeriod.days === 1 ? t('day') : t('days')}` : ''}`.trim()}
@@ -1278,8 +1268,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                         sx={{ 
                           backgroundColor: 'rgba(33, 150, 243, 0.1)',
                           color: '#1976D2',
-                          fontSize: { xs: '0.7rem', lg: '0.75rem' },
-                          fontWeight: 'medium'
+                          fontSize: '0.7rem',
+                          fontWeight: 'medium',
+                          height: '24px'
                         }}
                       />
                     )}
@@ -1290,8 +1281,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       sx={{ 
                         backgroundColor: 'rgba(33, 150, 243, 0.1)',
                         color: '#1976D2',
-                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
-                        fontWeight: 'medium'
+                        fontSize: '0.7rem',
+                        fontWeight: 'medium',
+                        height: '24px'
                       }}
                     />
                     
@@ -1301,76 +1293,56 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       sx={{ 
                         backgroundColor: 'rgba(33, 150, 243, 0.1)',
                         color: '#1976D2',
-                        fontSize: { xs: '0.7rem', lg: '0.75rem' },
-                        fontWeight: 'medium'
+                        fontSize: '0.7rem',
+                        fontWeight: 'medium',
+                        height: '24px'
                       }}
                     />
+                    
+                    {/* Daily Rate Info */}
+                    {interestRate && principalAmount && (
+                      <Chip 
+                        label={`₹${(() => {
+                          const rate = Number(interestRate);
+                          const principal = Number(principalAmount);
+                          let yearlyRate: number;
+                          if (interestPeriod === 'yearly') {
+                            yearlyRate = rate;
+                          } else {
+                            yearlyRate = rate * 12;
+                          }
+                          const dailyRate = yearlyRate / 365;
+                          const dailyAmount = (principal * dailyRate) / 100;
+                          return formatIndianNumber(dailyAmount);
+                        })()} ${t('perDay')} (${(() => {
+                          const rate = Number(interestRate);
+                          let yearlyRate: number;
+                          if (interestPeriod === 'yearly') {
+                            yearlyRate = rate;
+                          } else {
+                            yearlyRate = rate * 12;
+                          }
+                          const dailyRate = yearlyRate / 365;
+                          return dailyRate.toFixed(4);
+                        })()}% ${t('dailyRate')})`}
+                        size="small"
+                        sx={{ 
+                          backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                          color: '#7B1FA2',
+                          fontSize: '0.7rem',
+                          fontWeight: 'medium',
+                          height: '24px'
+                        }}
+                      />
+                    )}
                   </Box>
                 </Box>
-
-                {/* Daily Rate Info */}
-                {interestRate && principalAmount && (
-                  <Box sx={{ 
-                    p: { xs: 1.5, lg: 2 }, 
-                    bgcolor: 'rgba(156, 39, 176, 0.08)', 
-                    borderRadius: 1, 
-                    borderLeft: '3px solid #9C27B0'
-                  }}>
-                    <Typography variant="subtitle2" sx={{ 
-                      color: '#7B1FA2', 
-                      mb: 1,
-                      fontSize: { xs: '0.8rem', lg: '0.85rem' },
-                      fontWeight: 'bold'
-                    }}>
-                      📅 {t('dailyInfo')}
-                    </Typography>
-                    
-                    <Typography variant="body2" sx={{ 
-                      fontSize: { xs: '0.75rem', lg: '0.8rem' },
-                      mb: 0.5,
-                      color: '#7B1FA2',
-                      fontWeight: 'medium'
-                    }}>
-                      <strong>₹ {(() => {
-                        const rate = Number(interestRate);
-                        const principal = Number(principalAmount);
-                        let yearlyRate: number;
-                        if (interestPeriod === 'yearly') {
-                          yearlyRate = rate;
-                        } else {
-                          yearlyRate = rate * 12;
-                        }
-                        const dailyRate = yearlyRate / 365;
-                        const dailyAmount = (principal * dailyRate) / 100;
-                        return formatIndianNumber(dailyAmount);
-                      })()}</strong> {t('perDay')}
-                    </Typography>
-                    
-                    <Typography variant="body2" sx={{ 
-                      fontSize: { xs: '0.65rem', lg: '0.7rem' },
-                      color: '#666',
-                      fontWeight: 'medium'
-                    }}>
-                      ({(() => {
-                        const rate = Number(interestRate);
-                        let yearlyRate: number;
-                        if (interestPeriod === 'yearly') {
-                          yearlyRate = rate;
-                        } else {
-                          yearlyRate = rate * 12;
-                        }
-                        const dailyRate = yearlyRate / 365;
-                        return dailyRate.toFixed(4);
-                      })()}% {t('dailyRate')})
-                    </Typography>
-                  </Box>
-                )}
               </Box>
 
               {/* Monthly Breakdown Toggle - Expanded */}
               {monthlyBreakdown.length > 0 && (
                 <Box sx={{ 
-                  p: { xs: 2, lg: 2.5 }, 
+                  p: 2, 
                   bgcolor: 'rgba(255, 152, 0, 0.08)', 
                   borderRadius: 1, 
                   borderLeft: '3px solid #FF9800'
@@ -1401,7 +1373,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                       />
                       <Typography variant="subtitle2" sx={{ 
                         color: '#F57C00', 
-                        fontSize: { xs: '0.9rem', lg: '0.95rem' },
+                        fontSize: '0.95rem',
                         fontWeight: 'bold'
                       }}>
                         {t('monthlyBreakdown')} ({interestType === 'simple' ? t('simpleInterest') : t('compoundInterest')})
@@ -1421,65 +1393,87 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                   
                   {/* Breakdown Table */}
                   <Collapse in={showBreakdown}>
-                    <Box sx={{ mt: 2 }}>
+                    <Box sx={{ mt: 1.5 }}>
                       <TableContainer 
                         component={Paper} 
                         sx={{ 
-                          maxHeight: 350, 
+                          height: monthlyBreakdown.length > 5 ? 180 : 'auto',
+                          maxHeight: 180,
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: '1px solid rgba(245, 124, 0, 0.2)',
+                          border: '2px solid rgba(245, 124, 0, 0.3)',
                           borderRadius: 1,
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                          '&::-webkit-scrollbar': {
+                            width: '6px',
+                          },
+                          '&::-webkit-scrollbar-track': {
+                            backgroundColor: 'rgba(245, 124, 0, 0.1)',
+                            borderRadius: '3px',
+                          },
+                          '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: '#FFB74D',
+                            borderRadius: '3px',
+                            '&:hover': {
+                              backgroundColor: '#FF9800',
+                            },
+                          },
                         }}
                       >
-                        <Table size="small" stickyHeader>
+                        <Table size="small" stickyHeader sx={{ tableLayout: 'fixed', width: '100%' }}>
                           <TableHead>
                             <TableRow>
                               <TableCell sx={{ 
                                 fontWeight: 'bold', 
                                 backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
-                                py: 1.2,
-                                borderBottom: '2px solid #FFB74D'
+                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' }, 
+                                py: { xs: 0.15, sm: 0.25, md: 0.3 },
+                                px: { xs: 0.1, sm: 0.25, md: 0.3 },
+                                borderBottom: '2px solid #FFB74D',
+                                borderRight: '1px solid #FFB74D',
+                                width: { xs: '33px', sm: '60px', md: '70px' },
+                                textAlign: 'center',
+                                lineHeight: 1.0
                               }}>
-                                Month
+                                Month<br />Year
                               </TableCell>
-                              <TableCell align="right" sx={{ 
+                              <TableCell align="center" sx={{ 
                                 fontWeight: 'bold', 
                                 backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
-                                py: 1.2,
-                                borderBottom: '2px solid #FFB74D'
+                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' }, 
+                                py: { xs: 0.15, sm: 0.25, md: 0.3 },
+                                px: { xs: 0.1, sm: 0.25, md: 0.3 },
+                                borderBottom: '2px solid #FFB74D',
+                                borderRight: '1px solid #FFB74D',
+                                width: { xs: '20px', sm: '35px', md: '40px' },
+                                lineHeight: 1.0
                               }}>
                                 Days
                               </TableCell>
-                              <TableCell align="right" sx={{ 
+                              <TableCell align="center" sx={{ 
                                 fontWeight: 'bold', 
                                 backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
-                                py: 1.2,
-                                borderBottom: '2px solid #FFB74D'
-                              }}>
-                                Principal
-                              </TableCell>
-                              <TableCell align="right" sx={{ 
-                                fontWeight: 'bold', 
-                                backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
-                                py: 1.2,
-                                borderBottom: '2px solid #FFB74D'
-                              }}>
-                                Monthly Interest
-                              </TableCell>
-                              <TableCell align="right" sx={{ 
-                                fontWeight: 'bold', 
-                                backgroundColor: '#FFF3E0', 
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' }, 
-                                py: 1.2,
+                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' }, 
+                                py: { xs: 0.15, sm: 0.25, md: 0.3 },
+                                px: { xs: 0.1, sm: 0.25, md: 0.3 },
                                 borderBottom: '2px solid #FFB74D',
-                                color: '#F57C00'
+                                borderRight: '1px solid #FFB74D',
+                                width: { xs: '38px', sm: '70px', md: '85px' },
+                                lineHeight: 1.0
                               }}>
-                                Total Interest
+                                Principal<br />Amount
+                              </TableCell>
+                              <TableCell align="center" sx={{ 
+                                fontWeight: 'bold', 
+                                backgroundColor: '#FFF3E0', 
+                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' }, 
+                                py: { xs: 0.15, sm: 0.25, md: 0.3 },
+                                px: { xs: 0.1, sm: 0.25, md: 0.3 },
+                                borderBottom: '2px solid #FFB74D',
+                                borderRight: '1px solid #FFB74D',
+                                width: { xs: '38px', sm: '70px', md: '85px' },
+                                lineHeight: 1.0
+                              }}>
+                                Monthly<br />Interest
                               </TableCell>
                             </TableRow>
                           </TableHead>
@@ -1498,92 +1492,108 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                                   }
                                 }}
                               >
-                                <TableCell sx={{ 
-                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
-                                  py: 1,
+                                <TableCell align="center" sx={{ 
+                                  fontSize: { xs: '0.45rem', sm: '0.55rem', md: '0.65rem' }, 
+                                  py: { xs: 0.05, sm: 0.1, md: 0.15 },
+                                  px: { xs: 0.1, sm: 0.15, md: 0.2 },
                                   fontWeight: 'medium',
-                                  color: '#424242'
+                                  color: '#424242',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  borderRight: '1px solid rgba(245, 124, 0, 0.2)',
+                                  borderBottom: '1px solid rgba(245, 124, 0, 0.1)'
                                 }}>
                                   {month.month} {month.year}
                                 </TableCell>
-                                <TableCell align="right" sx={{ 
-                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
-                                  py: 1,
-                                  color: '#666'
+                                <TableCell align="center" sx={{ 
+                                  fontSize: { xs: '0.45rem', sm: '0.55rem', md: '0.65rem' }, 
+                                  py: { xs: 0.05, sm: 0.1, md: 0.15 },
+                                  px: { xs: 0.1, sm: 0.15, md: 0.2 },
+                                  color: '#666',
+                                  borderRight: '1px solid rgba(245, 124, 0, 0.2)',
+                                  borderBottom: '1px solid rgba(245, 124, 0, 0.1)'
                                 }}>
                                   {month.daysInMonth}
                                 </TableCell>
-                                <TableCell align="right" sx={{ 
-                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
-                                  py: 1,
+                                <TableCell align="center" sx={{ 
+                                  fontSize: { xs: '0.45rem', sm: '0.55rem', md: '0.65rem' }, 
+                                  py: { xs: 0.05, sm: 0.1, md: 0.15 },
+                                  px: { xs: 0.1, sm: 0.15, md: 0.2 },
                                   color: '#2E7D32',
-                                  fontWeight: 'medium'
+                                  fontWeight: 'medium',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  borderRight: '1px solid rgba(245, 124, 0, 0.2)',
+                                  borderBottom: '1px solid rgba(245, 124, 0, 0.1)'
                                 }}>
-                                  ₹ {formatIndianNumber(month.principalForCalculation)}
+                                  ₹{formatIndianNumber(month.principalForCalculation)}
                                 </TableCell>
-                                <TableCell align="right" sx={{ 
-                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
-                                  py: 1,
+                                <TableCell align="center" sx={{ 
+                                  fontSize: { xs: '0.45rem', sm: '0.55rem', md: '0.65rem' }, 
+                                  py: { xs: 0.05, sm: 0.1, md: 0.15 },
+                                  px: { xs: 0.1, sm: 0.15, md: 0.2 },
                                   color: '#1976D2',
-                                  fontWeight: 'medium'
+                                  fontWeight: 'medium',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  borderBottom: '1px solid rgba(245, 124, 0, 0.1)'
                                 }}>
-                                  ₹ {formatIndianNumber(month.monthlyInterest)}
-                                </TableCell>
-                                <TableCell align="right" sx={{ 
-                                  fontSize: { xs: '0.7rem', lg: '0.75rem' }, 
-                                  py: 1, 
-                                  fontWeight: 'bold',
-                                  color: '#F57C00',
-                                  backgroundColor: index === monthlyBreakdown.length - 1 ? 'rgba(245, 124, 0, 0.1)' : 'transparent'
-                                }}>
-                                  ₹ {formatIndianNumber(month.cumulativeInterest)}
+                                  ₹{formatIndianNumber(month.monthlyInterest)}
                                 </TableCell>
                               </TableRow>
                             ))}
                             {/* Summary Row */}
                             <TableRow sx={{ 
-                              backgroundColor: 'rgba(245, 124, 0, 0.15)',
-                              borderTop: '2px solid #FFB74D'
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              borderTop: '2px solid #FFB74D',
+                              position: 'sticky',
+                              bottom: 0,
+                              zIndex: 10,
+                              boxShadow: '0 -2px 8px rgba(0,0,0,0.15)',
+                              backdropFilter: 'blur(4px)'
                             }}>
-                              <TableCell sx={{ 
-                                fontWeight: 'bold',
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' },
-                                py: 1.2,
-                                color: '#E65100'
+                              <TableCell align="center" sx={{ 
+                                fontWeight: 'medium',
+                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
+                                py: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                px: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                color: '#1B5E20',
+                                borderRight: '1px solid #FFB74D'
                               }}>
                                 Total
                               </TableCell>
-                              <TableCell align="right" sx={{ 
-                                fontWeight: 'bold',
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' },
-                                py: 1.2,
-                                color: '#E65100'
+                              <TableCell align="center" sx={{ 
+                                fontWeight: 'medium',
+                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
+                                py: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                px: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                color: '#1B5E20',
+                                borderRight: '1px solid #FFB74D'
                               }}>
                                 {monthlyBreakdown.reduce((sum, month) => sum + month.daysInMonth, 0)}
                               </TableCell>
-                              <TableCell align="right" sx={{ 
-                                fontWeight: 'bold',
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' },
-                                py: 1.2,
-                                color: '#E65100'
+                              <TableCell align="center" sx={{ 
+                                fontWeight: 'medium',
+                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
+                                py: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                px: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                color: '#1B5E20',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                borderRight: '1px solid #FFB74D'
                               }}>
-                                ₹ {principalAmount ? formatIndianNumber(principalAmount) : '0.00'}
+                                ₹{principalAmount ? formatIndianNumber(principalAmount) : '0.00'}
                               </TableCell>
-                              <TableCell align="right" sx={{ 
-                                fontWeight: 'bold',
-                                fontSize: { xs: '0.75rem', lg: '0.8rem' },
-                                py: 1.2,
-                                color: '#E65100'
+                              <TableCell align="center" sx={{ 
+                                fontWeight: 'medium',
+                                fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
+                                py: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                px: { xs: 0.1, sm: 0.2, md: 0.25 },
+                                color: '#1B5E20',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
                               }}>
-                                ₹ {interestAmount ? formatIndianNumber(interestAmount) : '0.00'}
-                              </TableCell>
-                              <TableCell align="right" sx={{ 
-                                fontWeight: 'bold',
-                                fontSize: { xs: '0.8rem', lg: '0.85rem' },
-                                py: 1.2,
-                                color: '#E65100'
-                              }}>
-                                ₹ {interestAmount ? formatIndianNumber(interestAmount) : '0.00'}
+                                ₹{interestAmount ? formatIndianNumber(interestAmount) : '0.00'}
                               </TableCell>
                             </TableRow>
                           </TableBody>
@@ -1597,8 +1607,8 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
           ) : (
             <Typography variant="body1" color="textSecondary" sx={{ 
               textAlign: 'center', 
-              mt: { xs: 6, lg: 8 },
-              fontSize: { xs: '0.875rem', lg: '1rem' }
+              mt: 8,
+              fontSize: '1rem'
             }}>
               {t('enterAllValues')}
             </Typography>
