@@ -54,6 +54,7 @@ interface MonthlyBreakdown {
   monthNumber: number;
   year: number;
   daysInMonth: number;
+  principalForCalculation: number; // Amount on which interest is calculated
   monthlyInterest: number;
   cumulativeInterest: number;
   totalAmount: number;
@@ -320,62 +321,88 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
 
     try {
       const breakdown: MonthlyBreakdown[] = [];
-      let current = start.clone();
+      let current = start.clone().startOf('month');
       let cumulativeInterest = 0;
       let currentPrincipal = principal;
+      
+      // Add 1 day to end date to include the end date in calculation (inclusive)
+      const adjustedEnd = end.add(1, 'day');
     
-    while (current.isBefore(end, 'month') || current.isSame(end, 'month')) {
-      const monthStart = current.startOf('month');
-      const monthEnd = current.endOf('month');
-      
-      // Determine the actual start and end dates for this month
-      const actualStart = current.isSame(start, 'month') ? start : monthStart;
-      const actualEnd = current.isSame(end, 'month') ? end : monthEnd;
-      
-      // Calculate days in this month for the interest period
-      let daysInMonth = actualEnd.diff(actualStart, 'day') + 1;
-      
-      // Apply rounding logic if enabled
-      let timeMultiplier: number;
-      if (applyRounding) {
-        if (daysInMonth >= 15) {
-          daysInMonth = current.daysInMonth(); // Consider full month
-        } else if (daysInMonth > 0) {
-          daysInMonth = current.daysInMonth() / 2; // Consider half month
+      while (current.isBefore(adjustedEnd, 'month') || current.isSame(adjustedEnd, 'month')) {
+        const monthStart = current.startOf('month');
+        const monthEnd = current.endOf('month');
+        
+        // Determine the actual start and end dates for this month
+        const actualStart = current.isSame(start, 'month') ? start : monthStart;
+        const actualEnd = current.isSame(adjustedEnd, 'month') ? adjustedEnd.subtract(1, 'day') : monthEnd;
+        
+        // Skip if the actual end is before actual start (shouldn't happen but safety check)
+        if (actualEnd.isBefore(actualStart)) {
+          current = current.add(1, 'month');
+          continue;
         }
+        
+        // Calculate days in this month for the interest period
+        let daysInMonth = actualEnd.diff(actualStart, 'day') + 1;
+        
+        // Ensure we don't exceed the total days in the month
+        const totalDaysInMonth = current.daysInMonth();
+        daysInMonth = Math.min(daysInMonth, totalDaysInMonth);
+        
+        // Apply rounding logic if enabled
+        let effectiveDays = daysInMonth;
+        if (applyRounding) {
+          // Only count days if they're >= 15, otherwise they're ignored (rounded down)
+          // This matches the calculateTimeDifference rounding logic
+          if (daysInMonth >= 15) {
+            effectiveDays = totalDaysInMonth; // Consider full month
+          } else {
+            effectiveDays = 0; // Ignore days < 15 when rounding is enabled
+          }
+        }
+        
+        // Calculate per-day interest rate (always convert to yearly first, then to daily)
+        let yearlyRate: number;
+        if (period === 'yearly') {
+          yearlyRate = rate; // Already yearly
+        } else {
+          yearlyRate = rate * 12; // Convert monthly to yearly
+        }
+        
+        // Always use yearly rate to calculate daily rate
+        const dailyRate = yearlyRate / 365; // Yearly rate ÷ 365 days
+        
+        let monthlyInterest: number;
+        let principalForThisMonth: number;
+        
+        if (type === 'simple') {
+          // Simple interest: (Principal × Daily Rate × Days) ÷ 100
+          // Always calculated on original principal
+          principalForThisMonth = principal;
+          monthlyInterest = (principal * dailyRate * effectiveDays) / 100;
+        } else {
+          // Compound interest: (Current Principal × Daily Rate × Days) ÷ 100
+          // Calculated on current principal (principal + accumulated interest)
+          principalForThisMonth = currentPrincipal;
+          monthlyInterest = (currentPrincipal * dailyRate * effectiveDays) / 100;
+          currentPrincipal += monthlyInterest; // Add interest to principal for next calculation
+        }
+        
+        cumulativeInterest += monthlyInterest;
+        
+        breakdown.push({
+          month: current.format('MMM'),
+          monthNumber: current.month() + 1,
+          year: current.year(),
+          daysInMonth: Math.round(daysInMonth),
+          principalForCalculation: principalForThisMonth,
+          monthlyInterest,
+          cumulativeInterest,
+          totalAmount: principal + cumulativeInterest
+        });
+        
+        current = current.add(1, 'month');
       }
-      
-      // Calculate time multiplier and effective rate for monthly calculation
-      const totalDaysInMonth = current.daysInMonth();
-      timeMultiplier = daysInMonth / totalDaysInMonth;
-      
-      // Convert rate to monthly equivalent if needed
-      const effectiveRate = period === 'yearly' ? rate / 12 : rate;
-      
-      let monthlyInterest: number;
-      if (type === 'simple') {
-        // Simple interest: always calculated on original principal
-        monthlyInterest = (principal * effectiveRate * timeMultiplier) / 100;
-      } else {
-        // Compound interest: calculated on current principal (principal + accumulated interest)
-        monthlyInterest = (currentPrincipal * effectiveRate * timeMultiplier) / 100;
-        currentPrincipal += monthlyInterest; // Add interest to principal for next calculation
-      }
-      
-      cumulativeInterest += monthlyInterest;
-      
-      breakdown.push({
-        month: current.format('MMM'),
-        monthNumber: current.month() + 1,
-        year: current.year(),
-        daysInMonth: Math.round(daysInMonth),
-        monthlyInterest,
-        cumulativeInterest,
-        totalAmount: principal + cumulativeInterest
-      });
-      
-      current = current.add(1, 'month');
-    }
     
     return breakdown;
     } catch (error) {
@@ -434,40 +461,34 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     setTimePeriod(timeDiff);
     setPrincipalAmount(principal);
 
-    // Convert time to the selected period with optional rounding logic
-    let timeInSelectedPeriod: number;
+    // Calculate interest using the same method as monthly breakdown for consistency
+    // Always convert to yearly rate first, then to daily rate
+    let yearlyRate: number;
     if (interestPeriod === 'yearly') {
-      if (useRounding) {
-        // Apply rounding logic: days < 15 = 0.5 month, days >= 15 already rounded up to full month
-        const adjustedDays = timeDiff.days > 0 && timeDiff.days < 15 ? 0.5 : 0;
-        timeInSelectedPeriod = timeDiff.years + ((timeDiff.months + adjustedDays) / 12);
-      } else {
-        // Use exact calculation without rounding
-        timeInSelectedPeriod = timeDiff.years + (timeDiff.months / 12) + (timeDiff.days / 365);
-      }
+      yearlyRate = rate; // Already yearly
     } else {
-      if (useRounding) {
-        // For monthly period with rounding
-        const adjustedDays = timeDiff.days > 0 && timeDiff.days < 15 ? 0.5 : 0;
-        timeInSelectedPeriod = (timeDiff.years * 12) + timeDiff.months + adjustedDays;
-      } else {
-        // Use exact calculation without rounding
-        timeInSelectedPeriod = (timeDiff.years * 12) + timeDiff.months + (timeDiff.days / 30);
-      }
+      yearlyRate = rate * 12; // Convert monthly to yearly
     }
+    
+    // Calculate daily rate (always from yearly)
+    const dailyRate = yearlyRate / 365;
 
     let interest: number;
     let total: number;
 
     if (interestType === 'simple') {
-      // Simple Interest Formula: SI = (P * R * T) / 100
-      interest = (principal * rate * timeInSelectedPeriod) / 100;
+      // For simple interest, use the same approach as the monthly breakdown for consistency
+      const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, useRounding);
+      const totalInterestFromBreakdown = breakdown.reduce((sum, month) => sum + month.monthlyInterest, 0);
+      interest = totalInterestFromBreakdown;
       total = principal + interest;
     } else {
-      // Compound Interest Formula: CI = P * (1 + R/100)^T - P
-      const compoundFactor = Math.pow(1 + (rate / 100), timeInSelectedPeriod);
-      total = principal * compoundFactor;
-      interest = total - principal;
+      // For compound interest, we need to sum up the monthly breakdown
+      // since daily compounding is complex to calculate directly
+      const breakdown = calculateMonthlyBreakdown(principal, rate, startDate, endDate, interestPeriod, interestType, useRounding);
+      const totalInterestFromBreakdown = breakdown.reduce((sum, month) => sum + month.monthlyInterest, 0);
+      interest = totalInterestFromBreakdown;
+      total = principal + interest;
     }
 
     setInterestAmount(interest);
@@ -1197,6 +1218,59 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 </Box>
               )}
 
+              {/* Daily Rate Information */}
+              {interestRate && principalAmount && (
+                <Box sx={{ 
+                  p: { xs: 1.5, lg: 2 }, 
+                  bgcolor: 'rgba(156, 39, 176, 0.1)', 
+                  borderRadius: 1, 
+                  borderLeft: '4px solid #9C27B0'
+                }}>
+                  <Typography variant="h6" sx={{ 
+                    color: '#7B1FA2', 
+                    mb: 1,
+                    fontSize: { xs: '1rem', lg: '1.25rem' }
+                  }}>
+                    Daily Interest Amount
+                  </Typography>
+                  <Typography variant="body1" sx={{
+                    fontSize: { xs: '0.875rem', lg: '1rem' }
+                  }}>
+                    {(() => {
+                      const rate = Number(interestRate);
+                      const principal = Number(principalAmount);
+                      let yearlyRate: number;
+                      if (interestPeriod === 'yearly') {
+                        yearlyRate = rate;
+                      } else {
+                        yearlyRate = rate * 12;
+                      }
+                      const dailyRate = yearlyRate / 365;
+                      const dailyAmount = (principal * dailyRate) / 100;
+                      return `₹ ${formatIndianNumber(dailyAmount)} per day`;
+                    })()}
+                  </Typography>
+                  <Typography variant="body2" sx={{ 
+                    color: '#666', 
+                    mt: 0.5, 
+                    fontStyle: 'italic',
+                    fontSize: { xs: '0.75rem', lg: '0.8rem' }
+                  }}>
+                    * Daily rate: {(() => {
+                      const rate = Number(interestRate);
+                      let yearlyRate: number;
+                      if (interestPeriod === 'yearly') {
+                        yearlyRate = rate;
+                      } else {
+                        yearlyRate = rate * 12;
+                      }
+                      const dailyRate = yearlyRate / 365;
+                      return `${dailyRate.toFixed(6)}%`;
+                    })()} ({interestPeriod === 'yearly' ? `${interestRate}% yearly` : `${Number(interestRate) * 12}% yearly`} ÷ 365 days)
+                  </Typography>
+                </Box>
+              )}
+
               {/* Principal Amount */}
               <Box sx={{ 
                 p: { xs: 1.5, lg: 2 }, 
@@ -1339,6 +1413,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                               Days
                             </TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
+                              Principal Amount
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
                               Monthly Interest
                             </TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: '#FFF3E0' }}>
@@ -1364,6 +1441,9 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                               </TableCell>
                               <TableCell align="right" sx={{ fontSize: '0.8rem' }}>
                                 {month.daysInMonth}
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontSize: '0.8rem' }}>
+                                ₹ {formatIndianNumber(month.principalForCalculation)}
                               </TableCell>
                               <TableCell align="right" sx={{ fontSize: '0.8rem' }}>
                                 ₹ {formatIndianNumber(month.monthlyInterest)}
