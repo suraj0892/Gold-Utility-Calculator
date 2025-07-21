@@ -69,7 +69,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs()); // Current date as default
   const [interestRate, setInterestRate] = useState<number | string>('');
-  const [interestPeriod, setInterestPeriod] = useState<'monthly' | 'yearly'>('yearly');
+  const [interestPeriod, setInterestPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [interestType, setInterestType] = useState<'simple' | 'compound'>('simple');
   // Feature toggle: Time Period Rounding is disabled
   const [useRounding, setUseRounding] = useState<boolean>(false);
@@ -525,7 +525,7 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
     setStartDate(null);
     setEndDate(dayjs());
     setInterestRate('');
-    setInterestPeriod('yearly');
+    setInterestPeriod('monthly');
     setInterestType('simple');
     // useRounding is always false (feature toggle disabled)
     // setUseRounding(false);
@@ -894,14 +894,14 @@ const InterestCalculator: React.FC<InterestCalculatorProps> = ({ onReset }) => {
                 }}
               >
                 <FormControlLabel 
-                  value="yearly" 
-                  control={<Radio size="small" />} 
-                  label={t('perYear')} 
-                />
-                <FormControlLabel 
                   value="monthly" 
                   control={<Radio size="small" />} 
                   label={t('perMonth')} 
+                />
+                <FormControlLabel 
+                  value="yearly" 
+                  control={<Radio size="small" />} 
+                  label={t('perYear')} 
                 />
               </RadioGroup>
             </FormControl>
